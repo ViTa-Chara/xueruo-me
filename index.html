@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="XueRuoMi — xueruo.me" />
+  <title>xueruo.me</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <header class="top">
+    <a class="mark" href="/">xueruo.me</a>
+    <nav>
+      <a href="#about">关于</a>
+      <a href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Personal site</p>
+      <h1>XueRuoMi</h1>
+      <p class="lede">在这里放想法、项目，和一点点日常。</p>
+      <div class="actions">
+        <a class="btn primary" href="#about">了解更多</a>
+        <a class="btn ghost" href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">看 GitHub</a>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <h2>关于</h2>
+      <p>
+        你好，我是 XueRuoMi。这是挂在 <strong>xueruo.me</strong> 上的个人主页，
+        文案可以随时换成你想说的话。
+      </p>
+      <ul class="facts">
+        <li>Engineering · 喜欢把东西做出来</li>
+        <li>喜欢维他柠檬茶</li>
+        <li>域名托管在 Cloudflare</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>© <span id="y"></span> XueRuoMi · <a href="https://xueruo.me">xueruo.me</a></p>
+  </footer>
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
