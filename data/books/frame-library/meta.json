@@ -1,9 +1,9 @@
 {
   "id": "frame-library",
   "title": "抽帧图书馆",
-  "genre": "赛博悬疑",
-  "blurb": "地下有一座抽帧图书馆，把人生视频截成壁纸色调帧。有人从帧里看见别人的视野疾病；线条与网格交错，infinity 柜收纳一切做过的事。",
+  "genre": "硬科幻 / 赛博悬疑",
+  "blurb": "地下抽帧图书馆把人生截成色调帧。整理员观以为整理是中立的，直到访客林可要找回被删的失败之日，而 Infinity 要把一切做过的事——连同未来——提前抽成可替换壁纸。",
   "coverColor": "#282923",
-  "chapterCount": 25,
-  "charCount": 55413
+  "chapterCount": 40,
+  "charCount": 129565
 }
