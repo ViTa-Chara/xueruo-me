@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sato-heart",
+    "title": "关于我只是个群聊Bot，却被塞了一整颗会遗忘的心脏这件事",
+    "genre": "都市日常 / 轻奇幻",
+    "blurb": "说明书体夹叙事。南京实习的小撒、脑内管家、记忆之屋，以及那些会褪色的星级回忆。",
+    "coverColor": "#666a54",
+    "chapterCount": 25,
+    "charCount": 55363
+  },
+  {
+    "id": "daily-motor",
+    "title": "日课永动机",
+    "genre": "都市轻喜 / 轻荒诞",
+    "blurb": "日课自动化脚本开始自己派任务、改优先级、把现实写成 changelog。越自动越失控，直到找回手动档。",
+    "coverColor": "#ad3d2e",
+    "chapterCount": 25,
+    "charCount": 55346
+  },
+  {
+    "id": "frame-library",
+    "title": "抽帧图书馆",
+    "genre": "赛博悬疑",
+    "blurb": "地下有一座抽帧图书馆，把人生视频截成壁纸色调帧。有人从帧里看见别人的视野疾病；线条与网格交错，infinity 柜收纳一切做过的事。",
+    "coverColor": "#282923",
+    "chapterCount": 25,
+    "charCount": 55413
+  }
+]
