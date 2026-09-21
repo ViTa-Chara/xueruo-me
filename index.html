@@ -1,55 +1,235 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="XueRuoMi — xueruo.me" />
-  <title>xueruo.me</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#efede6">
+<meta name="description" content="薛若米的个人空间。线条之外，还有一个小小的世界。书库收录三部连载。">
+<title>薛若米 / xueruo.me</title>
+<link rel="stylesheet" href="./css/site.css">
 </head>
-<body>
-  <div class="bg" aria-hidden="true"></div>
-  <header class="top">
-    <a class="mark" href="/">xueruo.me</a>
-    <nav>
-      <a href="#about">关于</a>
-      <a href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">GitHub</a>
+<body id="top">
+<div class="page">
+
+  <header class="header">
+    <a href="./index.html" class="identity" aria-label="薛若米，返回首页">
+      <span class="identity-symbol" aria-hidden="true">米</span>
+      <span class="identity-name">
+        薛若米
+        <small>THE PERSONAL EDITION</small>
+      </span>
+    </a>
+    <div class="header-center">
+      <span class="tiny-star" aria-hidden="true">✳</span>
+      A SMALL WORLD, CAREFULLY FOLDED.
+    </div>
+    <nav class="nav" aria-label="主导航">
+      <a href="#library">书库 ↘</a>
+      <a href="#elsewhere">找到我 ↘</a>
+      <a href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </nav>
   </header>
 
   <main>
-    <section class="hero">
-      <p class="eyebrow">Personal site</p>
-      <h1>XueRuoMi</h1>
-      <p class="lede">在这里放想法、项目，和一点点日常。</p>
-      <div class="actions">
-        <a class="btn primary" href="#about">了解更多</a>
-        <a class="btn ghost" href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">看 GitHub</a>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="issue">
+          <span class="issue-line" aria-hidden="true"></span>
+          <span>PERSONAL EDITION</span>
+          <span>—</span>
+          <span>NO. 001 / 薛若米</span>
+        </div>
+        <h1 class="hero-title" id="hero-title" aria-label="薛若米 Xue Ruomi">
+          <span aria-hidden="true">Xue</span>
+          <span class="second-line" aria-hidden="true">Ruomi.</span>
+        </h1>
+        <div class="name-row">
+          <span class="cn-name">薛若米</span>
+          <span class="name-rule" aria-hidden="true"></span>
+          <span class="name-pronunciation">/ xuē ruò mǐ /</span>
+        </div>
+        <p class="hero-description">
+          线条之外，还有一个小小的世界。<br>
+          这里是我的一角，<em>也是与你相遇的一页。</em>
+        </p>
+        <a class="primary-link" href="#library">
+          翻开书库 · 三部连载
+          <span class="link-arrow" aria-hidden="true">↗</span>
+        </a>
+        <div class="copy-sidenote">
+          A PORTRAIT, A FEW LINKS, AND A LITTLE CURIOSITY.
+        </div>
       </div>
+
+      <div class="art-area" id="artArea">
+        <div class="stage-fit" id="stageFit">
+          <div class="perspective">
+            <div class="scene" id="scene">
+              <div class="layer archive-board" aria-hidden="true">
+                <div class="board-top">THE RUOMI ARCHIVE</div>
+                <div class="board-type">between<br>the lines.</div>
+              </div>
+              <div class="layer manuscript" aria-hidden="true">
+                <div class="manuscript-note">a world of my own.</div>
+              </div>
+              <div class="layer portrait-paper">
+                <span class="registration reg-one" aria-hidden="true"></span>
+                <img class="portrait-image" src="https://raw.githubusercontent.com/ViTa-Chara/vita-chara.github.io/main/ruomi.png"
+                  alt="薛若米的手绘立绘：戴着眼镜，留着长双尾，穿高领毛衣与长裙，举起一根手指。"
+                  width="900" height="1350" fetchpriority="high" decoding="async">
+                <div class="portrait-bottom" aria-hidden="true">
+                  <span>FIG. 01 — XUE RUOMI</span>
+                  <span>ORIGINAL CHARACTER DRAWING</span>
+                </div>
+                <span class="registration reg-two" aria-hidden="true"></span>
+              </div>
+              <div class="layer tape" aria-hidden="true"></div>
+              <div class="layer index-tag" aria-hidden="true">
+                <div class="small">PERSONAL<br>COLLECTION</div>
+                <div class="number">01</div>
+              </div>
+              <div class="layer floating-caption" aria-hidden="true">
+                <div class="caption-top">
+                  <span>A LITTLE INTRODUCTION</span>
+                  <span>↗</span>
+                </div>
+                <div class="caption-title">
+                  <span>薛若米</span>
+                  <span>hello.</span>
+                </div>
+              </div>
+              <div class="layer seal" aria-hidden="true">
+                <svg viewBox="0 0 100 100">
+                  <defs>
+                    <path id="sealCircle" d="M50 50m-36 0a36 36 0 1 1 72 0a36 36 0 1 1-72 0"/>
+                  </defs>
+                  <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width=".7"/>
+                  <circle cx="50" cy="50" r="29" fill="none" stroke="currentColor" stroke-width=".7"/>
+                  <text fill="currentColor" font-size="7.1" font-family="Arial, sans-serif" letter-spacing="2.2">
+                    <textPath href="#sealCircle">XUE RUOMI · A WORLD OF MY OWN ·</textPath>
+                  </text>
+                  <path d="M50 31v38M31 50h38M37 37l26 26M37 63l26-26" stroke="currentColor" stroke-width="1.2"/>
+                  <circle cx="50" cy="50" r="7" fill="#efede6" stroke="currentColor"/>
+                </svg>
+              </div>
+              <svg class="layer scribble" viewBox="0 0 120 80" fill="none" aria-hidden="true">
+                <path d="M9 51C28 16 72 12 81 27 92 47 24 73 20 48 17 28 73 29 103 51 M91 37l14 15-21 2"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="art-meta">
+          <span class="art-meta-label">FIG. 01 / 鼠标轻移，看看纸张的另一面</span>
+          <button class="explode-button" id="explodeButton" type="button" aria-pressed="false" aria-controls="scene">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <span id="explodeLabel">展开纸层</span>
+          </button>
+        </div>
+      </div>
+      <div class="hero-edge" aria-hidden="true">A STUDY IN PAPER, LINES & PERSONALITY — 001</div>
     </section>
 
-    <section id="about" class="about">
-      <h2>关于</h2>
-      <p>
-        你好，我是 XueRuoMi。这是挂在 <strong>xueruo.me</strong> 上的个人主页，
-        文案可以随时换成你想说的话。
-      </p>
-      <ul class="facts">
-        <li>Engineering · 喜欢把东西做出来</li>
-        <li>喜欢维他柠檬茶</li>
-        <li>域名托管在 Cloudflare</li>
-      </ul>
+    <div class="editorial-strip">
+      <span class="strip-label">A NOTE IN THE MARGIN / 页边小记</span>
+      <p class="strip-quote">Not just lines. <em>A little world.</em></p>
+      <div class="strip-end">
+        <span>不止于线条。</span>
+        <span aria-hidden="true">✳</span>
+      </div>
+    </div>
+
+    <section class="library-section" id="library" aria-labelledby="library-title">
+      <div class="section-label">01 / THE PAPER LIBRARY</div>
+      <h2 class="library-heading" id="library-title">书库 · <em>三部连载</em></h2>
+      <p class="library-lead">说明书体、日课失控、抽帧悬疑——从仓库里长出来的故事，可以一直往下读。</p>
+      <div class="book-grid" id="bookGrid">
+        <!-- filled by inline script from books.json -->
+      </div>
+      <p style="margin-top:8px"><a class="primary-link" href="./library.html">完整书架 · library.html <span class="link-arrow" aria-hidden="true">↗</span></a></p>
+    </section>
+
+    <section class="connections" id="elsewhere" aria-labelledby="connections-title">
+      <div class="connections-intro">
+        <div class="section-label">02 / ELSEWHERE ON THE INTERNET</div>
+        <h2 id="connections-title">
+          故事的<span class="serif"> other side.</span><br>
+          在这些地方继续。
+        </h2>
+        <p>从这一页出发。<br>去看看书库、B 站空间，或是 GitHub 上的另一面。</p>
+      </div>
+      <div class="link-list">
+        <a class="destination" href="./library.html">
+          <span class="destination-number">01</span>
+          <span>
+            <span class="destination-title">书库</span>
+            <span class="destination-meta">
+              <span>三部连载 / 无限阅读</span>
+              <span>xueruo.me/library</span>
+            </span>
+          </span>
+          <span class="destination-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="destination" href="https://space.bilibili.com/204339779" target="_blank" rel="noopener noreferrer">
+          <span class="destination-number">02</span>
+          <span>
+            <span class="destination-title">Bilibili</span>
+            <span class="destination-meta">
+              <span>哔哩哔哩 / 个人空间</span>
+              <span>UID 204339779</span>
+            </span>
+          </span>
+          <span class="destination-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="destination" href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">
+          <span class="destination-number">03</span>
+          <span>
+            <span class="destination-title">GitHub</span>
+            <span class="destination-meta">
+              <span>代码 / 个人主页</span>
+              <span>@ViTa-Chara</span>
+            </span>
+          </span>
+          <span class="destination-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>© <span id="y"></span> XueRuoMi · <a href="https://xueruo.me">xueruo.me</a></p>
+  <footer class="footer">
+    <span class="footer-name">薛若米 <span style="color:var(--red)">✳</span></span>
+    <span>© <span id="year">2026</span> XueRuoMi · xueruo.me</span>
+    <a href="#top">回到这一页的开头 ↑</a>
   </footer>
-  <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
-  </script>
+</div>
+<script src="./js/collage.js"></script>
+<script>
+(async () => {
+  const grid = document.getElementById('bookGrid');
+  try {
+    const books = await (await fetch('./data/books.json')).json();
+    grid.innerHTML = books.map((b, i) => `
+      <a class="book-card" href="./read.html?book=${encodeURIComponent(b.id)}">
+        <div class="book-cover" style="background:${b.coverColor}">
+          <div class="genre">${b.genre}</div>
+          <div class="cover-mark">${String(i+1).padStart(2,'0')}</div>
+        </div>
+        <div class="book-body">
+          <h3 class="book-title">${b.title}</h3>
+          <p class="book-blurb">${b.blurb}</p>
+          <div class="book-meta">
+            <span>${b.chapterCount} 章</span>
+            <span>约 ${Math.round(b.charCount/10000)} 万字</span>
+          </div>
+          <span class="book-cta">开始阅读 <span aria-hidden="true">↗</span></span>
+        </div>
+      </a>`).join('');
+  } catch (e) {
+    grid.innerHTML = '<p style="color:var(--muted)">书库加载中… 请先生成章节数据。</p>';
+  }
+})();
+</script>
 </body>
 </html>
