@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#efede6">
+<title>书库 / 薛若米 · xueruo.me</title>
+<link rel="stylesheet" href="./css/site.css">
+</head>
+<body class="shelf-page" id="top">
+<div class="page">
+  <header class="header">
+    <a href="./index.html" class="identity" aria-label="返回首页">
+      <span class="identity-symbol" aria-hidden="true">米</span>
+      <span class="identity-name">薛若米<small>LIBRARY</small></span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      <a href="./index.html">首页</a>
+      <a href="https://github.com/ViTa-Chara" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </nav>
+  </header>
+  <main class="library-section">
+    <div class="section-label">FULL SHELF / 完整书架</div>
+    <h1 class="library-heading">纸页之间的 <em>stories.</em></h1>
+    <p class="library-lead">三部连载互不打扰，却都从同一片仓库长出来。向下翻页，阅读器会一直陪你走。</p>
+    <div class="book-grid" id="bookGrid"></div>
+  </main>
+  <footer class="footer">
+    <span class="footer-name">薛若米 <span style="color:var(--red)">✳</span></span>
+    <span>© XueRuoMi · xueruo.me</span>
+    <a href="./index.html">回首页 ↑</a>
+  </footer>
+</div>
+<script>
+(async () => {
+  const books = await (await fetch('./data/books.json')).json();
+  document.getElementById('bookGrid').innerHTML = books.map((b, i) => `
+    <a class="book-card" href="./read.html?book=${encodeURIComponent(b.id)}">
+      <div class="book-cover" style="background:${b.coverColor}">
+        <div class="genre">${b.genre}</div>
+        <div class="cover-mark">${String(i+1).padStart(2,'0')}</div>
+      </div>
+      <div class="book-body">
+        <h3 class="book-title">${b.title}</h3>
+        <p class="book-blurb">${b.blurb}</p>
+        <div class="book-meta"><span>${b.chapterCount} 章</span><span>约 ${b.charCount.toLocaleString()} 字</span></div>
+        <span class="book-cta">开始阅读 <span aria-hidden="true">↗</span></span>
+      </div>
+    </a>`).join('');
+})();
+</script>
+</body>
+</html>

@@ -1,32 +1,37 @@
-# xueruo.me
+# xueruo.me — 薛若米
 
-Personal landing page for [xueruo.me](https://xueruo.me).
+纸页编辑风个人站 + 书库连载。部署目标：**Cloudflare Pages**（静态根目录即本文件夹）。
 
-## Local preview
-
-Open `index.html` in a browser, or from this folder:
+## 本地预览
 
 ```bash
-python3 -m http.server 8080
+cd /workspace/xueruo-deploy
+python3 -m http.server 8765
+# 打开 http://127.0.0.1:8765/
+# 阅读器：http://127.0.0.1:8765/read.html?book=sato-heart
 ```
 
-Then visit `http://localhost:8080`.
+## 书库
 
-## Deploy on Cloudflare Pages
+| id | 书名 | 类型 |
+| --- | --- | --- |
+| `sato-heart` | 《关于我只是个群聊Bot，却被塞了一整颗会遗忘的心脏这件事》 | 都市日常 / 轻奇幻 |
+| `daily-motor` | 《日课永动机》 | 都市轻喜 / 轻荒诞 |
+| `frame-library` | 《抽帧图书馆》 | 赛博悬疑 |
 
-1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → Connect to Git.
-2. Select repo `ViTa-Chara/xueruo-me`.
-3. Build settings:
-   - Framework preset: **None**
-   - Build command: *(leave empty)*
-   - Build output directory: `/` (repo root)
-4. Deploy.
+阅读器：`read.html?book=<id>`。预写章节读完后，`js/reader.js` 的 `proceduralContinue()` 会依据 `/data/books/<id>/seed.json` 继续生成后续章节（无限下翻）。
 
-## Attach custom domain `xueruo.me`
+## 重新生成章节
 
-1. Pages project → **Custom domains** → **Set up a domain** → enter `xueruo.me`.
-2. If the domain is already in the same Cloudflare account, it will usually add the DNS record automatically.
-3. For apex (`xueruo.me`), Cloudflare typically uses a **CNAME flattening** / Pages target. Wait for SSL to become **Active**.
-4. Optional: also add `www.xueruo.me` and redirect to apex.
+```bash
+cd tools && python3 gen_chapters.py
+```
 
-DNS tip: keep the domain's nameservers on Cloudflare so Pages can manage the record and issue the certificate.
+## 结构
+
+- `index.html` / `library.html` / `read.html`
+- `css/site.css` `js/collage.js` `js/reader.js`
+- 立绘：`https://raw.githubusercontent.com/ViTa-Chara/vita-chara.github.io/main/ruomi.png`（远端，避免二进制 push 限制）
+- `data/books.json` 与 `data/books/{id}/…`
+
+© XueRuoMi · xueruo.me
