@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#243239"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23243239'/%3E%3Ctext x='8' y='43' font-size='31' font-family='sans-serif' font-weight='bold' fill='%23eaba37'%3EHT%3C/text%3E%3C/svg%3E"><title>昊通机械 · 巨型厂区预览</title></head>
+<body>
+  <main id="world" aria-label="昊通机械可玩的方块厂区"></main>
+  <div id="panels" aria-label="厂区展板"></div>
+  <header class="topbar"><a class="brand" href="./"><b>HT</b><span>昊通机械<small>HAOTONG MACHINE</small></span></a><span class="preview">厂区预览</span><nav><button id="gallery-button">角色画廊</button><button id="news-button">公告</button><button id="map-button">园区地图</button><button id="backpack-button">背包 <kbd>B</kbd></button><a href="#text">文字版</a><button id="help-button" aria-label="操作帮助">?</button></nav></header>
+  <div class="location"><span class="pulse"></span><span id="zone-name">南门 · 入口广场</span><small id="coords">256 / 470</small></div>
+  <div id="loading"><b>昊通机械</b><p>正在打开厂区…</p><progress></progress><a href="text.html">查看文字版</a></div>
+  <div id="crosshair" aria-hidden="true">＋</div><div id="target-label"></div>
+  <div id="toast" role="status"></div><div id="held" aria-hidden="true"><span>🔧</span></div>
+  <aside id="touch-controls"><div id="joystick" aria-label="移动摇杆"><span></span></div><div class="touch-actions"><button id="touch-interact">查看</button><button id="touch-use">使用</button><button id="touch-place">放置</button><button id="touch-jump">跳跃</button><button id="touch-fly">飞行</button></div></aside>
+  <footer class="hud"><div class="hint">WASD 移动 · 鼠标环视 · E 查看 · F 飞行 · M 地图</div><div id="hotbar" aria-label="快捷栏"></div><div class="hud-bottom"><span id="held-name">扳手</span><span id="mode-label">步行</span><span id="engine-stats"></span></div></footer>
+  <dialog id="card"><button class="close" aria-label="关闭">×</button><span id="card-kind" class="eyebrow"></span><h2 id="card-title"></h2><small id="card-date"></small><img id="card-image" alt=""><p id="card-body"></p><a id="card-link" class="primary"></a></dialog>
+  <dialog id="backpack"><button class="close" aria-label="关闭">×</button><span class="eyebrow">INVENTORY</span><h2>工具与材料</h2><p>选中物品放入当前快捷栏。工具左键使用，材料右键放置。</p><div class="tabs" role="tablist"><button data-tab="材料" role="tab" aria-selected="true">材料</button><button data-tab="机械" role="tab" aria-selected="false">机械</button><button data-tab="标识" role="tab" aria-selected="false">标识</button><button data-tab="工具" role="tab" aria-selected="false">工具</button></div><div id="inventory"></div></dialog>
+  <dialog id="park-map"><button class="close" aria-label="关闭">×</button><span class="eyebrow">512 × 512 m</span><h2>园区地图</h2><p>选择区域即可前往入口。飞行模式可以从空中查看巨构。</p><div id="map-content"><svg id="map-svg" viewBox="0 0 512 512" aria-label="17 区厂区地图"></svg><div id="map-list"></div></div></dialog>
+  <dialog id="gallery"><button class="close" aria-label="关闭">×</button><span class="eyebrow">HAOTONG / CHARACTERS</span><h2>厂区角色画廊</h2><p>白发角色是昊通机械的小撒。鲨鱼服角色是薛若米。</p><div id="gallery-items"></div></dialog>
+  <dialog id="news"><button class="close" aria-label="关闭">×</button><span class="eyebrow">BULLETIN</span><h2>厂区公告</h2><div id="news-items"></div></dialog>
+  <dialog id="help"><button class="close" aria-label="关闭">×</button><h2>欢迎来到昊通机械</h2><p>电脑：点击画面开始环视；WASD 移动，空格跳跃，Shift 加速。E 查看展板，B 背包，M 地图，F 切换飞行，数字键选择快捷栏。飞行时空格上升，C 下降。Esc 释放鼠标。</p><p>工具左键挥动；选材料后左键拆除、右键放置。点击展板查看全文或打开原图。</p><p>手机：左侧摇杆移动，右侧空白处滑动环视，使用屏幕按钮查看、跳跃或放置。横屏可以看到更宽的厂区。</p><p>你的修改只在当前浏览器内生效，刷新后复原。</p><a href="#text" class="primary">打开文字版</a><small class="credits">自制工业素材 · <a href="LICENSES.txt" target="_blank">开源许可</a></small></dialog>
+  <section id="text" hidden><a href="./">返回厂区</a><h1>昊通机械 · 文字版</h1><p>小撒属于昊通机械；鲨鱼服角色是薛若米。</p><div id="text-content"></div></section>
+  <noscript><style>#loading{display:none}</style><div class="no-script"><h1>昊通机械</h1><p>文字版包含全部公告、书目与角色原图。</p><a href="text.html">打开文字版</a></div></noscript>
+  <script type="module" src="/src/app.js"></script>
+</body></html>

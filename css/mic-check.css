@@ -1,0 +1,66 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  overflow-x: hidden;
+}
+
+.void {
+  height: 100svh;
+  background: #000000;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  background: #000000;
+}
+
+.tail {
+  height: 35svh;
+  background: #000000;
+}
+
+.slot {
+  position: relative;
+  width: 100%;
+}
+
+.item {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+  opacity: 0;
+  transition: opacity 0.85s ease;
+  will-change: left, opacity;
+}
+
+.slot.visible .item {
+  opacity: 1;
+}
+
+.crop {
+  position: relative;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.crop img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>昊通机械 · 方块厂区 · 薛若米 / xueruo.me</title>
+<meta name="description" content="薛若米（xueruo.me）的个人主页：昊通机械 HaoTong Machine 主题的复古方块厂区，可以在浏览器里直接玩，里面有最新动态、资料室连载和各种传送门。">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta property="og:title" content="昊通机械 · 方块厂区">
+<meta property="og:description" content="薛若米的个人主页 —— 昊通机械主题、可以玩的方块厂区。">
+<link rel="icon" href="/media/ht-logo-64.png">
+<meta property="og:image" content="/media/ht-logo.png">
+<style>
+  html, body { margin: 0; height: 100%; background: #1e2128; color: #eee; font-family: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; overflow: hidden; }
+  #canvas { display: block; border: 0; padding: 0; width: 100vw; height: 100vh; background: #000; }
+  #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+             background: repeating-linear-gradient(135deg, #2b2f36 0 40px, #30353d 40px 80px); color: #f7c418; z-index: 5; }
+  #loading::before, #loading::after { content: ""; position: absolute; left: 0; right: 0; height: 18px; background: repeating-linear-gradient(135deg, #f7c418 0 22px, #1e2228 22px 44px); }
+  #loading::before { top: 0 } #loading::after { bottom: 0 }
+  #loading h1 { margin: 0; font-size: clamp(28px, 6vw, 54px); letter-spacing: .08em; text-shadow: 4px 4px 0 #000a; }
+  #loading .en { font-size: clamp(14px, 2.4vw, 20px); letter-spacing: .35em; color: #e8eaee; margin-top: -8px }
+  #loading .sub { font-size: 15px; color: #ff7a1a }
+  #loading .bar { width: min(360px, 70vw); height: 14px; border: 3px solid #f7c418; background: #0006; }
+  #loading .bar i { display: block; height: 100%; width: 5%; background: #ff7a1a; transition: width .3s; }
+  #logmsg { font-size: 13px; min-height: 1em; color: #c8ccd4 }
+  #hud { position: fixed; top: 10px; right: 10px; z-index: 4; display: flex; gap: 6px; }
+  #hud button, .btn { font: inherit; font-size: 13px; padding: 6px 10px; border: 2px solid #1e2228; background: #f7c418; color: #1e2228; cursor: pointer; box-shadow: 2px 2px 0 #1e2228; font-weight: 600; text-decoration: none; display: inline-block; }
+  #hud button:hover, .btn:hover { background: #ffd84a; }
+  #hint { position: fixed; left: 50%; bottom: 74px; transform: translateX(-50%); z-index: 4; background: #0009; color: #fff; padding: 6px 12px; font-size: 13px; border-radius: 4px; pointer-events: none; transition: opacity 1s; }
+  #overlay { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; background: #0008; }
+  #overlay.open { display: flex; }
+  #card { width: min(560px, 92vw); max-height: 86vh; overflow: auto; background: #eceae4; color: #2b2a28; border: 6px solid #343840; border-top: 14px solid #343840; border-image: none; box-shadow: inset 0 10px 0 -2px #f7c418, 8px 8px 0 2px #0006; padding: 26px 24px 22px; position: relative; }
+  #card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; background: repeating-linear-gradient(135deg, #f7c418 0 14px, #1e2228 14px 28px); }
+  #card img { display: block; max-width: 100%; max-height: 46vh; margin: 12px auto 0; image-rendering: auto; border: 4px solid #343840; background: #fff; }
+  #card img[hidden] { display: none; }
+  #card h2 { margin: 0 0 6px; color: #1e2228; font-size: 22px; }
+  #card time { color: #d65c0e; font-size: 13px; }
+  #card .body { white-space: pre-wrap; line-height: 1.75; margin: 14px 0 18px; font-size: 15px; }
+  #card .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  #text { position: fixed; inset: 0; z-index: 8; overflow: auto; background: #eceae4; border-top: 12px solid #f7c418; color: #2b2a28; display: none; padding: 28px clamp(16px, 6vw, 80px); }
+  #text.open { display: block; }
+  #text h1 { color: #1e2228; margin-top: 0 } #text h2 { color: #1e2228; border-bottom: 4px solid #ff7a1a; padding-bottom: 4px; }
+  #text li { margin: 0 0 14px; } #text time { color: #d65c0e; font-size: 13px; margin-right: 6px; } #text p { margin: 4px 0; line-height: 1.7; }
+  #text a { color: #2e5cb8; }
+  .nogl #loading { display: none } .nogl #hud { display: none }
+</style>
+</head>
+<body>
+<canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+
+<div id="loading">
+  <h1>昊通机械</h1>
+  <div class="en">HAOTONG MACHINE</div>
+  <div class="sub">方块厂区 · 薛若米 / xueruo.me</div>
+  <div class="bar"><i id="bar"></i></div>
+  <span id="logmsg">载入中…</span>
+  <button class="btn" onclick="xrShowText()">直接看文字版</button>
+</div>
+
+<div id="hud">
+  <button onclick="xrShowHelp()">帮助</button>
+  <button onclick="xrShowText()">文字版</button>
+  <a class="btn" href="/classic/" target="_blank" rel="noopener">旧版主页</a>
+</div>
+<div id="hint">点击公告牌 / 动图 / 书 / 控制台查看详情（或对准后按 E）</div>
+
+<div id="overlay" role="dialog" aria-modal="true">
+  <div id="card">
+    <h2 id="c-title"></h2>
+    <time id="c-date"></time>
+    <img id="c-img" alt="" hidden>
+    <div class="body" id="c-body"></div>
+    <div class="row">
+      <a class="btn" id="c-link" target="_blank" rel="noopener">打开链接</a>
+      <button class="btn" onclick="xrClose()">回到世界（Esc）</button>
+    </div>
+  </div>
+</div>
+
+<!-- Text version: shown when WebGL is unavailable or on request; also what search engines read. -->
+<main id="text">
+  <p><button class="btn" onclick="xrHideText()">← 回到方块世界</button></p>
+  <h1>昊通机械 HaoTong Machine · 薛若米 / xueruo.me</h1>
+  <p>这里是薛若米的个人主页。完整版是一个昊通机械主题、可以在浏览器里直接玩的复古方块厂区，这是它的文字版。</p>
+  <h2>动图</h2>
+  <p><img src="/media/shark-baguette.gif" alt="鲨鱼帽 · 法棍散步" width="250" loading="lazy"> <img src="/media/shark-cat.gif" alt="鲨鱼帽 · 抱猫" width="200" loading="lazy"></p>
+  <h2>最新动态</h2>
+  <ul>
+{{NEWS_LIST}}
+  </ul>
+  <h2>资料室（书库）</h2>
+  <ul>{{BOOK_LIST}}</ul>
+  <h2>其他地方</h2>
+  <ul>
+    <li><a href="/library.html">书库（完整书架）</a></li>
+    <li><a href="/classic/">旧版主页（纸页风 THE PERSONAL EDITION）</a></li>
+    <li><a href="https://space.bilibili.com/204339779">Bilibili 个人空间（UID 204339779）</a></li>
+    <li><a href="https://github.com/ViTa-Chara">GitHub @ViTa-Chara</a></li>
+  </ul>
+  <p style="font-size:12px;opacity:.7">游戏引擎：<a href="https://github.com/ClassiCube/ClassiCube">ClassiCube</a>（BSD-3-Clause），材质为 ClassiCube 自带材质及自制工业材质；昊通机械 HT 标识与配色为本站自制（未找到官方标志）；像素字体：<a href="https://github.com/TakWolf/fusion-pixel-font">缝合像素字体</a>（OFL-1.1）。</p>
+</main>
+<noscript><style>#text{display:block} #loading,#hud{display:none}</style></noscript>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  // keep our Chinese page title: the engine would otherwise rename the tab to "ClassiCube (user)"
+  try { var pageTitle = document.title; Object.defineProperty(document, 'title', { configurable: true, get: function () { return pageTitle; }, set: function () {} }); } catch (e) {}
+  var items = [], overlayOpen = false, lastOpen = 0;
+
+  function hasWebGL() {
+    try { var c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); }
+    catch (e) { return false; }
+  }
+
+  window.xrShowText = function () {
+    $('text').classList.add('open');
+    if (window.Module && Module._xr_ReleaseInput) Module._xr_ReleaseInput();
+    if (document.exitPointerLock) document.exitPointerLock();
+  };
+  window.xrHideText = function () { $('text').classList.remove('open'); };
+
+  function openCard(it) {
+    $('c-title').textContent = it.title || '';
+    $('c-date').textContent = it.date || '';
+    $('c-body').textContent = it.body || '';
+    var im = $('c-img');
+    if (it.img) { im.src = it.img; im.alt = it.title || ''; im.hidden = false; } else { im.hidden = true; im.removeAttribute('src'); }
+    var a = $('c-link');
+    if (it.url) { a.style.display = ''; a.href = it.url; a.textContent = it.cta || '打开链接'; }
+    else a.style.display = 'none';
+    if (it.url === '#text') { a.removeAttribute('target'); a.onclick = function (e) { e.preventDefault(); xrClose(); xrShowText(); }; }
+    else { a.setAttribute('target', '_blank'); a.onclick = null; }
+    $('overlay').classList.add('open');
+    overlayOpen = true; lastOpen = Date.now();
+    window.xrLastOpened = it;
+    var unlock = function () {
+      if (window.Module && Module._xr_ReleaseInput) Module._xr_ReleaseInput();
+      if (overlayOpen && document.exitPointerLock) document.exitPointerLock();
+    };
+    setTimeout(unlock, 0); setTimeout(unlock, 250);
+  }
+  window.xrClose = function () {
+    $('overlay').classList.remove('open'); overlayOpen = false; lastOpen = Date.now();
+    if (window.Module && Module._xr_ReleaseInput) Module._xr_ReleaseInput();
+  };
+  window.xrTeleport = function (x, y, z, yaw, pitch) { if (Module._xr_Teleport) Module._xr_Teleport(x, y, z, yaw || 0, pitch || 0); };
+  window.xrShowHelp = function () {
+    var w = items.filter(function (i) { return i.title && i.title.indexOf('欢迎') === 0; })[0];
+    if (w) openCard(w);
+  };
+
+  // Called by the patched engine when a block is clicked/tapped (or E is pressed while aiming at it)
+  window.xrInteract = function (x, y, z, block) {
+    for (var i = 0; i < items.length; i++) {
+      var b = items[i].box;
+      if (x >= b[0] && x <= b[3] && y >= b[1] && y <= b[4] && z >= b[2] && z <= b[5]) {
+        if (!overlayOpen && Date.now() - lastOpen > 350) openCard(items[i]);
+        return true;   // consume: signs are not broken by clicks
+      }
+    }
+    return false;
+  };
+
+  // keep keyboard/touch input away from the game while the card or text view is open
+  function block(e) {
+    if (!(overlayOpen || $('text').classList.contains('open'))) return;
+    if (e.type === 'keydown' && e.key === 'Escape') { if (overlayOpen) xrClose(); else xrHideText(); }
+    e.stopImmediatePropagation();
+  }
+  ['keydown', 'keyup', 'keypress'].forEach(function (t) { window.addEventListener(t, block, true); });
+  ['overlay', 'text', 'hud', 'loading'].forEach(function (id) {
+    ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(function (t) {
+      $(id).addEventListener(t, function (e) { e.stopPropagation(); }, false);
+    });
+  });
+  window.addEventListener('keydown', function (e) {
+    if (overlayOpen || e.repeat) return;
+    if (e.code === 'KeyE' && window.Module && Module._xr_InteractSelected) Module._xr_InteractSelected();
+  }, true);
+
+  if (!hasWebGL() || location.hash === '#text') {
+    document.documentElement.classList.add(hasWebGL() ? 'x' : 'nogl');
+    xrShowText();
+    if (!hasWebGL()) return;
+  }
+
+  // ClassiCube asks the page to size the canvas (default would be 300x150 → blurry)
+  window.resizeGameCanvas = function () {
+    var c = $('canvas'), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.round(window.innerWidth * dpr), h = Math.round(window.innerHeight * dpr);
+    if (c.width !== w) c.width = w;
+    if (c.height !== h) c.height = h;
+  };
+  resizeGameCanvas();
+
+  fetch('/world.json').then(function (r) { return r.json(); }).then(function (j) { items = j.items || []; });
+
+  var steps = 0;
+  window.Module = {
+    preRun: [], postRun: [],
+    arguments: ['xueruomi'],
+    xrTexturePack: '/static/default.zip',
+    xrWorld: '/world.cw',
+    xrDefaultOptions: 'gui-showfps=false\nsingleplayerphysics=false\n',
+    locateFile: function (p) { return '/static/' + p; },
+    print: function (t) { console.log(t); },
+    printErr: function (t) { console.warn(t); },
+    canvas: $('canvas'),
+    setStatus: function (text) {
+      if (text) { $('logmsg').textContent = text; steps++; $('bar').style.width = Math.min(95, 10 + steps * 18) + '%'; }
+      else {
+        $('bar').style.width = '100%';
+        setTimeout(function () { $('loading').style.display = 'none'; window.xrReady = true; }, 600);
+        setTimeout(function () { $('hint').style.opacity = 0; }, 12000);
+      }
+    },
+    totalDependencies: 0,
+    monitorRunDependencies: function (left) { }
+  };
+  window.onerror = function (msg) { $('logmsg').textContent = '出错了：' + msg + '（可以先看文字版）'; };
+  var s = document.createElement('script'); s.src = '/static/ClassiCube.js'; s.async = true;
+  document.body.appendChild(s);
+})();
+</script>
+</body>
+</html>

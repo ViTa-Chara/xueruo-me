@@ -1,0 +1,29 @@
+# 昊通机械 · 方块厂区 (xueruo.me blockworld) — static files only.
+# Matches requests addressed to the server IP (and world.xueruo.me if DNS is ever pointed here);
+# other hostnames keep using the existing default / bin.xueruo.me servers.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name 101.132.143.85 world.xueruo.me;
+
+    root /opt/blockworld/site;
+    index index.html;
+    charset utf-8;
+    access_log /var/log/nginx/blockworld.access.log;
+    error_log  /var/log/nginx/blockworld.error.log warn;
+
+    add_header X-Robots-Tag "noindex" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    gzip on;
+    gzip_vary on;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_types application/wasm application/javascript text/javascript text/css application/json text/plain image/svg+xml;
+
+    location /static/ { expires 10m; }
+    location /media/  { expires 1h; }
+    location = /world.cw { default_type application/octet-stream; expires -1; }
+    location ~ /\. { deny all; }
+    location / { try_files $uri $uri/ $uri.html =404; }
+}

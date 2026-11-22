@@ -1,0 +1,23 @@
+{
+  "characters": [
+    {
+      "id": "sato",
+      "name": "小撒",
+      "affiliation": "昊通机械",
+      "images": [
+        { "file": "sato-portrait.original.png", "title": "小撒 · 肖像", "source": "1a9ce68efe6c0a9189d7da71796a1b94.png" },
+        { "file": "sato-drawing.original.png", "title": "小撒 · 图纸", "source": "a2da5aece97033e8970aab3fe9184b4d.png" }
+      ]
+    },
+    {
+      "id": "xueruomi",
+      "name": "薛若米",
+      "outfit": "鲨鱼服",
+      "images": [
+        { "file": "../gifs/shark-baguette.original.gif", "title": "薛若米 · 法棍散步" },
+        { "file": "../gifs/shark-cat.original.gif", "title": "薛若米 · 抱猫" }
+      ]
+    }
+  ],
+  "identitySource": "用户于 2026-10-08 在当前会话中的说明；不从外观推断角色身份。"
+}

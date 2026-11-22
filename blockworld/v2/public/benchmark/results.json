@@ -1,0 +1,431 @@
+{
+  "date": "2026-10-08",
+  "environment": "Apple M5 Pro / macOS 27 / Chromium 155，无头浏览器，localhost 静态服务器，无网络或 CPU 限速",
+  "method": "每项使用新浏览器上下文（空缓存）；出生点等待区块稳定后采样 10 秒。两个新候选统一视距、FOV、控制与实体预算。JS 堆不含 WASM 堆、GPU 或 Worker 内存。",
+  "runs": [
+    {
+      "engine": "Three.js + Worker",
+      "ready": true,
+      "loadMS": 113,
+      "position": [
+        256,
+        2.8835663999999994,
+        470
+      ],
+      "mobile": false,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 600,
+      "visibleActors": 6,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 8,
+      "chunks": 240,
+      "pending": 0,
+      "generated": 240,
+      "meshingMS": 715,
+      "drawCalls": 155,
+      "triangles": 8512,
+      "geometries": 114,
+      "edits": 0,
+      "resources": [
+        {
+          "name": "/assets/index-C7a5kom8.js",
+          "bytes": 17642
+        },
+        {
+          "name": "/assets/index-D_HOM6u2.css",
+          "bytes": 10879
+        },
+        {
+          "name": "/assets/actors-CrpA1rPJ.js",
+          "bytes": 13476
+        },
+        {
+          "name": "/content.json",
+          "bytes": 7677
+        },
+        {
+          "name": "/assets/three-engine-BhyfPXJj.js",
+          "bytes": 518472
+        },
+        {
+          "name": "/media/sato-portrait.png",
+          "bytes": 1654237
+        },
+        {
+          "name": "/media/sato-drawing.png",
+          "bytes": 1755557
+        },
+        {
+          "name": "/assets/mesh.worker-C0IoAc_b.js",
+          "bytes": 5456
+        }
+      ],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "errors": []
+    },
+    {
+      "engine": "noa 0.33 + Babylon",
+      "ready": true,
+      "loadMS": 145,
+      "position": [
+        256,
+        2.8835664,
+        470
+      ],
+      "mobile": false,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 600,
+      "visibleActors": 6,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 35,
+      "chunks": 240,
+      "generated": 240,
+      "meshes": 464,
+      "activeMeshes": 109,
+      "edits": 0,
+      "resources": [
+        {
+          "name": "/assets/index-C7a5kom8.js",
+          "bytes": 17642
+        },
+        {
+          "name": "/assets/index-D_HOM6u2.css",
+          "bytes": 10879
+        },
+        {
+          "name": "/assets/actors-CrpA1rPJ.js",
+          "bytes": 13476
+        },
+        {
+          "name": "/content.json",
+          "bytes": 7677
+        },
+        {
+          "name": "/assets/noa-engine-Bpt-ihCt.js",
+          "bytes": 1157663
+        },
+        {
+          "name": "/media/sato-portrait.png",
+          "bytes": 1654237
+        },
+        {
+          "name": "/media/sato-drawing.png",
+          "bytes": 1755557
+        }
+      ],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "errors": []
+    },
+    {
+      "engine": "ClassiCube 1.3.8",
+      "ready": true,
+      "loadMS": 160,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 600,
+      "wasmHeapMB": 32,
+      "jsHeapMB": 4,
+      "resources": [
+        {
+          "name": "/benchmark/ClassiCube.js",
+          "bytes": 113311
+        },
+        {
+          "name": "/benchmark/ClassiCube.wasm",
+          "bytes": 490066
+        },
+        {
+          "name": "/benchmark/default.zip",
+          "bytes": 966
+        },
+        {
+          "name": "/benchmark/world.cw",
+          "bytes": 75514
+        },
+        {
+          "name": "/skins/xueruomi.png",
+          "bytes": 1151
+        }
+      ],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "mobile": false,
+      "errors": []
+    },
+    {
+      "engine": "Three.js + Worker",
+      "ready": true,
+      "loadMS": 96,
+      "position": [
+        256,
+        2.8830998,
+        470
+      ],
+      "mobile": true,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 600,
+      "visibleActors": 1,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 6,
+      "chunks": 87,
+      "pending": 0,
+      "generated": 87,
+      "meshingMS": 318,
+      "drawCalls": 46,
+      "triangles": 1178,
+      "geometries": 40,
+      "edits": 0,
+      "resources": [
+        {
+          "name": "/assets/index-C7a5kom8.js",
+          "bytes": 17642
+        },
+        {
+          "name": "/assets/index-D_HOM6u2.css",
+          "bytes": 10879
+        },
+        {
+          "name": "/assets/actors-CrpA1rPJ.js",
+          "bytes": 13476
+        },
+        {
+          "name": "/content.json",
+          "bytes": 7677
+        },
+        {
+          "name": "/assets/three-engine-BhyfPXJj.js",
+          "bytes": 518472
+        },
+        {
+          "name": "/media/sato-portrait.png",
+          "bytes": 1654237
+        },
+        {
+          "name": "/media/sato-drawing.png",
+          "bytes": 1755557
+        },
+        {
+          "name": "/assets/mesh.worker-C0IoAc_b.js",
+          "bytes": 5456
+        }
+      ],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "errors": []
+    },
+    {
+      "engine": "noa 0.33 + Babylon",
+      "ready": true,
+      "loadMS": 144,
+      "position": [
+        256,
+        2.8833332,
+        470
+      ],
+      "mobile": true,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 600,
+      "visibleActors": 1,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 24,
+      "chunks": 87,
+      "generated": 87,
+      "meshes": 401,
+      "activeMeshes": 31,
+      "edits": 0,
+      "resources": [
+        {
+          "name": "/assets/index-I7pqKVDr.js",
+          "bytes": 17642
+        },
+        {
+          "name": "/assets/index-D_HOM6u2.css",
+          "bytes": 10879
+        },
+        {
+          "name": "/assets/actors-CrpA1rPJ.js",
+          "bytes": 13476
+        },
+        {
+          "name": "/content.json",
+          "bytes": 7677
+        },
+        {
+          "name": "/assets/noa-engine-DEXBOlMI.js",
+          "bytes": 1157677
+        },
+        {
+          "name": "/media/sato-portrait.png",
+          "bytes": 1654237
+        },
+        {
+          "name": "/media/sato-drawing.png",
+          "bytes": 1755557
+        }
+      ],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "errors": []
+    },
+    {
+      "engine": "ClassiCube 1.3.8",
+      "ready": true,
+      "loadMS": 75,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 600,
+      "wasmHeapMB": 32,
+      "jsHeapMB": 4,
+      "resources": [
+        {
+          "name": "/benchmark/ClassiCube.js",
+          "bytes": 113311
+        },
+        {
+          "name": "/benchmark/ClassiCube.wasm",
+          "bytes": 490066
+        },
+        {
+          "name": "/benchmark/default.zip",
+          "bytes": 966
+        },
+        {
+          "name": "/benchmark/world.cw",
+          "bytes": 75514
+        },
+        {
+          "name": "/skins/xueruomi.png",
+          "bytes": 1151
+        }
+      ],
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "mobile": true,
+      "errors": []
+    }
+  ],
+  "sceneRuns": [
+    {
+      "engine": "Three.js + Worker",
+      "ready": true,
+      "loadMS": 113,
+      "position": [
+        108,
+        2,
+        286
+      ],
+      "mobile": false,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 360,
+      "visibleActors": 37,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 10,
+      "chunks": 363,
+      "pending": 0,
+      "generated": 450,
+      "meshingMS": 1279,
+      "drawCalls": 260,
+      "triangles": 8258,
+      "geometries": 205,
+      "edits": 0,
+      "scene": "精密加工车间"
+    },
+    {
+      "engine": "noa 0.33 + Babylon",
+      "ready": true,
+      "loadMS": 145,
+      "position": [
+        108,
+        2,
+        286
+      ],
+      "mobile": false,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 360,
+      "visibleActors": 37,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 46,
+      "chunks": 363,
+      "generated": 450,
+      "meshes": 506,
+      "activeMeshes": 320,
+      "edits": 0,
+      "scene": "精密加工车间"
+    },
+    {
+      "engine": "Three.js + Worker",
+      "ready": true,
+      "loadMS": 96,
+      "position": [
+        108,
+        2,
+        286
+      ],
+      "mobile": true,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 360,
+      "visibleActors": 21,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 7,
+      "chunks": 117,
+      "pending": 0,
+      "generated": 198,
+      "meshingMS": 623,
+      "drawCalls": 175,
+      "triangles": 5486,
+      "geometries": 49,
+      "edits": 0,
+      "scene": "精密加工车间"
+    },
+    {
+      "engine": "noa 0.33 + Babylon",
+      "ready": true,
+      "loadMS": 144,
+      "position": [
+        108,
+        2,
+        286
+      ],
+      "mobile": true,
+      "meanFPS": 60,
+      "p95FrameMS": 17,
+      "samples": 360,
+      "visibleActors": 21,
+      "worldActors": 59,
+      "signs": 58,
+      "zones": 17,
+      "blocks": 120,
+      "jsHeapMB": 34,
+      "chunks": 117,
+      "generated": 198,
+      "meshes": 411,
+      "activeMeshes": 175,
+      "edits": 0,
+      "scene": "精密加工车间"
+    }
+  ]
+}

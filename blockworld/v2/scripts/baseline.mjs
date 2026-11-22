@@ -1,0 +1,17 @@
+import { readFile, writeFile, mkdir, cp } from 'node:fs/promises';
+import { createWorld } from '../src/world.js';
+import { palette } from '../src/palette.js';
+import { spawnSync } from 'node:child_process';
+const content = JSON.parse(await readFile(new URL('../public/content.json', import.meta.url), 'utf8'));
+const out = new URL('../public/benchmark/', import.meta.url);
+await mkdir(out, { recursive: true });
+await writeFile(new URL('scene.json', out), JSON.stringify({ world: createWorld(content), palette }));
+for (const file of ['ClassiCube.js', 'ClassiCube.wasm']) await cp(new URL(`../../dist_prod/static/${file}`, import.meta.url), new URL(file, out));
+const result = spawnSync('python3', [new URL('baseline.py', import.meta.url).pathname], { stdio: 'inherit' });
+if (result.status !== 0) process.exit(result.status || 1);
+await writeFile(new URL('classic.html', out), `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" href="data:,"><title>ClassiCube · 同场景基线</title><style>body{margin:0;background:#c5dce1}canvas{width:100vw;height:100vh}a{position:absolute;top:20px;left:20px;background:#fff;padding:12px;font:12px system-ui;z-index:4}</style><a href="../compare.html">返回比较</a><canvas id="canvas" tabindex="0"></canvas><script>const mobile=new URLSearchParams(location.search).has('mobile');const canvas=document.getElementById('canvas');canvas.width=innerWidth;canvas.height=innerHeight;
+// An empty Emscripten status fires before the map exists. Measure the first
+// depth-tested 3D draw after our map download, rather than WASM initialization.
+for(const Type of [window.WebGLRenderingContext,window.WebGL2RenderingContext].filter(Boolean)){for(const name of ['drawArrays','drawElements']){const original=Type.prototype[name];Type.prototype[name]=function(...args){const result=original.apply(this,args);const count=name==='drawArrays'?args[2]:args[1];if(!window.xrReady&&window.xrWorldReady&&count>=6&&this.isEnabled(this.DEPTH_TEST)){window.xrReady=true;window.xrLoadTime=performance.now()}return result}}}
+window.Module={preRun:[],postRun:[],arguments:['xueruomi'],canvas,xrWorld:new URL('world.cw',location.href).href,xrTexturePack:new URL('default.zip',location.href).href,xrDefaultOptions:'gui-showfps=true\\nsingleplayerphysics=false\\nviewdist='+(mobile?96:192)+'\\n',locateFile:p=>new URL(p,location.href).href,print:console.log,printErr:console.warn,setStatus:t=>{window.xrStatus=t},onRuntimeInitialized:()=>{window.xrRuntime=true}};let last=performance.now();const samples=[];function frame(now){if(window.xrReady){samples.push(now-last);if(samples.length>600)samples.shift()}last=now;requestAnimationFrame(frame)}requestAnimationFrame(frame);window.ht={metrics:()=>({engine:'ClassiCube 1.3.8',ready:!!window.xrReady,loadMS:Math.round(window.xrLoadTime||performance.now()),meanFPS:Math.round(1000/(samples.reduce((a,b)=>a+b,0)/Math.max(1,samples.length))),p95FrameMS:Math.round([...samples].sort((a,b)=>a-b)[Math.floor(samples.length*.95)]||0),samples:samples.length,wasmHeapMB:window.HEAPU8?Math.round(window.HEAPU8.length/1048576):null,jsHeapMB:performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):null}),resetMetrics:()=>samples.splice(0)};</script><script src="ClassiCube.js"></script></html>`);
+console.log('同场景 ClassiCube 基线已生成。');

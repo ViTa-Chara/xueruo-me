@@ -1,0 +1,158 @@
+<!doctype html><html><head><meta charset="utf-8"><title>HQ PoC · 昊通机械</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}#lbl{position:fixed;left:12px;bottom:10px;color:#fff;font:13px system-ui;text-shadow:0 1px 2px #000}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body><div id="lbl">HQ renderer PoC — three.js · sun shadows · GTAO · bloom · ACES · same voxel world</div>
+<script type="module">
+import * as THREE from 'three';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const P = new URLSearchParams(location.search);
+const meta = await (await fetch('world.json')).json();
+const raw = new Uint16Array(await (await fetch('world.bin')).arrayBuffer());
+const { W, H, L } = meta;
+const B = meta.blocks;
+const get = (x, y, z) => (x < 0 || y < 0 || z < 0 || x >= W || y >= H || z >= L) ? (y < 0 ? 7 : 0) : raw[(y * L + z) * W + x];
+const def = id => B[id] || { tex: [0,0,0,0,0,0], draw: 0, h: 16, fb: false };
+const opaqueFull = id => { if (!id) return false; const d = def(id); return d.draw === 0 && d.h === 16; };
+
+// ---------- meshing: face culling + per-vertex AO, grouped by material ----------
+const FACES = [ // dir, corners (relative), u axis, v axis, cw tex index
+  { n: [0, 1, 0], ti: 0, c: [[0,1,1],[1,1,1],[1,1,0],[0,1,0]] },
+  { n: [0,-1, 0], ti: 1, c: [[0,0,0],[1,0,0],[1,0,1],[0,0,1]] },
+  { n: [-1,0, 0], ti: 2, c: [[0,0,0],[0,0,1],[0,1,1],[0,1,0]] },
+  { n: [1, 0, 0], ti: 3, c: [[1,0,1],[1,0,0],[1,1,0],[1,1,1]] },
+  { n: [0, 0,-1], ti: 4, c: [[1,0,0],[0,0,0],[0,1,0],[1,1,0]] },
+  { n: [0, 0, 1], ti: 5, c: [[0,0,1],[1,0,1],[1,1,1],[0,1,1]] },
+];
+const TU = 1 / 16, TV = 1 / 32, EPS = 0.5 / 1024;
+function uvOf(tile) { const c = tile % 16, r = Math.floor(tile / 16); return [c * TU + EPS, 1 - (r + 1) * TV + EPS / 2, (c + 1) * TU - EPS, 1 - r * TV - EPS / 2]; }
+const groups = { solid: [], cut: [], fb: [], water: [] };
+function newBuf() { return { p: [], n: [], uv: [], c: [], i: [] }; }
+const REG = 32;
+const bufs = {};
+function buf(kind, rx, rz) { const k = kind + rx + '_' + rz; return bufs[k] || (bufs[k] = Object.assign(newBuf(), { kind })); }
+function ao(s1, s2, c) { return (s1 && s2) ? 0 : 3 - (s1 + s2 + c); }
+for (let y = 0; y < H; y++) for (let z = 0; z < L; z++) for (let x = 0; x < W; x++) {
+  const id = raw[(y * L + z) * W + x]; if (!id) continue;
+  const d = def(id); if (d.draw === 4) continue;
+  const kind = d.draw === 3 ? 'water' : d.fb ? 'fb' : (d.draw === 1 || d.draw === 2 || d.draw === 5) ? 'cut' : 'solid';
+  const b = buf(kind, Math.floor(x / REG), Math.floor(z / REG));
+  if (d.draw === 5) { // sprite: two crossed quads
+    const [u0, v0, u1, v1] = uvOf(d.tex[2]);
+    for (const q of [[[0,0,0],[1,0,1],[1,1,1],[0,1,0]], [[1,0,0],[0,0,1],[0,1,1],[1,1,0]]]) {
+      const base = b.p.length / 3;
+      q.forEach((v, k) => { b.p.push(x + 0.15 + v[0] * 0.7, y + v[1], z + 0.15 + v[2] * 0.7); b.n.push(0, 1, 0); b.c.push(1, 1, 1);
+        b.uv.push(k === 0 || k === 3 ? u0 : u1, k < 2 ? v0 : v1); });
+      b.i.push(base, base + 1, base + 2, base, base + 2, base + 3);
+    }
+    continue;
+  }
+  const hh = d.h / 16;
+  for (const f of FACES) {
+    const [nx, ny, nz] = f.n;
+    const nb = get(x + nx, y + ny, z + nz);
+    if (!(ny === 1 && hh < 1)) {
+      if (opaqueFull(nb)) continue;
+      if (nb === id && d.draw !== 0) continue;
+      if (d.draw === 3 && nb && def(nb).draw === 3) continue;
+    }
+    const [u0, v0, u1, v1] = uvOf(d.tex[f.ti]);
+    const base = b.p.length / 3;
+    const uvs = [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
+    f.c.forEach((v, k) => {
+      const px = x + v[0], py = y + v[1] * hh, pz = z + v[2];
+      b.p.push(px, py, pz); b.n.push(nx, ny, nz);
+      // AO: sample the 3 neighbours outside this corner
+      let a = 3;
+      if (d.draw === 0 && kind !== 'fb') {
+        const ox = x + nx, oy = y + ny, oz = z + nz;
+        const sx = v[0] * 2 - 1, sy = v[1] * 2 - 1, sz = v[2] * 2 - 1;
+        let s1, s2, cc;
+        if (nx) { s1 = opaqueFull(get(ox, y + sy, z)) | 0; s2 = opaqueFull(get(ox, y, z + sz)) | 0; cc = opaqueFull(get(ox, y + sy, z + sz)) | 0; }
+        else if (ny) { s1 = opaqueFull(get(x + sx, oy, z)) | 0; s2 = opaqueFull(get(x, oy, z + sz)) | 0; cc = opaqueFull(get(x + sx, oy, z + sz)) | 0; }
+        else { s1 = opaqueFull(get(x + sx, y, oz)) | 0; s2 = opaqueFull(get(x, y + sy, oz)) | 0; cc = opaqueFull(get(x + sx, y + sy, oz)) | 0; }
+        a = ao(s1, s2, cc);
+      }
+      const l = 0.45 + 0.55 * a / 3; b.c.push(l, l, l);
+      b.uv.push(uvs[k][0], k < 2 ? (ny === 0 ? v0 : uvs[k][1]) : (ny === 0 ? v0 + (v1 - v0) * hh : uvs[k][1]));
+    });
+    b.i.push(base, base + 1, base + 2, base, base + 2, base + 3);
+  }
+}
+
+// ---------- three.js scene ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.55;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.1, 900);
+
+const tex = await new THREE.TextureLoader().loadAsync('terrain.png');
+tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestMipmapLinearFilter; tex.generateMipmaps = true; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+tex.colorSpace = THREE.SRGBColorSpace;
+const M = {
+  solid: new THREE.MeshStandardMaterial({ map: tex, vertexColors: true, roughness: 0.85, metalness: 0.05 }),
+  cut: new THREE.MeshStandardMaterial({ map: tex, vertexColors: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.9 }),
+  fb: new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.55, roughness: 0.6 }),
+  water: new THREE.MeshStandardMaterial({ map: tex, transparent: true, opacity: 0.78, roughness: 0.08, metalness: 0.2, color: 0x9fd0ff }),
+};
+let tris = 0;
+for (const k in bufs) {
+  const b = bufs[k]; if (!b.i.length) continue;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(b.p, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(b.n, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(b.uv, 2));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(b.c, 3));
+  g.setIndex(b.i); tris += b.i.length / 3;
+  const m = new THREE.Mesh(g, M[b.kind]);
+  m.castShadow = b.kind !== 'water'; m.receiveShadow = true;
+  scene.add(m);
+}
+
+const sky = new Sky(); sky.scale.setScalar(2000); scene.add(sky);
+const su = sky.material.uniforms;
+su.turbidity.value = 2.5; su.rayleigh.value = 2.2; su.mieCoefficient.value = 0.003; su.mieDirectionalG.value = 0.8;
+const elev = +(P.get('elev') || 28), azim = +(P.get('azim') || 215);
+const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - elev), THREE.MathUtils.degToRad(azim));
+su.sunPosition.value.copy(sunDir);
+const pm = new THREE.PMREMGenerator(renderer);
+const envScene = new THREE.Scene(); const sky2 = sky.clone(); envScene.add(sky2);
+scene.environment = pm.fromScene(envScene, 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const sun = new THREE.DirectionalLight(0xfff1dc, 3.2);
+const C = new THREE.Vector3(+(P.get('cx') || 140), 36, +(P.get('cz') || 130));
+sun.position.copy(C).addScaledVector(sunDir, 220); sun.target.position.copy(C); scene.add(sun, sun.target);
+sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+const sc = sun.shadow.camera; sc.left = -130; sc.right = 130; sc.top = 130; sc.bottom = -130; sc.near = 10; sc.far = 500;
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04;
+scene.add(new THREE.HemisphereLight(0xbfd8ff, 0x6a5a48, 0.35));
+scene.fog = new THREE.Fog(0xa9c4e0, 160, 700);
+
+const views = {
+  spawn:  [[128.5, 39.0, 140], [128.5, 46, 100]],
+  aerial: [[205, 92, 215], [128, 36, 128]],
+  gallery:[[150, 44, 108], [200, 37, 130]],
+  plaza:  [[96, 50, 150], [128, 40, 112]],
+};
+const v = views[P.get('view') || 'aerial'];
+camera.position.set(...v[0]); camera.lookAt(...v[1]);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+if (P.get('ao') !== '0') { const g = new GTAOPass(scene, camera, innerWidth, innerHeight); g.updateGtaoMaterial({ radius: 1.2, distanceFallOff: 1, thickness: 1.5 }); g.blendIntensity = 0.85; composer.addPass(g); }
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.35, 0.5, 0.92));
+composer.addPass(new OutputPass());
+let frames = 0;
+function loop() { composer.render(); if (++frames === 3) { window.hqReady = true; console.log('tris', tris); } requestAnimationFrame(loop); }
+loop();
+</script></body></html>

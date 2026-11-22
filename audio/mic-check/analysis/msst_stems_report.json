@@ -1,0 +1,64 @@
+{
+  "engine": "ZFTurbo/Music-Source-Separation-Training (Official MSST)",
+  "install_path": "/Users/xueruomi/Documents/Music-Source-Separation-Training",
+  "pipeline": {
+    "stage1_vocals_ensemble": [
+      "BS-PolarFormer (model_bs_polarformer_float16.ckpt, Multisong SDR 11.00)",
+      "MelBand-RoFormer KJ (MelBandRoformer_KJ.ckpt, Multisong SDR 10.98)"
+    ],
+    "stage2_instruments_ensemble": [
+      "SCNet-XL-IHF (model_scnet_xl_ihf_sdr_10.0891.ckpt, MUSDB 10.08 / Multisong 9.92, weight 1.5)",
+      "BS-RoFormer 4-stem (model_bs_roformer_4stem_sdr_9.6568.ckpt, MUSDB 9.65 / Multisong 9.38, weight 1.0)"
+    ],
+    "reconstruction": "Phase-exact lossless residual (vocals + drums + bass + other == original master)",
+    "output_format": "48000 Hz, 24-bit PCM Stereo WAV (soxr VHQ resampling, zero forced clipping normalization)"
+  },
+  "reconstruction_snr_db": 135.88,
+  "stems": {
+    "01_vocals.wav": {
+      "description": "Vocals / Choir (BS-PolarFormer + MelBand-RoFormer KJ)",
+      "peak": 1.0,
+      "rms_db": -18.3,
+      "intro_rms_db": -15.57,
+      "groove_rms_db": -24.7,
+      "chorus_rms_db": -21.96,
+      "outro_rms_db": -18.5
+    },
+    "02_drums.wav": {
+      "description": "Drums / Percussion (SCNet-XL-IHF + BS-RoFormer-4stem)",
+      "peak": 1.0,
+      "rms_db": -20.53,
+      "intro_rms_db": -33.73,
+      "groove_rms_db": -15.84,
+      "chorus_rms_db": -16.82,
+      "outro_rms_db": -35.18
+    },
+    "03_bass.wav": {
+      "description": "Bass / Sub (SCNet-XL-IHF + BS-RoFormer-4stem)",
+      "peak": 0.5439,
+      "rms_db": -23.03,
+      "intro_rms_db": -25.56,
+      "groove_rms_db": -46.87,
+      "chorus_rms_db": -18.7,
+      "outro_rms_db": -59.73
+    },
+    "04_other_instruments_sfx.wav": {
+      "description": "Guitar / Synths / Foley (Phase-Exact Residual)",
+      "peak": 1.0,
+      "rms_db": -22.25,
+      "intro_rms_db": -24.38,
+      "groove_rms_db": -22.79,
+      "chorus_rms_db": -17.7,
+      "outro_rms_db": -35.11
+    },
+    "05_instrumental_no_vocals.wav": {
+      "description": "Full Instrumental (Original - Ensembled Vocals)",
+      "peak": 1.0,
+      "rms_db": -16.55,
+      "intro_rms_db": -20.89,
+      "groove_rms_db": -14.97,
+      "chorus_rms_db": -12.58,
+      "outro_rms_db": -31.06
+    }
+  }
+}

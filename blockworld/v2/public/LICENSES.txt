@@ -1,0 +1,1518 @@
+昊通机械 · 引擎验证预览
+工业模型、配色、界面和厂区数据为本站制作；用户原图按授权展示。
+
+===== ClassiCube 1.3.8 baseline (BSD-3-Clause) =====
+﻿Copyright (c) 2014 - 2024, UnknownShadow200
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this 
+list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this 
+list of conditions and the following disclaimer in the documentation and/or other 
+materials provided with the distribution.
+
+3. Neither the name of ClassiCube nor the names of its contributors may be 
+used to endorse or promote products derived from this software without specific prior 
+written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Other function licenses
+=======================
+
+Ray-box intersection algorithm comes from:
+"An efficient and robust ray-box intersection algorithm", Williams, Barrus, Morley & Shirley, Journal of Graphics Tools, 2005"
+C++ source at http://www.cs.utah.edu/~awilliam/box/ does not appear to have an attached license.
+
+
+Cell traversal of rays based on code I found that was in turn from http://www.xnawiki.com/index.php/Voxel_traversal
+The archived about page (http://web.archive.org/web/20090412065116/http://www.xnawiki.com/index.php/XNAWiki:About) states
+that "All code found on the wiki is considered public domain".
+
+
+Frustum culling was based on the code from http://www.crownandcutlass.com/features/technicaldetails/frustum.html,
+which is in turn archived from (now defunct) http://www.markmorley.com/
+"This page and its contents are Copyright 2000 by Mark Morley
+Unless otherwise noted, you may use any and all code examples provided herein in any way you want."
+
+
+OpenTK license
+===============
+Copyright (c) 2006 - 2010 The Open Toolkit library.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+OpenTK.Platform.Windows and OpenTK.Platform.X11 include portions of the Mono class library. 
+These portions are covered by the following license:
+
+Copyright (c) 2004 Novell, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+Emscripten license
+==============================================================================
+
+Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+==============================================================================
+
+Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal with the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+    Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimers.
+
+    Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following disclaimers
+    in the documentation and/or other materials provided with the
+    distribution.
+
+    Neither the names of Mozilla,
+    nor the names of its contributors may be used to endorse
+    or promote products derived from this Software without specific prior
+    written permission. 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
+
+==============================================================================
+
+
+BearSSL license
+==============================================================================
+Copyright (c) 2016 Thomas Pornin <pornin@bolet.org>
+
+Permission is hereby granted, free of charge, to any person obtaining 
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be 
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+==============================================================================
+
+
+
+BearSSL license
+==================
+Copyright (c) 2016 Thomas Pornin <pornin@bolet.org>
+
+Permission is hereby granted, free of charge, to any person obtaining 
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be 
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+
+FreeType license
+==================
+                    The FreeType Project LICENSE
+                    ----------------------------
+
+                            2006-Jan-27
+
+                    Copyright 1996-2002, 2006 by
+          David Turner, Robert Wilhelm, and Werner Lemberg
+
+
+
+Introduction
+============
+
+  The FreeType  Project is distributed in  several archive packages;
+  some of them may contain, in addition to the FreeType font engine,
+  various tools and  contributions which rely on, or  relate to, the
+  FreeType Project.
+
+  This  license applies  to all  files found  in such  packages, and
+  which do not  fall under their own explicit  license.  The license
+  affects  thus  the  FreeType   font  engine,  the  test  programs,
+  documentation and makefiles, at the very least.
+
+  This  license   was  inspired  by  the  BSD,   Artistic,  and  IJG
+  (Independent JPEG  Group) licenses, which  all encourage inclusion
+  and  use of  free  software in  commercial  and freeware  products
+  alike.  As a consequence, its main points are that:
+
+    o We don't promise that this software works. However, we will be
+      interested in any kind of bug reports. (`as is' distribution)
+
+    o You can  use this software for whatever you  want, in parts or
+      full form, without having to pay us. (`royalty-free' usage)
+
+    o You may not pretend that  you wrote this software.  If you use
+      it, or  only parts of it,  in a program,  you must acknowledge
+      somewhere  in  your  documentation  that  you  have  used  the
+      FreeType code. (`credits')
+
+  We  specifically  permit  and  encourage  the  inclusion  of  this
+  software, with  or without modifications,  in commercial products.
+  We  disclaim  all warranties  covering  The  FreeType Project  and
+  assume no liability related to The FreeType Project.
+
+
+  Finally,  many  people  asked  us  for  a  preferred  form  for  a
+  credit/disclaimer to use in compliance with this license.  We thus
+  encourage you to use the following text:
+
+   """
+    Portions of this software are copyright © <year> The FreeType
+    Project (www.freetype.org).  All rights reserved.
+   """
+
+  Please replace <year> with the value from the FreeType version you
+  actually use.
+
+
+Legal Terms
+===========
+
+0. Definitions
+--------------
+
+  Throughout this license,  the terms `package', `FreeType Project',
+  and  `FreeType  archive' refer  to  the  set  of files  originally
+  distributed  by the  authors  (David Turner,  Robert Wilhelm,  and
+  Werner Lemberg) as the `FreeType Project', be they named as alpha,
+  beta or final release.
+
+  `You' refers to  the licensee, or person using  the project, where
+  `using' is a generic term including compiling the project's source
+  code as  well as linking it  to form a  `program' or `executable'.
+  This  program is  referred to  as  `a program  using the  FreeType
+  engine'.
+
+  This  license applies  to all  files distributed  in  the original
+  FreeType  Project,   including  all  source   code,  binaries  and
+  documentation,  unless  otherwise  stated   in  the  file  in  its
+  original, unmodified form as  distributed in the original archive.
+  If you are  unsure whether or not a particular  file is covered by
+  this license, you must contact us to verify this.
+
+  The FreeType  Project is copyright (C) 1996-2000  by David Turner,
+  Robert Wilhelm, and Werner Lemberg.  All rights reserved except as
+  specified below.
+
+1. No Warranty
+--------------
+
+  THE FREETYPE PROJECT  IS PROVIDED `AS IS' WITHOUT  WARRANTY OF ANY
+  KIND, EITHER  EXPRESS OR IMPLIED,  INCLUDING, BUT NOT  LIMITED TO,
+  WARRANTIES  OF  MERCHANTABILITY   AND  FITNESS  FOR  A  PARTICULAR
+  PURPOSE.  IN NO EVENT WILL ANY OF THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE  FOR ANY DAMAGES CAUSED  BY THE USE OR  THE INABILITY TO
+  USE, OF THE FREETYPE PROJECT.
+
+2. Redistribution
+-----------------
+
+  This  license  grants  a  worldwide, royalty-free,  perpetual  and
+  irrevocable right  and license to use,  execute, perform, compile,
+  display,  copy,   create  derivative  works   of,  distribute  and
+  sublicense the  FreeType Project (in  both source and  object code
+  forms)  and  derivative works  thereof  for  any  purpose; and  to
+  authorize others  to exercise  some or all  of the  rights granted
+  herein, subject to the following conditions:
+
+    o Redistribution of  source code  must retain this  license file
+      (`FTL.TXT') unaltered; any  additions, deletions or changes to
+      the original  files must be clearly  indicated in accompanying
+      documentation.   The  copyright   notices  of  the  unaltered,
+      original  files must  be  preserved in  all  copies of  source
+      files.
+
+    o Redistribution in binary form must provide a  disclaimer  that
+      states  that  the software is based in part of the work of the
+      FreeType Team,  in  the  distribution  documentation.  We also
+      encourage you to put an URL to the FreeType web page  in  your
+      documentation, though this isn't mandatory.
+
+  These conditions  apply to any  software derived from or  based on
+  the FreeType Project,  not just the unmodified files.   If you use
+  our work, you  must acknowledge us.  However, no  fee need be paid
+  to us.
+
+3. Advertising
+--------------
+
+  Neither the  FreeType authors and  contributors nor you  shall use
+  the name of the  other for commercial, advertising, or promotional
+  purposes without specific prior written permission.
+
+  We suggest,  but do not require, that  you use one or  more of the
+  following phrases to refer  to this software in your documentation
+  or advertising  materials: `FreeType Project',  `FreeType Engine',
+  `FreeType library', or `FreeType Distribution'.
+
+  As  you have  not signed  this license,  you are  not  required to
+  accept  it.   However,  as  the FreeType  Project  is  copyrighted
+  material, only  this license, or  another one contracted  with the
+  authors, grants you  the right to use, distribute,  and modify it.
+  Therefore,  by  using,  distributing,  or modifying  the  FreeType
+  Project, you indicate that you understand and accept all the terms
+  of this license.
+
+4. Contacts
+-----------
+
+  There are two mailing lists related to FreeType:
+
+    o freetype@nongnu.org
+
+      Discusses general use and applications of FreeType, as well as
+      future and  wanted additions to the  library and distribution.
+      If  you are looking  for support,  start in  this list  if you
+      haven't found anything to help you in the documentation.
+
+    o freetype-devel@nongnu.org
+
+      Discusses bugs,  as well  as engine internals,  design issues,
+      specific licenses, porting, etc.
+
+  Our home page can be found at
+
+    https://www.freetype.org
+
+
+--- end of FTL.TXT ---
+
+===== @babylonjs/core 6.49.0 (Apache-2.0) =====
+# Apache License 2.0 (Apache)
+
+Apache License
+Version 2.0, January 2004
+<http://www.apache.org/licenses/>
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+## Definitions
+
+"License" shall mean the terms and conditions for use, reproduction, and distribution as defined by Sections 1 through 9 of this document.
+
+"Licensor" shall mean the copyright owner or entity authorized by the copyright owner that is granting the License.
+
+"Legal Entity" shall mean the union of the acting entity and all other entities that control, are controlled by, or are under common control with that entity. For the purposes of this definition, "control" means (i) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding shares, or (iii) beneficial ownership of such entity.
+
+"You" (or "Your") shall mean an individual or Legal Entity exercising permissions granted by this License.
+
+"Source" form shall mean the preferred form for making modifications, including but not limited to software source code, documentation source, and configuration files.
+
+"Object" form shall mean any form resulting from mechanical transformation or translation of a Source form, including but not limited to compiled object code, generated documentation, and conversions to other media types.
+
+"Work" shall mean the work of authorship, whether in Source or Object form, made available under the License, as indicated by a copyright notice that is included in or attached to the work (an example is provided in the Appendix below).
+
+"Derivative Works" shall mean any work, whether in Source or Object form, that is based on (or derived from) the Work and for which the editorial revisions, annotations, elaborations, or other modifications represent, as a whole, an original work of authorship. For the purposes of this License, Derivative Works shall not include works that remain separable from, or merely link (or bind by name) to the interfaces of, the Work and Derivative Works thereof.
+
+"Contribution" shall mean any work of authorship, including the original version of the Work and any modifications or additions to that Work or Derivative Works thereof, that is intentionally submitted to Licensor for inclusion in the Work by the copyright owner or by an individual or Legal Entity authorized to submit on behalf of the copyright owner. For the purposes of this definition, "submitted" means any form of electronic, verbal, or written communication sent to the Licensor or its representatives, including but not limited to communication on electronic mailing lists, source code control systems, and issue tracking systems that are managed by, or on behalf of, the Licensor for the purpose of discussing and improving the Work, but excluding communication that is conspicuously marked or otherwise designated in writing by the copyright owner as "Not a Contribution."
+
+"Contributor" shall mean Licensor and any individual or Legal Entity on behalf of whom a Contribution has been received by Licensor and subsequently incorporated within the Work.
+
+## Grant of Copyright License
+
+Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.
+
+## Grant of Patent License
+
+Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this License for that Work shall terminate as of the date such litigation is filed.
+
+## Redistribution
+
+You may reproduce and distribute copies of the Work or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:
+
+1. You must give any other recipients of the Work or Derivative Works a copy of this License; and
+
+2. You must cause any modified files to carry prominent notices stating that You changed the files; and
+
+3. You must retain, in the Source form of any Derivative Works that You distribute, all copyright, patent, trademark, and attribution notices from the Source form of the Work, excluding those notices that do not pertain to any part of the Derivative Works; and
+
+4. If the Work includes a "NOTICE" text file as part of its distribution, then any Derivative Works that You distribute must include a readable copy of the attribution notices contained within such NOTICE file, excluding those notices that do not pertain to any part of the Derivative Works, in at least one of the following places: within a NOTICE text file distributed as part of the Derivative Works; within the Source form or documentation, if provided along with the Derivative Works; or, within a display generated by the Derivative Works, if and wherever such third-party notices normally appear. The contents of the NOTICE file are for informational purposes only and do not modify the License. You may add Your own attribution notices within Derivative Works that You distribute, alongside or as an addendum to the NOTICE text from the Work, provided that such additional attribution notices cannot be construed as modifying the License.
+
+You may add Your own copyright statement to Your modifications and may provide additional or different license terms and conditions for use, reproduction, or distribution of Your modifications, or for any such Derivative Works as a whole, provided Your use, reproduction, and distribution of the Work otherwise complies with the conditions stated in this License.
+
+## Submission of Contributions
+
+Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in the Work by You to the Licensor shall be under the terms and conditions of this License, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such Contributions.
+
+## Trademarks
+
+This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file.
+
+## Disclaimer of Warranty
+
+Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
+
+## Limitation of Liability
+
+In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
+
+## Accepting Warranty or Additional Liability
+
+While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
+
+
+===== @jpweeks/typedarray-pool 2.0.0 (MIT) =====
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Mikola Lysenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== aabb-3d 0.3.0 (MIT) =====
+Author: "Chris Dickinson <chris@neversaw.us>"
+Source: {"type":"git","url":"https://github.com/chrisdickinson/aabb-3d"}
+# aabb-3d
+
+Axis aligned bounding boxes for fun and profit.
+
+[![browser support](http://ci.testling.com/chrisdickinson/aabb-3d.png)](http://ci.testling.com/chrisdickinson/aabb-3d)
+
+```javascript
+import aabb from 'aabb-3d'
+
+const bounding_box = new aabb([0, 0, 0], [12, 12, 12])   // x, y, z == 0; width, height, depth == 12
+const other = new aabb([10, 10, 10], [2, 2, 2])
+
+bounding_box.intersects(other) // true
+bounding_box.translate([2, 2, 2])  // moves the bounding box
+bounding_box.expand(other)  // returns a new aabb that surrounds both bboxes
+
+```
+
+# API
+
+### aabb = new aabb([x, y, z], [w, h, d])
+
+returns a new aabb.
+
+### aabb.width() -> Number
+### aabb.height() -> Number
+### aabb.depth() -> Number
+### aabb.x0()
+### aabb.y0()
+### aabb.x1()
+### aabb.y1()
+### aabb.z0()
+### aabb.z1()
+
+returns:
+
+```
+    
+        x0/y1/z1---x1/y1/z1
+depth->  /           /|
+        /           / |
+    x0/y1/z0 -- x1/y1/z0
+      |           |   |
+      |           | <-- height
+      |           |  /
+      |           | /
+   x0/y0/z0 ----- x1/y0/z0
+            ^
+            |
+          width
+```
+
+### aabb.translate([x, y, z])
+
+moves the box. returns itself.
+
+### aabb.intersects(aabb) -> Boolean
+
+returns true if the two bounding boxes intersect (or touch at all.)
+
+### aabb.union(aabb) -> new aabb or null
+
+returns a new `aabb` representing the shared area of the
+two aabb's. returns `null` if the boxes don't intersect.
+
+### aabb.expand(aabb) -> new aabb
+
+returns a new `aabb` that surrounds both aabbs.
+
+# License
+
+MIT
+
+
+
+
+===== bit-twiddle 1.0.2 (MIT) =====
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Mikola Lysenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== box-intersect 1.0.3 (MIT) =====
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Mikola Lysenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== dup 1.0.0 (MIT) =====
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Mikola Lysenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== ent-comp 0.11.0 (MIT) =====
+Author: "Andy Hall"
+Source: "github:fenomas/ent-comp"
+# ent-comp
+
+A light, *fast* entity-component system in JS with no dependencies.
+
+## Overview
+
+An [Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system) 
+(ECS) is a programming construct that solves a very common 
+problem in gamedev. It lets you easily model dynamic systems 
+where the entities are difficult to describe with OO-style inheritance.
+
+This library is the distilled result of my playing with a bunch of ECS libraries,
+removing what wasn't useful, and rejiggering what remained to perform well in the 
+most important cases. Specifically it's tuned to be fast at accessing the state 
+of a given entity/component, and looping over all states for a given component. 
+
+To get started, check the usage examples below, or the [API reference](api.md).
+
+## Installation:
+
+To use as a dependency:
+
+	npm install ent-comp
+
+To hack on it:
+
+```sh
+git clone https://github.com/fenomas/ent-comp.git
+cd ent-comp
+npm install
+npm test         # run tests
+npm run bench    # run benchmarks
+npm run doc      # rebuild API docs
+```
+
+## API reference:
+
+See [api.md](api.md).
+
+
+## Basic usage:
+
+Create the ECS, entities, and components thusly:
+
+```js
+var EntComp = require('ent-comp')
+var ecs = new EntComp()
+
+// Entities are simply integer IDs:
+var playerID = ecs.createEntity() // 1
+var monsterID = ecs.createEntity() // 2
+
+// components are defined with a definition object:
+ecs.createComponent({
+	name: 'isPlayer'
+})
+
+// component definitions can be accessed by name
+ecs.components['isPlayer']  // returns the definition object
+```
+
+Once you have some entities and components, you can add them, remove them, and check their existence:
+
+```js
+ecs.addComponent(playerID, 'isPlayer')
+ecs.hasComponent(playerID, 'isPlayer') // true
+
+ecs.removeComponent(playerID, 'isPlayer')
+ecs.hasComponent(playerID, 'isPlayer') // false
+
+// when creating an entity you can pass in an array of components to add
+var id = ecs.createEntity([ 'isPlayer', 'other-component' ]) 
+```
+
+The trivial example above implements a stateless component, which can be used like a boolean flag for entities. But most real components will also need to manage some data for each entity. This is done by giving the component a `state` object, and using the `#getState` method. 
+
+```js
+// createComponent returns the component name, for convenience
+var locationComp = ecs.createComponent({
+	name: 'location',
+	state: { x:0, y:0, z:0 },
+})
+
+// give the player entity a location component
+ecs.addComponent(playerID, locationComp)
+
+// grab its state to update its data
+var loc = ecs.getState(playerID, locationComp)
+loc.y = 37
+
+// you can also pass in initial state values when adding a component:
+ecs.addComponent(monsterID, locationComp, { y: 42 })
+ecs.getState(monsterID, locationComp) // { x:0, y:42, z:0 }
+```
+
+When a component is added to an entity, its state object is automatically 
+populated with an `__id` property denoting the entity's ID. 
+
+```js
+loc.__id // same as playerID
+```
+
+Components can also have `onAdd` and `onRemove` properties, which get called 
+as any entity gains or loses the component. 
+
+```js
+ecs.createComponent({
+	name: 'orientation',
+	state: { angle:0 },
+	onAdd: (id, state) => {
+		// initialize to a random direction
+		state.angle = 360 * Math.random()
+	},
+	onRemove: (id, state) => {
+		console.log('orientation removed from entity', id)
+	}
+})
+```
+
+Finally, components can define `system` and/or `renderSystem` functions. 
+When your game ticks or renders, call the appropriate library methods, 
+and each component system function will get passed a list of state objects
+for all the entities that have that component.
+
+Components can also define an `order` property (default `99`), to specify the order in which systems fire (lowest to highest).
+
+```js
+ecs.createComponent({
+	name: 'hitPoints',
+	state: { hp: 100 },
+	order: 10,
+	system: function(dt, states) {
+		// states is an array of entity state objects
+		states.forEach(state => {
+			if (state.hp <= 0) console.log('Dead entity!', state.__id)
+		})
+	},
+	renderSystem: function(dt, states) {
+		states.forEach(state => {
+			var id = state.__id
+			var hp = state.hp
+			drawTheEntityHitpoints(id, hp) 
+		})
+	},
+})
+
+// calling tick/render triggers the systems
+ecs.tick( tick_time )
+ecs.render( render_time )
+```
+
+See the [API reference](api.md) for details on each method.
+
+## Multi-components
+
+This library now supports multi components, where a component can be added to the same entity multiple times. Each addition creates a separate state object.
+
+API may change someday, but for now all ECS methods that normally 
+return a state object instead return an array of state objects. 
+Calling `removeComponent` will remove all multi-component instances for 
+that entity, and there's a new `removeMultiComponent(id, name, index)` 
+API to remove them individually (by their index in the array).
+
+In practice it looks like this:
+```js
+ecs.createComponent({
+	name: 'buff',
+	multi: true, // this marks the component as multi
+	state: { buffName: '', duration: 100 },
+	system: function(dt, stateLists) {
+		// stateLists is the array of all ent/comp pairs
+		stateLists.forEach(statesArr => {
+			// statesArr is an array of multi components for this entity
+			statesArr.forEach((state, i) => {
+				// update the state of this particular entity's buff
+				state.duration -= dt
+				if (state.duration < 0) {
+					ecs.removeMultiComponent(state.__id, 'buff', i)
+				}
+			})
+		})
+	},
+})
+```
+
+## Further usage:
+
+If you need to query certain components many times each frame, you can create 
+bound accessor functions to get the existence or state of a given component.
+These accessors are moderately faster than `getState` and `hasComponent`.
+
+```js
+var hasLocation = ecs.getComponentAccessor('location')
+hasLocation(entityID) // true or false
+
+var getLocation = ecs.getStateAccessor('location')
+getLocation(entityID) // returns a state object
+```
+
+There's also an API for getting an array of all state objects for a given component.
+
+```js
+var states = ecs.getStatesList('hitPoints')
+// returns the same array that gets passed to `system` functions
+```
+
+## Caveat about complex state objects:
+
+When you add a component to an entity, a new state object is created for that ent/comp pair. This new state object is a **shallow copy** of the component's default state, not a duplicate or deep clone. This means any non-primitive state properties will be copied by reference.
+
+What this means to you is, state objects containing nested objects or arrays 
+probably won't do what you intended. For example:
+
+```js
+ecs.createComponent({
+	name: 'foo',
+	state: {
+		vector3: [0,0,0]
+	}
+})
+```
+
+If you define a component that way, all its state objects will contain references to *the same array*. You probably want each to have its own, which you can do by initializing them in the `onAdd` handler:
+
+```js
+ecs.createComponent({
+	name: 'foo',
+	state: {
+		vector3: null
+	},
+	onAdd: function(id, state) {
+		if (!state.vector3) state.vector3 = [0,0,0]
+	}
+})
+```
+
+Testing for the value before overwriting means that you can pass in an initial
+value when adding the component, and it will still do what you expect:
+
+```js
+ecs.addComponent(id, 'foo', { vector3: [1,1,1] })
+```
+
+## Things this library doesn't do:
+
+ 1. Assemblages. I can't for the life of me see how they add any value. 
+ If I'm missing something please file an issue.
+ 
+ 2. Provide any way of querying which entities have components A and B, but not C, and so on. If you need this, I think maintaining your own lists will be faster 
+ (and probably easier to use) than anything the library could do automatically.
+
+
+## Change list
+
+ * 0.10.0
+   * Changes internals such that removals and deletions are handled immediately. Removes the need for `immediately` arguments on such methods.
+ * 0.9.0
+   * Adds `order` property to component definitions
+ * 0.7.0
+   * Internals rebuilt and bugs fixed, should be no API changes
+ * 0.6.0
+   * `removeComponent` changed to be deferred by default
+   * `removeComponentLater` removed
+   * Adds `multi`-tagged components, and `removeMultiComponent`
+   * Doubles performance of `hasComponent` and `getState` (for some reason..)
+
+----
+
+### Author: https://github.com/fenomas
+
+### License: MIT
+
+
+
+===== events 3.3.0 (MIT) =====
+MIT
+
+Copyright Joyent, Inc. and other Node contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+===== fast-voxel-raycast 0.1.1 (MIT) =====
+Author: "Andy Hall"
+Source: {"type":"git","url":"git+https://github.com/andyhall/fast-voxel-raycast.git"}
+## fast-voxel-raycast
+
+Fast raycasting through voxels.
+
+This is a fork of [voxel-raycast](https://github.com/mikolalysenko/voxel-raycast), 
+using the faster, simpler algorithm described in 
+[this paper](http://www.cse.chalmers.se/edu/year/2010/course/TDA361/grid.pdf)
+by Amanatides and Woo.
+
+In general it functions equivalently to the parent library, except for 
+edge cases (e.g. when the raycast precisely touches the corner of a solid voxel),
+in which case no particular behavior is defined.
+
+### Installation
+
+    npm install fast-voxel-raycast
+    
+### Usage
+
+```js
+var raycast = require('fast-voxel-raycast')
+
+raycast( getVoxel, start, direction, distance, hit_position, hit_normal )
+```
+
+* `getVoxel` - a `function(x,y,z)` that returns a truthy value for whether each voxel should block the raycast
+* `start` - origin of the ray
+* `direction` - direction of the ray
+* `distance` - how far to check the ray before giving up
+* `hit_position` - result array, gets populated with the point of impact
+* `hit_normal` - gets populated with a normal vector pointing away from the voxel that was struck 
+
+**Returns:**  whatever value was returned by the `getVoxel` function for the struck voxel, 
+or `0` if no voxel was struck.
+
+### Example
+
+```js
+var raycast = require('fast-voxel-raycast')
+
+var getVoxel = function(x,y,z) {
+    // return a truthy value here for voxels that block the raycast
+    return (y<0) ? 1 : 0
+}
+
+var hit_position = []
+var hit_normal = []
+
+var result = raycast( getVoxel, [3,4,5], [1,-1,-1], 20, hit_position, hit_normal )
+
+if (result != 0) {
+    console.log('hit:', result, hit_position, hit_normal)
+} else {
+    console.log('no truthy voxel was struck')
+}
+```
+
+
+
+===== game-inputs 0.8.0 (ISC) =====
+Author: "Andy Hall"
+Source: {"type":"git","url":"https://github.com/fenomas/game-inputs"}
+game-inputs
+==========
+A simple library for abstracting key/mouse input for games. 
+
+Does stuff like:
+
+* Virtual key bindings (i.e. map one or more physical keys to a single action)
+* Emits down/up events for each binding (not each key)
+* Handles annoying edge cases, like overlapping events from two keys bound to the same action, or the browser losing focus while a key is pressed, etc.
+* Exposes objects with the current state of each binding, the number of press/release events since the last tick, etc.
+* Also tracks mouse/pointer events and scroll/wheel inputs
+
+Canonical names for physical keys are as specified by [KeyboardEvent.code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code). To check key codes, try the [live demo](http://fenomas.github.io/game-inputs/).
+
+
+## Sample usage:
+
+```js
+import { GameInputs } from 'game-inputs'
+
+// instantiate
+var domElement = document.querySelector('...')
+var inputs = new GameInputs(domElement, {
+  preventDefaults: true, 
+  allowContextMenu: false,
+})
+
+// bind an arbitrary event name to one or more physical key codes
+inputs.bind( 'move-fwd',  'KeyW' )
+inputs.bind( 'move-left', 'KeyA', 'ArrowLeft' )
+
+// listen to that event name for press/release events
+inputs.down.on( 'move-fwd', (ev) => { startMovingFwd() } )
+inputs.up.on( 'move-fwd', (ev) => { stopMovingFwd() } )
+
+// mouse/pointer buttons are bindable as `Mouse1`, `Mouse2`, ...
+inputs.bind( 'shoot', 'Mouse1' )
+inputs.bind( 'RMB', 'Mouse3' )
+
+// you can also query various input states in the game loop
+function myGameLoop() {
+  // current boolean state of a key or mouse button
+  var leftCurrentlyPressed = inputs.state['move-left']
+  var shootButtonPressed = inputs.state['shoot']
+
+  // pointer movement and scroll/wheel data
+  var mouseMovedBy = [inputs.pointerState.dx, inputs.pointerState.dy]
+  var scrolledBy = inputs.pointerState.scrolly
+
+  // accumulated number of presses/releases since the last tick
+  var fwdPresses = inputs.pressCount['move-fwd']
+  var fwdReleases = inputs.releaseCount['move-fwd']
+
+  // calling tick() zeroes out cumulative mouse/scroll/press/release values
+  inputs.tick()
+}
+
+// you can optionally filter events before they occur - e.g. if you want
+// keyboard events not to fire if control keys are pressed
+inputs.filterEvents = (ev, bindingName) => {
+    if (/^Key/.test(ev.code) && ev.ctrlKey) return false
+    return true
+}
+```
+
+Here's the [interactive demo](http://fenomas.github.io/game-inputs/).
+
+
+## Installation
+
+```shell
+npm install game-inputs
+```
+
+
+## API
+
+The various methods and properties are documented via doc comments, so in a 
+modern editor you should hopefully see them as tooltips.
+
+Otherwise, please see the source ;)
+
+
+## Notes:
+
+* When you specify a `domElement`, this module will only track **pointer** inputs (movement, clicks, and scrolls) inside that element. However **keyboard** inputs will be tracked globally at the document level.
+* If you don't specify a DOM element, `document` will be used.
+* For several reasons, this module doesn't call `preventDefault` or `stopPropagation` on mouse or scroll events, even if those properties are set. If you want to prevent parts of your page from scrolling or panning, it's more performant to do so via CSS.
+
+
+## Known issues:
+
+ - On Mac `keyup` events never fire while the Command key is pressed ([see here](https://bugs.chromium.org/p/chromium/issues/detail?id=1393524)), so if the user presses `cmd+A` it's impossible to detect whether the `A` key gets released. There's no great way to work around this - this library errs on the side of avoiding phantom key inputs by emulating an `up` for such key chords when the Command key is released.
+
+
+
+<br>
+
+----
+
+## History
+
+ * `0.8.0` Works around mac-only command key bug
+ * `0.7.0` Adds `filterEvents()`
+ * `0.6.0` Modernization pass - adopts real physical key codes, Pointer events (still fallback to mouse), etc. Also adds proper docs/types.  
+ Breaking changes:
+   * now an ES module exporting a named `class`, not a factory function
+   * Key binding names now use [KeyboardEvent.code](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code) strings (e.g. `KeyA`, `Space`)
+   * Bindings for mouse buttons are now `Mouse1`, `Mouse2`..
+   * Mouse/scroll values (`dx,dy,scrollx,scrolly`) moved from `inputs.state` to `inputs.pointerState`
+ * `0.5.0` Minor features and dependency updates
+ * `0.3.0` Stable release
+
+
+----
+
+## By
+
+Made with 🍺 by [Andy Hall](https://fenomas.com).
+
+License is ISC.
+
+Originally modeled after 
+[game-shell](https://github.com/mikolalysenko/game-shell), but probably doesn't resemble it much anymore.
+
+
+===== gl-matrix 3.4.4 (MIT) =====
+Copyright (c) 2015-2025, Brandon Jones, Colin MacKenzie IV.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+===== gl-vec3 1.2.0 (zlib) =====
+Copyright (c) 2013 Brandon Jones, Colin MacKenzie IV
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+ 1. The origin of this software must not be misrepresented you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+ 2. Altered source versions must be plainly marked as such, and must not
+    be misrepresented as being the original software.
+
+ 3. This notice may not be removed or altered from any source distribution.
+
+===== iota-array 1.0.0 (MIT) =====
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Mikola Lysenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== is-buffer 2.0.5 (MIT) =====
+The MIT License (MIT)
+
+Copyright (c) Feross Aboukhadijeh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== micro-game-shell 0.9.0 (ISC) =====
+Author: "andy (https://fenomas.com/)"
+Source: {"type":"git","url":"https://github.com/andyhall/micro-game-shell"}
+
+# micro-game-shell
+
+A small game shell. Provides reliable timing events, and manages pointerlock/fullscreen/resize.
+
+[Live demo](https://fenomas.github.io/micro-game-shell/)
+
+This library provides two sets of timing events: `tick`, which can fire at any specified rate, and `render`, which fires on browser frame updates (but can be throttled to a lower rate).`
+
+The intention is that game clients can use these events to implement 
+[fixed timesteps](https://gafferongames.com/post/fix_your_timestep/), where game logic (e.g. physics) runs at a different cadence than rendering.
+
+
+----
+
+## Usage
+
+```sh
+npm i --save micro-game-shell
+```
+
+```js
+import { MicroGameShell } from 'micro-game-shell'
+
+// instantiate
+var document.querySelector('#game')     // optional
+var pollRate = 10                       // optional
+var shell = new MicroGameShell(domElement, pollRate)
+
+// settings
+shell.tickRate = 30               // ticks/second
+shell.maxRenderRate = 0           // fps - 0 means uncapped
+shell.stickyPointerLock = false   // whether to request pointerLock on click
+shell.stickyFullscreen = false    // ditto for fullscreen
+shell.maxTickProcessingTime = 25  // see below
+
+// add event callbacks
+shell.onTick = (tickDur)  => { /* ... */ }
+shell.onRender = (dt, fp) => { /* ... */ }
+// see below for rest of events
+```
+
+
+## API
+
+Consctructor params:
+
+ * `domElement` - a DOM element, for pointerLock/fullscreen. If none is specified, shell instance will ignore DOM features, and just issue timing events.
+ * `pollTime` (10ms) - how often to poll for ticks. Set to `0` if you want to disable polling.
+
+Instance properties:
+
+ * `tickRate` - desired tick events per second. Default `30`
+ * `maxRenderRate` - upper limit for the rate of render events. Default of `0` means uncapped.
+ * `pointerLock` - check or set whether the DOM element has pointerlock
+ * `fullscreen` - check or set whether the DOM element has fullscreen
+ * `stickyPointerLock` - shell will request pointerLock when the domElement is clicked. default `false`
+ * `stickyFullscreen` - shell will request fullscreen when the domElement is clicked. default `false`
+ * `maxTickTime` - max time spent issuing tick events when behind schedule. If the shell spends this long on tick events, it will discard all pending ticks to catch up. Default `100`ms.
+
+Events:
+
+ * `onTick(tickDur)` - tick event handler. `tickDur` is a fixed constant value (ms), not the actual time elapsed.
+ * `onRender(dt, framePart, tickTime)` - render event handler. `dt` is actual time since the last render (in ms), and `framepart` is the fractional number of game ticks (i.e. how far we are into the current tick).
+
+ * `onInit()` - fires once, when shell is set up (after `DOMReady`)
+ * `onResize()` - fires when dom element's window changes size
+ * `onPointerLockChanged(hasPL)` - fires on gaining/losing pointerLock
+ * `onFullscreenChanged(hasFS)` - fires on gaining/losing fullscreen
+ * `onPointerLockError(err)` - fires when pointerLock is refused by the browser
+
+
+----
+
+## Credits
+
+Made with 🍺 by [Andy Hall](https://twitter.com/fenomas), license is ISC.
+
+
+
+===== ndarray 1.1.1 (MIT) =====
+
+The MIT License (MIT)
+
+Copyright (c) 2013-2016 Mikola Lysenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== is-buffer 1.1.6 (MIT) =====
+The MIT License (MIT)
+
+Copyright (c) Feross Aboukhadijeh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== noa-engine 0.33.0 (MIT) =====
+The MIT License (MIT)
+
+Copyright (c) 2015-2022 Andy Hall (andy@fenomas.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+===== three 0.186.1 (MIT) =====
+The MIT License
+
+Copyright © 2010-2026 three.js authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+===== voxel-aabb-sweep 0.5.0 (MIT) =====
+Author: "Andy Hall"
+Source: {"type":"git","url":"git+https://github.com/andyhall/voxel-aabb-sweep.git"}
+## voxel-aabb-sweep
+
+Sweep an AABB along a vector and find where it collides with a set of voxels. 
+
+There are other libraries that do this naively, by sweeping the AABB along 
+each axis in turn, but this is inaccurate for larger movements, 
+and it gives anisotropic results (i.e. it prefers to collide in some axes over others).
+
+In contrast this library essentially raycasts along the the AABB's leading corner, 
+and each time the ray crosses a voxel boundary, it checks for collisions across the 
+AABB's leading face in that axis. This gives correct results even across long movements,
+with reasonably solid performance.
+ 
+The raycasting algorithm is from [fast-voxel-raycast](https://github.com/andyhall/fast-voxel-raycast).
+
+### Installation
+
+```sh
+npm install voxel-aabb-sweep
+```
+    
+### Usage
+
+```js
+var sweep = require('voxel-aabb-sweep')
+var callback = function (dist, axis, dir, vec) { /* .. */ }
+var distance = sweep(getVoxels, box, vector, callback, noTranslate, epsilon)
+```
+
+ * `distance` - the total scalar distance the AABB moved during the sweep
+ * `getVoxel` - a `function(x,y,z)` that returns a truthy value for voxels that collide the AABB
+ * `box` - an object shaped like an [aabb-3d](https://github.com/andyhall/aabb-3d)
+ * `vector` - vector along which the AABB is to move. E.g. `[5, 10, -3]`
+ * `callback` - A function that will get called when a collision occurs.
+ * `noTranslate` - (default false) If true, the AABB will not be translated to its new position.
+ * `epsilon` - (default 1e-10) Rounding factor by which an AABB must cross a voxel boundary to count
+
+The collision callback:
+
+ * `dist` - the scalar distance moved so far in the sweep
+ * `axis` - the axis in which a collision occured
+ * `dir` - movement direction (1 or -1) along the collision axis
+ * `vec` - the vector distance remaining to be moved (can and probably should be updated by the callback)
+ * *return value*: if you return true the sweep will end at the collision; otherwise it will continue along `vec`
+ 
+Once the sweep ends, `box` will be moved to its final position via its `translate()` method.
+
+### Example
+
+```js
+var sweep = require('voxel-aabb-sweep')
+var getVoxel = function(x,y,z) { return (y > 5) }
+var box = { base: [0,0,0], max: [1,1,1], translate: function() {} }
+var vector = [ 5, 10, -4 ]
+var dist = sweep( getVoxel, box, vector, function() {
+    return true
+})
+// dist: 5.937171043518958
+```
+
+### How to use this library
+
+To use this like a volumetric raycast, and simply find where the first collision occurs,
+you'll want to return `true` in the callback (like the example above).
+
+To use this as you might in a physics engine, where collisions mean the AABB stops 
+moving in the obstructed direction, but continues along the other axes,
+you'll probably want to zero out the obstructed component of the `vec` parameter 
+(which signfies how far the AABB has left to sweep) and let the sweep continue:
+
+```js
+var dist = sweep( getVoxel, box, vector, function(dist, axis, dir, vec) {
+    vec[axis] = 0
+    return false
+})
+```
+
+You could also do something more complicated, like bouncing back along the obstructed axis, etc. 
+
+### Hacking
+
+```sh
+# clone this repo
+cd voxel-aabb-sweep
+npm install     # get dev dependencies
+npm test        # run tests
+```
+
+### License
+
+&copy; 2016 Andy Hall, MIT license
+
+
+===== voxel-physics-engine 0.13.0 (MIT) =====
+The MIT License (MIT)
+
+Copyright (c) 2015 Andy Hall
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
