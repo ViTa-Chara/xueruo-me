@@ -64,3 +64,32 @@ html, body {
   user-select: none;
   -webkit-user-drag: none;
 }
+
+.physics-layer {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.physics-body {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+body.blackout,
+html.blackout {
+  height: 100%;
+  overflow: hidden;
+  background: #000000;
+}
+
+body.blackout .void,
+body.blackout .stage,
+body.blackout .tail {
+  display: none;
+}
