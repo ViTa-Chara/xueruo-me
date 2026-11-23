@@ -1,0 +1,305 @@
+/* =========================================================================
+   MIC CHECK — VERTICAL 3D STREET CORRIDOR & ULTRA-THIN SONGTI MOSAIC SCREENS
+   Pure #000000 void · Pure #ffffff ultra-thin Songti (weight 200)
+   Zero overlays on images · Zero transparency hacks · Zero empty gaps
+   ========================================================================= */
+
+:root {
+  --song-thin: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --pure-white: #ffffff;
+}
+
+.pv-stage {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  overflow: hidden;
+  z-index: 120;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: clip-path;
+}
+
+/* True one-point 3D perspective converging onto dead screen center (50% 50%) */
+.pv-corridor-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 10;
+  perspective: 820px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+.pv-street-item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.pv-street-item .pv-crop {
+  position: relative;
+  overflow: visible;
+}
+
+.pv-street-item img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.pv-monitor-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.pv-toss-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 30;
+}
+
+.pv-toss-body {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.pv-toss-body .pv-crop {
+  position: relative;
+  overflow: visible;
+}
+
+.pv-toss-body img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* =========================================================================
+   MONITOR SHELL & SCREEN SLOT (FRONT OR BEHIND CUT-OUT BEZEL)
+   ========================================================================= */
+
+.pv-monitor-unit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
+  transform-origin: 0 0;
+  display: none;
+}
+
+.pv-monitor-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.pv-monitor-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  z-index: 1;
+}
+
+.pv-monitor-frame.behind-bezel .pv-monitor-photo {
+  z-index: 3;
+  transform: translateZ(1px);
+}
+
+.pv-screen-slot {
+  position: absolute;
+  overflow: hidden;
+  background: #000000;
+  z-index: 2;
+  transform-origin: center center;
+}
+
+.pv-monitor-frame.behind-bezel .pv-screen-slot {
+  z-index: 1;
+  transform-origin: 0 0;
+}
+
+.pv-screen-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: #000000;
+  color: var(--pure-white);
+  font-family: var(--song-thin);
+  font-weight: 200;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================================
+   ZERO-GAP, ZERO-OVERLAP EDITORIAL MOSAIC GRID SYSTEM
+   Every cell is EITHER a 100%-opaque real image OR pure #ffffff thin Songti
+   ========================================================================= */
+
+.m-screen {
+  background: #000000;
+  color: #ffffff;
+  font-family: var(--song-thin);
+  font-weight: 200;
+  display: grid;
+  gap: 5px;
+  padding: 6px;
+  overflow: hidden;
+}
+
+.m-screen-16x9 {
+  width: 960px;
+  height: 540px;
+}
+
+.m-screen-4x3 {
+  width: 800px;
+  height: 600px;
+}
+
+.m-row {
+  display: grid;
+  gap: 5px;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.m-col {
+  display: grid;
+  gap: 5px;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 100% opaque, untouched project image cell — ZERO scrim, ZERO overlay text */
+.m-img {
+  position: relative;
+  overflow: hidden;
+  background: #000000;
+  min-height: 0;
+  min-width: 0;
+}
+
+.m-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+}
+
+.m-img.fit-stretch img {
+  object-fit: fill;
+}
+
+.m-img.pos-top img {
+  object-position: center 44%;
+}
+
+.m-img.pos-eye img {
+  object-position: 45% 58%;
+  transform: scale(1.16);
+}
+
+.m-img.pos-daw img {
+  object-position: left center;
+}
+
+/* Pure #000000 + pure #ffffff Ultra-Thin Songti stretched SVG anchor cell */
+.m-fit {
+  position: relative;
+  overflow: hidden;
+  background: #000000;
+  min-height: 0;
+  min-width: 0;
+  display: block;
+}
+
+.m-fit svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.m-fit text {
+  fill: #ffffff;
+  font-family: var(--song-thin);
+  font-weight: 200;
+}
+
+/* Tightly packed, fully legible pure #ffffff ultra-thin Songti prose block */
+.m-prose {
+  background: #000000;
+  color: #ffffff;
+  font-family: var(--song-thin);
+  font-weight: 200;
+  font-size: 13.5px;
+  line-height: 1.38;
+  letter-spacing: 0.015em;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+  padding: 1px 2px;
+  word-break: break-word;
+}
+
+.m-prose.sm {
+  font-size: 12.2px;
+  line-height: 1.34;
+}
+
+.m-prose.md {
+  font-size: 14.5px;
+  line-height: 1.40;
+}
+
+.m-prose.en {
+  font-size: 12.6px;
+  line-height: 1.32;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Pure monochrome readable production code layer cell (for SatoBot) */
+.m-code {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  font-family: ui-monospace, 'SF Mono', 'Menlo', 'Monaco', monospace;
+  font-weight: 300;
+  font-size: 10.6px;
+  line-height: 1.36;
+  padding: 6px 8px;
+  margin: 0;
+  white-space: pre;
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+  letter-spacing: -0.01em;
+}
+

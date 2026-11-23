@@ -68,10 +68,10 @@ html, body {
 .camera-rig {
   position: fixed;
   inset: 0;
-  background: #000000;
+  background: transparent;
   overflow: hidden;
   pointer-events: none;
-  z-index: 100;
+  z-index: 140;
   will-change: transform;
 }
 

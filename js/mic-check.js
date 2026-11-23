@@ -2,12 +2,12 @@
   'use strict';
 
   const CHAIN_PROBABILITY = 0.35;
-  const MONITOR_SRC = './items/screens/016.png';
-  // Exact measured pixel geometry of items/screens/016.png (1009x708)
+  const MONITOR_SRC = './items/screens/016_cutout.png';
+  // Exact measured pixel geometry of items/screens/016_cutout.png (1009x708, transparent cut-out inner glass)
   const MONITOR_GEOM = {
     aspect: 1009 / 708,
     panel: { x0: 0.0129, y0: 0.0169, x1: 0.9366, y1: 0.7514 },
-    screen: { x0: 0.0327, y0: 0.0466, x1: 0.9167, y1: 0.7486, cx: 0.4747, cy: 0.3976 },
+    screen: { x0: 0.0347, y0: 0.0480, x1: 0.9148, y1: 0.7444, cx: 0.4747, cy: 0.3962 },
   };
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
 
@@ -55,6 +55,9 @@
     if (!monitorImgPreload) {
       monitorImgPreload = new Image();
       monitorImgPreload.src = MONITOR_SRC;
+    }
+    if (window.MicCheckPV) {
+      window.MicCheckPV.preload();
     }
     if (finalePreloaded || !audioCtx || !entries.length) return;
     const last = entries[entries.length - 1];
@@ -205,9 +208,12 @@
   // - Beat 10 (+5.376s) -> Beat 15 (+8.362s): Exponential cinema dolly-in
   //   straight into the monitor's black LCD -> pure #000000 black
   // =========================================================================
-  function triggerDrumDrop() {
+  function triggerDrumDrop(drumDropAtAudioTime) {
     if (finaleStarted) return;
     finaleStarted = true;
+    if (window.MicCheckPV) {
+      window.MicCheckPV.preload();
+    }
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -239,20 +245,12 @@
     monImg.alt = '';
     monImg.decoding = 'sync';
     monEl.appendChild(monImg);
-
-    const veilEl = document.createElement('div');
-    veilEl.className = 'monitor-screen-veil';
-    const sg = MONITOR_GEOM.screen;
-    veilEl.style.left = (sg.x0 * 100).toFixed(3) + '%';
-    veilEl.style.top = (sg.y0 * 100).toFixed(3) + '%';
-    veilEl.style.width = ((sg.x1 - sg.x0) * 100).toFixed(3) + '%';
-    veilEl.style.height = ((sg.y1 - sg.y0) * 100).toFixed(3) + '%';
-    monEl.appendChild(veilEl);
     layer.appendChild(monEl);
 
+    const sg = MONITOR_GEOM.screen;
     const innerW = monW * (sg.x1 - sg.x0);
     const innerH = monH * (sg.y1 - sg.y0);
-    const targetScale = Math.max(vw / innerW, vh / innerH) * 1.32;
+    const targetScale = Math.max(vw / innerW, vh / innerH) * 1.24;
 
     // --- Gather all 23 objects ---
     const visibleList = [];
@@ -338,47 +336,68 @@
     const panelSpan = panelRightTarget - panelLeftTarget;
 
     mainAbove.forEach((info, idx) => {
-      // Spread arrival times smoothly from +0.45s to +3.15s (meeting the monitor as it rises from Beat 4 -> Beat 8!)
+      // Spread arrival times smoothly from +0.30s to +2.05s (meeting the faster rising monitor!)
       const frac = mainAbove.length > 1 ? idx / (mainAbove.length - 1) : 0;
-      const delay = 0.45 + frac * 2.70 + (Math.random() - 0.5) * 0.14;
+      const delay = 0.30 + frac * 1.75 + (Math.random() - 0.5) * 0.10;
       const spanMin = Math.max(info.boxW * 0.5 + 18, panelLeftTarget - 110);
       const spanMax = Math.min(vw - info.boxW * 0.5 - 18, panelRightTarget + 110);
       const startX = clamp(spanMin + Math.random() * (spanMax - spanMin), info.boxW * 0.5 + 18, vw - info.boxW * 0.5 - 18);
       const startY = -info.boxH * 0.65 - 24;
-      spawnBody(info, startX, startY, (Math.random() - 0.5) * 70, 90 + Math.random() * 110, (Math.random() - 0.5) * 0.9, Math.max(0, delay));
+      spawnBody(info, startX, startY, (Math.random() - 0.5) * 70, 120 + Math.random() * 120, (Math.random() - 0.5) * 0.9, Math.max(0, delay));
     });
 
-    // 3 late straggler objects arriving right as the monitor settles (~3.6s - 4.4s)
+    // 3 late straggler objects arriving right as the cut-out monitor settles (~2.35s - 2.95s)
     lateAbove.forEach((info, idx) => {
-      // Aim toward left/center/right thirds of the monitor top bezel so they hit, tip naturally, and drop off sides
       const lane = idx === 0 ? 0.20 : idx === 1 ? 0.78 : 0.48;
       const startX = clamp(
         panelLeftTarget + (lane + (Math.random() - 0.5) * 0.08) * panelSpan,
         info.boxW * 0.5 + 20,
         vw - info.boxW * 0.5 - 20
       );
-      const delay = 3.55 + idx * 0.40;
-      spawnBody(info, startX, -info.boxH * 0.65 - 24, (Math.random() - 0.5) * 50, 80, (Math.random() - 0.5) * 0.6, delay);
+      const delay = 2.35 + idx * 0.28;
+      spawnBody(info, startX, -info.boxH * 0.65 - 24, (Math.random() - 0.5) * 50, 110, (Math.random() - 0.5) * 0.6, delay);
     });
 
     document.body.appendChild(rig);
     document.documentElement.classList.add('blackout');
     document.body.classList.add('blackout');
 
-    // Beat-locked timeline (seconds from drum impact @ 100.848s):
-    const RISE_START = BEAT * 3;     // +1.792s = EXACTLY Beat 4 ("进鼓第四拍上升"!)
-    const RISE_DUR = BEAT * 4;       //  2.389s = slow, weighty 4-beat rise (Beat 4 -> Beat 8 @ +4.181s)
-    const ZOOM_START = BEAT * 9;     // +5.376s = after late stragglers clear off monitor
-    const ZOOM_DUR = BEAT * 5;       //  2.987s = smooth cinema dolly-in -> pure #000000 black
+    // Beat-locked seamless timeline (seconds from drum impact @ 100.848s):
+    // - Beat 4 (+1.792s): Cut-out monitor 016_cutout.png rises briskly over 2 beats -> Beat 6 (+2.987s)
+    // - Live 3D vertical street corridor runs seamlessly BEHIND the cut-out hole!
+    // - Beat 6.6 (+3.345s) -> Beat 10 (+5.376s): Seamless camera push straight THROUGH the cut-out glass
+    //   into the street (ZERO black curtain!), arriving in time for 1st "Mic Check" Showcase at Bar 4.1 (+7.17s)!
+    const RISE_START = BEAT * 3.0;   // +1.792s = Beat 4
+    const RISE_DUR = BEAT * 2.0;     //  1.195s = brisk 2-beat rise (Beat 4 -> Beat 6)
+    const ZOOM_START = BEAT * 5.6;   // +3.345s
+    const ZOOM_DUR = BEAT * 3.4;     //  2.031s = seamless push-through ending @ +5.376s
 
-    const GRAVITY = 2150;
+    const GRAVITY = 2350;
     const RESTITUTION = 0.32;
     const MON_RESTITUTION = 0.28;
     const FRICTION = 0.42;
-    const MAX_OMEGA = 3.2;           // Natural physical spin cap (never fidget-spins!)
+    const MAX_OMEGA = 3.2;
     const SUBSTEPS = 6;
 
-    let elapsed = 0;
+    const fallbackStartMs = performance.now();
+    function getAudioElapsed() {
+      if (audioCtx && typeof drumDropAtAudioTime === 'number') {
+        return Math.max(0, audioCtx.currentTime - drumDropAtAudioTime);
+      }
+      return (performance.now() - fallbackStartMs) / 1000;
+    }
+
+    // Mount live 3D vertical street corridor IMMEDIATELY behind 016_cutout.png's transparent window!
+    let pvCtrl = null;
+    if (window.MicCheckPV) {
+      pvCtrl = window.MicCheckPV.start({
+        getElapsedSec: getAudioElapsed,
+        fallenItems: entries.map((e) => e.imgMeta),
+      });
+      pvCtrl.setPortalWindow({ hidden: true });
+    }
+
+    let elapsed = getAudioElapsed();
     let monTop = monStartTop;
     let monRecoilY = 0;
     let monRecoilV = 0;
@@ -391,9 +410,12 @@
       lastTs = now;
       const dt = rawDt / SUBSTEPS;
       const airAngDamp = Math.exp(-1.15 * dt);
+      const targetElapsed = getAudioElapsed();
+      const stepStartElapsed = elapsed;
+      const stepDelta = Math.max(0.001, Math.min(0.04, targetElapsed - stepStartElapsed)) / SUBSTEPS;
 
       for (let s = 0; s < SUBSTEPS; s++) {
-        elapsed += dt;
+        elapsed += stepDelta;
 
         // 1. Update slow, heavy rising monitor starting right on Beat 4 (+1.792s)
         const prevMonTop = monTop;
@@ -639,22 +661,40 @@
         b.el.style.transform = `translate3d(${(b.x - b.halfW).toFixed(1)}px, ${(b.y - b.halfH).toFixed(1)}px, 0) rotate(${b.theta.toFixed(3)}rad)`;
       }
 
-      // Camera push-in straight into the monitor's black LCD screen -> pure #000000 black
+      // Seamless camera push-in straight THROUGH the cut-out transparent glass of 016_cutout.png!
       const zoomU = clamp((elapsed - ZOOM_START) / ZOOM_DUR, 0, 1);
-      if (zoomU > 0) {
-        const originX = monRestLeft + screenCxLocal;
-        const originY = monTop + screenCyLocal;
-        rig.style.transformOrigin = `${originX.toFixed(1)}px ${originY.toFixed(1)}px`;
-        const camScale = Math.pow(targetScale, easeInOutQuart(zoomU));
-        rig.style.transform = `scale(${camScale.toFixed(4)})`;
+      const originX = monRestLeft + screenCxLocal;
+      const originY = monTop + screenCyLocal;
+      const camScale = zoomU > 0 ? Math.pow(targetScale, easeInOutQuart(zoomU)) : 1;
 
-        const veilAlpha = clamp((zoomU - 0.52) / 0.44, 0, 1);
-        veilEl.style.opacity = veilAlpha.toFixed(3);
+      if (zoomU > 0) {
+        rig.style.transformOrigin = `${originX.toFixed(1)}px ${originY.toFixed(1)}px`;
+        rig.style.transform = `scale(${camScale.toFixed(4)})`;
+      }
+
+      // Sync exact portal window of the live 3D street scaled right inside 016_cutout.png's hole!
+      if (pvCtrl) {
+        const wx0 = monRestLeft + monW * sg.x0;
+        const wy0 = monTop + monH * sg.y0;
+        const wx1 = monRestLeft + monW * sg.x1;
+        const wy1 = monTop + monH * sg.y1;
+        const sx0 = originX + (wx0 - originX) * camScale;
+        const sy0 = originY + (wy0 - originY) * camScale;
+        const sx1 = originX + (wx1 - originX) * camScale;
+        const sy1 = originY + (wy1 - originY) * camScale;
+        if (sy0 >= vh - 1) {
+          pvCtrl.setPortalWindow({ hidden: true });
+        } else if (sx0 <= 0.5 && sy0 <= 0.5 && sx1 >= vw - 0.5 && sy1 >= vh - 0.5) {
+          pvCtrl.setPortalWindow({ open: true });
+        } else {
+          pvCtrl.setPortalWindow({ x0: sx0, y0: sy0, x1: sx1, y1: sy1 });
+        }
       }
 
       if (zoomU < 1) {
         requestAnimationFrame(simulate);
       } else {
+        if (pvCtrl) pvCtrl.setPortalWindow({ open: true });
         rig.remove();
         window.scrollTo(0, 0);
       }
@@ -703,7 +743,7 @@
       voice.dropTimer = setTimeout(() => {
         if (currentVoice === voice && !voice.dropped) {
           voice.dropped = true;
-          triggerDrumDrop();
+          triggerDrumDrop(dropAt);
         }
       }, waitMs + 4);
     }
@@ -786,7 +826,7 @@
       if (isFinale && !voice.dropped && now >= startAt + drumDropSec) {
         voice.dropped = true;
         if (voice.dropTimer) clearTimeout(voice.dropTimer);
-        triggerDrumDrop();
+        triggerDrumDrop(startAt + drumDropSec);
         return;
       }
 
@@ -908,6 +948,22 @@
       { rootMargin: '80px 0px -40px 0px', threshold: 0.06 }
     );
     entries.forEach((e) => obs.observe(e.slot));
+
+    // Optional direct PV scene inspection via URL query (?scene=pv&t=15.0[&freeze=1])
+    const qs = new URLSearchParams(window.location.search);
+    if (qs.get('scene') === 'pv' && window.MicCheckPV) {
+      finaleStarted = true;
+      const startT = parseFloat(qs.get('t') || '10.5');
+      const freeze = qs.get('freeze') === '1';
+      const wallT0 = performance.now();
+      window.MicCheckPV.preload().then(() => {
+        window.MicCheckPV.start({
+          getElapsedSec: () => startT + (performance.now() - wallT0) / 1000,
+          fallenItems: pickedItems,
+          freezeAt: freeze ? startT : null,
+        });
+      });
+    }
   }
 
   window.addEventListener('resize', () => {
