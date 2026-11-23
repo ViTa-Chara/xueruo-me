@@ -3,27 +3,39 @@
 
   let pvDataCache = null;
   let pvDataPromise = null;
-  const preloadedUrls = new Set();
+  const loadedImgUrls = new Set();
+  const queuedImgUrls = new Set();
+  const decodedImgCache = new Map();
 
-  function preloadImg(url) {
-    if (!url || preloadedUrls.has(url)) return;
-    preloadedUrls.add(url);
-    const im = new Image();
-    im.decoding = 'async';
-    im.src = url;
+  function fetchJsonWithRetry(url, retries) {
+    const maxRetries = typeof retries === 'number' ? retries : 3;
+    let attempt = 0;
+    function run() {
+      return fetch(url).then((r) => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      }).catch((err) => {
+        if (attempt < maxRetries) {
+          attempt++;
+          return new Promise((res) => setTimeout(res, 180 * attempt)).then(run);
+        }
+        throw err;
+      });
+    }
+    return run();
   }
 
   function loadPvData() {
     if (pvDataCache) return Promise.resolve(pvDataCache);
     if (pvDataPromise) return pvDataPromise;
-    pvDataPromise = fetch('./data/mic_check_pv.json')
-      .then((r) => {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
+    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json', 3)
       .then((d) => {
         pvDataCache = d;
         return d;
+      })
+      .catch((err) => {
+        pvDataPromise = null;
+        throw err;
       });
     return pvDataPromise;
   }
@@ -41,16 +53,97 @@
     './assets/portfolio/hifishifter/preview.png',
   ];
 
+  // Attach automatic retry on any live <img> element so transient connection limits never leave blank images!
+  function attachImgWithRetry(img, url, retries) {
+    const maxRetries = typeof retries === 'number' ? retries : 3;
+    let attempts = 0;
+    img.onerror = () => {
+      if (attempts < maxRetries) {
+        attempts++;
+        const sep = url.indexOf('?') >= 0 ? '&' : '?';
+        setTimeout(() => {
+          img.src = url + sep + '_r=' + attempts;
+        }, 200 * attempts);
+      }
+    };
+    img.src = url;
+    return img;
+  }
+
+  let preloadQueueRunning = false;
+  const highPriorityQueue = [];
+  const normalPriorityQueue = [];
+
+  function enqueueImg(url, highPriority) {
+    if (!url || loadedImgUrls.has(url) || queuedImgUrls.has(url)) return;
+    queuedImgUrls.add(url);
+    if (highPriority) highPriorityQueue.push({ url, tries: 0 });
+    else normalPriorityQueue.push({ url, tries: 0 });
+    pumpPreloadQueue();
+  }
+
+  // Priority-tiered resilient preloader (max 3 concurrent sockets, automatic 3x retry + decode()!)
+  function pumpPreloadQueue() {
+    if (preloadQueueRunning) return;
+    preloadQueueRunning = true;
+    let inFlight = 0;
+    const MAX_CONCURRENT = 3;
+
+    function popNext() {
+      if (highPriorityQueue.length > 0) return highPriorityQueue.shift();
+      if (normalPriorityQueue.length > 0) return normalPriorityQueue.shift();
+      return null;
+    }
+
+    function next() {
+      while (inFlight < MAX_CONCURRENT) {
+        const job = popNext();
+        if (!job) break;
+        inFlight++;
+        const im = new Image();
+        im.decoding = 'async';
+        const finish = (ok) => {
+          inFlight--;
+          if (ok) {
+            loadedImgUrls.add(job.url);
+            decodedImgCache.set(job.url, im);
+            if (typeof im.decode === 'function') im.decode().catch(() => {});
+          } else if (job.tries < 3) {
+            job.tries++;
+            setTimeout(() => {
+              normalPriorityQueue.push(job);
+              pumpPreloadQueue();
+            }, 260 * job.tries);
+          } else {
+            queuedImgUrls.delete(job.url);
+          }
+          next();
+        };
+        im.onload = () => finish(true);
+        im.onerror = () => finish(false);
+        const sep = job.url.indexOf('?') >= 0 ? '&' : '?';
+        im.src = job.tries > 0 ? (job.url + sep + '_r=' + job.tries) : job.url;
+      }
+      if (inFlight === 0 && highPriorityQueue.length === 0 && normalPriorityQueue.length === 0) {
+        preloadQueueRunning = false;
+      }
+    }
+    next();
+  }
+
   function preload() {
-    PORTFOLIO_ASSETS.forEach(preloadImg);
-    preloadImg('./items/screens/016_cutout.png');
+    // Tier 0 (critical): portal bezel + portfolio showcase plates
+    enqueueImg('./items/screens/016_cutout.png', true);
+    PORTFOLIO_ASSETS.forEach((u) => enqueueImg(u, true));
     return loadPvData()
       .then((d) => {
-        Object.values(d.monitors || {}).forEach((m) => preloadImg(m.src));
+        // Tier 0 (critical): all 4 hero monitor frames
+        Object.values(d.monitors || {}).forEach((m) => enqueueImg(m.src, true));
+        // Tier 1 (background): street corridor buildings, streets, and signs
         const a = d.assets || {};
-        (a.buildings || []).forEach((x) => preloadImg(x.src));
-        (a.streets || []).slice(0, 24).forEach((x) => preloadImg(x.src));
-        (a.signs || []).forEach((x) => preloadImg(x.src));
+        (a.buildings || []).forEach((x) => enqueueImg(x.src, false));
+        (a.streets || []).forEach((x) => enqueueImg(x.src, false));
+        (a.signs || []).forEach((x) => enqueueImg(x.src, false));
         return d;
       })
       .catch(() => null);
@@ -324,26 +417,29 @@ class AgentRunResult:
     const fallenItems = (opts.fallenItems && opts.fallenItems.length) ? opts.fallenItems : [];
     const freezeAt = typeof opts.freezeAt === 'number' ? opts.freezeAt : null;
 
+    let maskEl = null;
     let stageEl = null;
     let pendingPortal = null;
     let alive = true;
 
-    function applyPortal(el, p) {
-      if (!el) return;
+    function applyPortal(mEl, sEl, p) {
+      if (!mEl || !sEl) return;
       if (!p || p.open) {
-        el.style.clipPath = 'none';
-        el.style.webkitClipPath = 'none';
-        el.style.transform = '';
-        el.style.transformOrigin = '50% 50%';
+        mEl.style.visibility = 'visible';
+        mEl.style.clipPath = 'none';
+        mEl.style.webkitClipPath = 'none';
+        sEl.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
         return;
       }
       if (p.hidden) {
-        el.style.clipPath = 'inset(100% 0px 0px 0px)';
-        el.style.webkitClipPath = 'inset(100% 0px 0px 0px)';
+        mEl.style.visibility = 'hidden';
+        mEl.style.clipPath = 'inset(100% 0px 0px 0px)';
+        mEl.style.webkitClipPath = 'inset(100% 0px 0px 0px)';
+        sEl.style.transform = 'translate3d(0px, 0px, 0px) scale(0.5)';
         return;
       }
-      // Scale & center the entire live 3D vertical street corridor right inside 016_cutout.png's
-      // transparent window hole, expanding seamlessly 1:1 as the camera pushes through!
+      // Clip in exact viewport pixel coordinates on the NON-transformed outer maskEl,
+      // while scaling inner stageEl cleanly to match 016_cutout.png's transparent hole!
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const winW = Math.max(1, p.x1 - p.x0);
@@ -354,84 +450,98 @@ class AgentRunResult:
       const dx = winCx - vw * 0.5;
       const dy = winCy - vh * 0.5;
 
-      // Express the exact window rectangle in pre-transform element coordinates for clip-path
-      const localX0 = vw * 0.5 + (p.x0 - winCx) / scale;
-      const localX1 = vw * 0.5 + (p.x1 - winCx) / scale;
-      const localY0 = vh * 0.5 + (p.y0 - winCy) / scale;
-      const localY1 = vh * 0.5 + (p.y1 - winCy) / scale;
-      const topIn = clamp(localY0, 0, vh);
-      const rightIn = clamp(vw - localX1, 0, vw);
-      const botIn = clamp(vh - localY1, 0, vh);
-      const leftIn = clamp(localX0, 0, vw);
+      const topIn = clamp(p.y0, 0, vh);
+      const rightIn = clamp(vw - p.x1, 0, vw);
+      const botIn = clamp(vh - p.y1, 0, vh);
+      const leftIn = clamp(p.x0, 0, vw);
 
-      el.style.transformOrigin = '50% 50%';
-      el.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`;
       const clipStr = `inset(${topIn.toFixed(1)}px ${rightIn.toFixed(1)}px ${botIn.toFixed(1)}px ${leftIn.toFixed(1)}px)`;
-      el.style.clipPath = clipStr;
-      el.style.webkitClipPath = clipStr;
+      mEl.style.visibility = 'visible';
+      mEl.style.clipPath = clipStr;
+      mEl.style.webkitClipPath = clipStr;
+      sEl.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0px) scale(${scale.toFixed(4)})`;
     }
 
     const controller = {
       setPortalWindow(p) {
         pendingPortal = p;
-        applyPortal(stageEl, p);
+        applyPortal(maskEl, stageEl, p);
       },
       destroy() {
         alive = false;
-        if (stageEl && stageEl.parentNode) stageEl.remove();
+        if (maskEl && maskEl.parentNode) maskEl.remove();
       },
     };
 
     loadPvData().then((data) => {
       if (!data || !alive) return;
-      stageEl = mountScene(data, getElapsedSec, fallenItems, freezeAt, () => alive);
+      const mounted = mountScene(data, getElapsedSec, fallenItems, freezeAt, () => alive, pendingPortal);
+      maskEl = mounted.mask;
+      stageEl = mounted.stage;
       if (pendingPortal !== null) {
-        applyPortal(stageEl, pendingPortal);
+        applyPortal(maskEl, stageEl, pendingPortal);
       }
     });
 
     return controller;
   }
 
-  function mountScene(data, getElapsedSec, fallenItems, freezeAt, isAlive) {
+  function mountScene(data, getElapsedSec, fallenItems, freezeAt, isAlive, initialPortal) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const BEAT = data.beatSec || (60 / 100.45);
+    // Exact measured tempo of Cornelius - Mic Check.wav: 101.00 BPM (+-3ms across 16 bars!)
+    const BEAT = data.beatSec || (60 / 101.0);
     const BAR = data.barSec || (BEAT * 4);
-    const TWO_BARS = BAR * 2; // 4.7785s
+    const TWO_BARS = BAR * 2; // 4.7525s
 
     document.documentElement.classList.add('blackout');
     document.body.classList.add('blackout');
 
+    const mask = document.createElement('div');
+    mask.className = 'pv-portal-mask';
+    if (initialPortal && initialPortal.hidden) {
+      mask.style.visibility = 'hidden';
+      mask.style.clipPath = 'inset(100% 0px 0px 0px)';
+      mask.style.webkitClipPath = 'inset(100% 0px 0px 0px)';
+    }
+
     const root = document.createElement('div');
     root.className = 'pv-stage';
+    root.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
 
     const corridorLayer = document.createElement('div');
     corridorLayer.className = 'pv-corridor-layer';
+    const floorTextLayer = document.createElement('div');
+    floorTextLayer.className = 'pv-floor-text-layer';
     const monitorLayer = document.createElement('div');
     monitorLayer.className = 'pv-monitor-layer';
     const tossLayer = document.createElement('div');
     tossLayer.className = 'pv-toss-layer';
 
+    // Strict stacking: Street (10) -> Floor Text Z=0 homography UNDER monitor (15) -> Monitors (20) -> Tossed (30)
     root.appendChild(corridorLayer);
+    root.appendChild(floorTextLayer);
     root.appendChild(monitorLayer);
     root.appendChild(tossLayer);
-    document.body.appendChild(root);
+    mask.appendChild(root);
+    document.body.appendChild(mask);
 
     // ---------------------------------------------------------------------
-    // 1. 4 COMPLETELY DISTINCT MONITORS LOCKED TO THE 4 "MIC CHECK" BEATS
-    //    (Every 2 bars, shifted earlier right after seamless 016 push-through!)
-    //    Bar 4.1  (+7.168s, "Mic Check" @ +7.12s):  AKPlugins   (015.png)
-    //    Bar 6.1 (+11.946s, "Mic Check" @ +11.88s): SatoInput   (001.png)
-    //    Bar 8.1 (+16.725s, "Mic Check" @ +16.63s): SatoBot     (003.png)
-    //    Bar 10.1(+21.503s, "Mic Check" @ +21.39s): HiFiShifter (006_cutout.png)
+    // 1. 4 COMPLETELY DISTINCT MONITORS PACED ACROSS ALL 14 BARS (Bar 4 -> Bar 16.4)
+    //    Supporting the full street arc right up to Bar 17.1 (+38.02s) "ONE! TWO! THREE! FOUR!"
+    //    Spaced every 3 full bars (7.13s) with ~4.8s calm, ultra-readable hero dwell each!
+    //    - AKPlugins   (015.png):        Hero center Bar  5.1 (+9.50s), pass +4.94s -> +14.07s
+    //    - SatoInput   (001.png):        Hero center Bar  8.1 (+16.63s), pass +12.07s -> +21.20s
+    //    - SatoBot     (003.png):        Hero center Bar 11.1 (+23.76s), pass +19.20s -> +28.32s
+    //    - HiFiShifter (006_cutout.png): Hero center Bar 14.1 (+30.89s), pass +26.33s -> +35.45s
     // ---------------------------------------------------------------------
-    const HERO1_START = BAR * 3; // +7.1677s = EXACT Bar 4.1 (1st "Mic Check" in street!)
+    const THREE_BARS = BAR * 3; // 7.1287s
+    const MON1_CENTER = BAR * 4; // +9.505s = Bar 5.1
     const showcaseDefs = [
-      { id: 'akplugins',   spec: data.monitors.akplugins,   screenBuilder: createAkPluginsScreen,   tHeroStart: HERO1_START },
-      { id: 'satoinput',   spec: data.monitors.satoinput,   screenBuilder: createSatoInputScreen,   tHeroStart: HERO1_START + TWO_BARS },
-      { id: 'satobot',     spec: data.monitors.satobot,     screenBuilder: createSatoBotScreen,     tHeroStart: HERO1_START + TWO_BARS * 2 },
-      { id: 'hifishifter', spec: data.monitors.hifishifter, screenBuilder: createHiFiShifterScreen, tHeroStart: HERO1_START + TWO_BARS * 3 },
+      { id: 'akplugins',   spec: data.monitors.akplugins,   screenBuilder: createAkPluginsScreen,   tCenter: MON1_CENTER },
+      { id: 'satoinput',   spec: data.monitors.satoinput,   screenBuilder: createSatoInputScreen,   tCenter: MON1_CENTER + THREE_BARS },
+      { id: 'satobot',     spec: data.monitors.satobot,     screenBuilder: createSatoBotScreen,     tCenter: MON1_CENTER + THREE_BARS * 2 },
+      { id: 'hifishifter', spec: data.monitors.hifishifter, screenBuilder: createHiFiShifterScreen, tCenter: MON1_CENTER + THREE_BARS * 3 },
     ];
 
     const monitors = showcaseDefs.map((def) => {
@@ -442,28 +552,39 @@ class AgentRunResult:
       const scxFrac = (sg.x0 + sg.x1) * 0.5;
       const scyFrac = (sg.y0 + sg.y1) * 0.5;
 
-      const targetScreenW = vw * (vw <= 640 ? 0.90 : 0.80);
-      const targetScreenH = vh * (vw <= 640 ? 0.76 : 0.80);
+      const targetScreenW = vw * (vw <= 640 ? 0.84 : 0.72);
+      const targetScreenH = vh * (vw <= 640 ? 0.65 : 0.65);
       const monWByW = targetScreenW / swFrac;
       const monWByH = (targetScreenH / shFrac) * m.aspect;
       const baseW = Math.min(monWByW, monWByH);
       const baseH = baseW / m.aspect;
 
+      const scxLocal = baseW * scxFrac;
+      const scyLocal = baseH * scyFrac;
+
       const unitEl = document.createElement('div');
       unitEl.className = 'pv-monitor-unit';
-      unitEl.style.width = baseW.toFixed(1) + 'px';
-      unitEl.style.height = baseH.toFixed(1) + 'px';
+      unitEl.style.width = baseW.toFixed(2) + 'px';
+      unitEl.style.height = baseH.toFixed(2) + 'px';
+      // Anchor screen center dead-on viewport center (50%, 50%) for pure GPU sub-pixel optical zoom!
+      unitEl.style.marginLeft = (-scxLocal).toFixed(2) + 'px';
+      unitEl.style.marginTop = (-scyLocal).toFixed(2) + 'px';
+      unitEl.style.transformOrigin = `${scxLocal.toFixed(2)}px ${scyLocal.toFixed(2)}px`;
 
       const frameEl = document.createElement('div');
       frameEl.className = 'pv-monitor-frame' + (m.behindBezel ? ' behind-bezel' : '');
 
       const photoImg = document.createElement('img');
       photoImg.className = 'pv-monitor-photo';
-      photoImg.src = m.src;
       photoImg.alt = '';
       photoImg.decoding = 'sync';
+      attachImgWithRetry(photoImg, m.src, 3);
 
       const screenCtrl = def.screenBuilder();
+      screenCtrl.el.querySelectorAll('img').forEach((im) => {
+        const origSrc = im.getAttribute('src');
+        if (origSrc) attachImgWithRetry(im, origSrc, 3);
+      });
       const slotEl = document.createElement('div');
       slotEl.className = 'pv-screen-slot';
 
@@ -508,22 +629,18 @@ class AgentRunResult:
       unitEl.appendChild(frameEl);
       monitorLayer.appendChild(unitEl);
 
-      // Continuous forward camera push-in:
-      //   Approach:  1.65s (rushing forward down the vertical 3D street corridor)
-      //   Hero:      2.98s = 5 beats (full-bleed ultra-thin Songti mosaic, steady forward push)
-      //   Pass-thru: 0.98s (camera rushes straight past the monitor bezel!)
-      const tAppear = def.tHeroStart - 1.65;
-      const tHeroEnd = def.tHeroStart + BEAT * 5.0;
-      const tPassEnd = tHeroEnd + 0.98;
+      // Single C-infinity smooth quintic optical dolly timeline (~9.12s total, ~4.8s calm hero dwell!):
+      // Glides gently from far horizon -> unhurried readable hero creep -> fluid pass-through!
+      const tCenter = def.tCenter;
+      const halfSpan = BAR * 1.92; // 4.56s each side (9.12s unbroken silky pass)
+      const tAppear = tCenter - halfSpan;
+      const tPassEnd = tCenter + halfSpan;
 
       return {
         id: def.id,
         unitEl,
-        scxLocal: baseW * scxFrac,
-        scyLocal: baseH * scyFrac,
         tAppear,
-        tHeroStart: def.tHeroStart,
-        tHeroEnd,
+        tCenter,
         tPassEnd,
       };
     });
@@ -533,7 +650,7 @@ class AgentRunResult:
     //    Only blocks the EXACT airborne window on that specific side so the
     //    background city streetscapes NEVER stop appearing across monitors!
     // ---------------------------------------------------------------------
-    const allTosses = (data.ahTosses || []).filter((e) => e.t >= 5.20 && e.t <= 38.0);
+    const allTosses = (data.ahTosses || []).filter((e) => e.t >= 5.20 && e.t <= 40.4);
     const tossBusyL = [];
     const tossBusyR = [];
     allTosses.forEach((ev) => {
@@ -570,8 +687,8 @@ class AgentRunResult:
     const signsPool = assets.signs || [];
     const rng = makeRng(20261123);
 
-    const CAMERA_Z_SPEED = 185;
-    const MAX_ACTIVE_PIECES = 44;
+    const CAMERA_Z_SPEED = 115;
+    const MAX_ACTIVE_PIECES = 88;
     const streetPieces = [];
 
     let bCursor = 0;
@@ -585,9 +702,9 @@ class AgentRunResult:
       const crop = document.createElement('div');
       crop.className = 'pv-crop';
       const img = document.createElement('img');
-      img.src = meta.src;
       img.alt = '';
       img.decoding = 'async';
+      attachImgWithRetry(img, meta.src, 3);
 
       const sc = targetMaxPx / Math.max(meta.bw, meta.bh);
       const boxW = Math.round(meta.bw * sc);
@@ -654,9 +771,10 @@ class AgentRunResult:
 
         const wallYaw = -sideSign * (kind === 'sign' ? (24 + rng() * 10) : (30 + rng() * 12));
 
-        const stagger = k * 0.09;
+        const stagger = k * 0.11;
         const birthT = ev.t + stagger;
-        const dur = (ev.decay || 2.1) * (1.08 + rng() * 0.25);
+        // Longer architectural dwell (~3.8s - 6.2s) so city blocks linger with weight before gliding out
+        const dur = (ev.decay || 2.2) * (1.85 + rng() * 0.35);
 
         const { wrap, boxW, boxH } = buildPieceElement(meta, targetPx);
         corridorLayer.appendChild(wrap);
@@ -720,9 +838,9 @@ class AgentRunResult:
       crop.style.height = boxH + 'px';
 
       const img = document.createElement('img');
-      img.src = meta.src;
       img.alt = '';
       img.decoding = 'async';
+      attachImgWithRetry(img, meta.src, 3);
       img.style.width = Math.round(meta.w * sc) + 'px';
       img.style.height = Math.round(meta.h * sc) + 'px';
       img.style.left = -Math.round(meta.x0 * sc) + 'px';
@@ -758,11 +876,124 @@ class AgentRunResult:
     }
 
     // ---------------------------------------------------------------------
+    // 4.5 DRUM-LOCKED GROUND-PLANE VANISHING-POINT LAUNCHER
+    //     Source Han Sans Heavy (Noto Sans SC 900) · Pure #ffffff · Minimalist
+    //     Strictly UNDERNEATH monitors (Z=0 matrix3d, z-index 15 < z-index 20).
+    //     Paced evenly with wider breathing intervals across Bar 3.1 (+4.75s) -> Bar 16.4 (+37.43s)
+    //     so the final character glides right into Bar 17.1 (+38.02s) "ONE! TWO! THREE! FOUR!"
+    //     Every single launch lands strictly on a REAL drum hit (b1 Kick, b2 Snare, b4 Snare — ZERO silent b3!)
+    // ---------------------------------------------------------------------
+    const floorSequence = [
+      // Bar 3 (+4.75s .. +6.53s): 薛若米｜
+      { beat: 8,  ch: '薛' },
+      { beat: 9,  ch: '若' },
+      { beat: 11, ch: '米' },
+
+      // Bar 4-6 (+7.13s .. +11.88s, AKPlugins): 莫纳什大学大一，
+      { beat: 12, ch: '莫' },
+      { beat: 13, ch: '纳' },
+      { beat: 15, ch: '什' },
+      { beat: 16, ch: '大' },
+      { beat: 17, ch: '学' },
+      { beat: 19, ch: '大' },
+      { beat: 20, ch: '一' },
+
+      // Bar 6-10 (+13.66s .. +21.39s, SatoInput): 商业分析（Business Analytics）专业在读。
+      { beat: 23, ch: '商' },
+      { beat: 24, ch: '业' },
+      { beat: 25, ch: '分' },
+      { beat: 27, ch: '析' },
+      { beat: 28, ch: 'Business' },
+      { beat: 31, ch: 'Analytics' },
+      { beat: 32, ch: '专' },
+      { beat: 33, ch: '业' },
+      { beat: 35, ch: '在' },
+      { beat: 36, ch: '读' },
+
+      // Bar 10-12 (+23.17s .. +27.92s, SatoBot): 用数据理解商业，
+      { beat: 39, ch: '用' },
+      { beat: 40, ch: '数' },
+      { beat: 41, ch: '据' },
+      { beat: 43, ch: '理' },
+      { beat: 44, ch: '解' },
+      { beat: 45, ch: '商' },
+      { beat: 47, ch: '业' },
+
+      // Bar 13-14 (+29.11s .. +32.67s, HiFiShifter): 保持好奇， (wide 2-beat backbeat spacing!)
+      { beat: 49, ch: '保' },
+      { beat: 51, ch: '持' },
+      { beat: 53, ch: '好' },
+      { beat: 55, ch: '奇' },
+
+      // Bar 15-16 (+33.27s .. +37.43s -> Bar 17 "ONE! TWO! THREE! FOUR!"): 持续探索中。
+      { beat: 56, ch: '持' },
+      { beat: 57, ch: '续' },
+      { beat: 59, ch: '探' },
+      { beat: 61, ch: '索' },
+      { beat: 63, ch: '中' },
+    ];
+    const floorScript = floorSequence.map((item) => ({
+      t: item.beat * BEAT,
+      ch: item.ch,
+    }));
+
+    const activeGlyphs = [];
+    // Slow, unhurried 4.25-beat (~2.52s) flight from vanishing point to bottom exit!
+    // Exact 2D-plane Z=0 projective homography (computeQuadMatrix3d) of a 60deg downward-tilted floor:
+    // - ZERO CSS perspective / preserve-3d / contain:paint culling bugs!
+    // - 100% guaranteed strictly UNDERNEATH all monitors (z-index 15 < 20, Z=0)!
+    // - dBot stays strictly > 29px all the way to yTop = 105% (zero behind-camera singularity)!
+    const GLYPH_DUR = BEAT * 4.25;
+    const FLOOR_P = vh * 0.36;
+    const FLOOR_CX = vw * 0.50;
+    const FLOOR_VP_Y = vh * 0.50;
+    const FLOOR_Y_DROP = vh * 0.50;
+    const FLOOR_RAD = (60 * Math.PI) / 180;
+    const FLOOR_H = vh * 0.34;
+    const FLOOR_H_SIN = FLOOR_H * Math.sin(FLOOR_RAD);
+    const FLOOR_H_COS = FLOOR_H * Math.cos(FLOOR_RAD);
+    const FLOOR_HALF_W = vw * 0.48; // 96% vw full width at bottom edge
+    const FLOOR_D_START = FLOOR_P * 26.0;
+    const FLOOR_D_EXIT = (FLOOR_P * FLOOR_Y_DROP) / (1.05 * vh - FLOOR_VP_Y);
+    const FLOOR_D_RATIO = FLOOR_D_EXIT / FLOOR_D_START;
+
+    function buildFloorTransform(u) {
+      const dTop = FLOOR_D_START * Math.pow(FLOOR_D_RATIO, u);
+      const dBot = Math.max(12, dTop - FLOOR_H_SIN);
+      const yTop = FLOOR_VP_Y + (FLOOR_Y_DROP * FLOOR_P) / dTop;
+      const hwTop = (FLOOR_HALF_W * FLOOR_P) / dTop;
+      const yBot = FLOOR_VP_Y + ((FLOOR_Y_DROP + FLOOR_H_COS) * FLOOR_P) / dBot;
+      const hwBot = (FLOOR_HALF_W * FLOOR_P) / dBot;
+      return computeQuadMatrix3d(500, 500, [
+        [FLOOR_CX - hwTop, yTop],
+        [FLOOR_CX + hwTop, yTop],
+        [FLOOR_CX + hwBot, yBot],
+        [FLOOR_CX - hwBot, yBot],
+      ]);
+    }
+
+    function spawnFloorGlyph(ev) {
+      const el = document.createElement('div');
+      el.className = 'pv-floor-glyph';
+      if (ev.ch.length > 1) {
+        const safe = ev.ch.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        el.innerHTML = `<svg viewBox="0 0 500 500" preserveAspectRatio="none" aria-hidden="true"><text x="250" y="425" text-anchor="middle" font-size="420" textLength="492" lengthAdjust="spacingAndGlyphs">${safe}</text></svg>`;
+      } else {
+        el.textContent = ev.ch;
+      }
+      // Position at deep vanishing point immediately so element NEVER flashes unpositioned!
+      el.style.transform = buildFloorTransform(0);
+      floorTextLayer.appendChild(el);
+      activeGlyphs.push({ el, ev });
+    }
+
+    // ---------------------------------------------------------------------
     // 5. EVENT CURSORS & SILKY 60FPS RENDER LOOP
     // ---------------------------------------------------------------------
-    const plucks = (data.organPlucks || []).filter((e) => e.t >= 2.0 && e.t <= 38.0);
+    const plucks = (data.organPlucks || []).filter((e) => e.t >= 2.0 && e.t <= 40.4);
     let nextPluckIdx = 0;
     let nextTossIdx = 0;
+    let nextGlyphIdx = 0;
 
     const initialT = freezeAt !== null ? freezeAt : getElapsedSec();
     while (nextPluckIdx < plucks.length && plucks[nextPluckIdx].t <= initialT) {
@@ -777,8 +1008,14 @@ class AgentRunResult:
         spawnAhToss(ev);
       }
     }
+    while (nextGlyphIdx < floorScript.length && floorScript[nextGlyphIdx].t <= initialT) {
+      const ev = floorScript[nextGlyphIdx++];
+      if (initialT - ev.t <= GLYPH_DUR) {
+        spawnFloorGlyph(ev);
+      }
+    }
 
-    const SCENE_END = BAR * 16.2;
+    const SCENE_END = BAR * 18.2;
 
     function renderAt(t) {
       while (nextPluckIdx < plucks.length && plucks[nextPluckIdx].t <= t) {
@@ -787,40 +1024,39 @@ class AgentRunResult:
       while (nextTossIdx < allTosses.length && allTosses[nextTossIdx].t <= t) {
         spawnAhToss(allTosses[nextTossIdx++]);
       }
+      while (nextGlyphIdx < floorScript.length && floorScript[nextGlyphIdx].t <= t) {
+        spawnFloorGlyph(floorScript[nextGlyphIdx++]);
+      }
 
-      // 1. Render 4 Portfolio Monitors (continuous forward push-in -> pass-through, ZERO text jitter!)
+      // 1. Render 4 Portfolio Monitors with C-infinity smooth quintic optical dolly (ZERO kinks!)
       for (let i = 0; i < monitors.length; i++) {
         const mon = monitors[i];
         if (t < mon.tAppear || t > mon.tPassEnd) {
-          mon.unitEl.style.display = 'none';
+          mon.unitEl.style.visibility = 'hidden';
+          mon.unitEl.style.opacity = '0';
           continue;
         }
-        mon.unitEl.style.display = 'block';
+        mon.unitEl.style.visibility = 'visible';
 
-        let camScale = 1;
+        const u = clamp((t - mon.tAppear) / (mon.tPassEnd - mon.tAppear), 0, 1);
+        const p = 2 * u - 1; // [-1 .. +1], centered at hero midpoint
+        const p2 = p * p;
+        // Infinitely smooth C-infinity S-dolly: brisk horizon approach -> long, calm, ultra-readable hero glide -> fluid pass-through!
+        const dolly = 0.14 * p + 0.86 * p * p2 * p2;
+        const camScale = 0.96 * Math.exp(2.05 * dolly);
+
+        // Smooth sine-eased appearance from deep distance & fade-out only after flying past bezel
         let alpha = 1;
-        let yShift = 0;
-
-        if (t < mon.tHeroStart) {
-          const u = clamp((t - mon.tAppear) / (mon.tHeroStart - mon.tAppear), 0, 1);
-          const eased = easeOutCubic(u);
-          camScale = 0.08 * Math.pow(0.92 / 0.08, eased);
-          alpha = clamp(u / 0.22, 0, 1);
-          yShift = (1 - eased) * vh * 0.03;
-        } else if (t <= mon.tHeroEnd) {
-          const u = clamp((t - mon.tHeroStart) / (mon.tHeroEnd - mon.tHeroStart), 0, 1);
-          camScale = 0.92 + u * 0.14;
-          alpha = 1;
-        } else {
-          const u = clamp((t - mon.tHeroEnd) / (mon.tPassEnd - mon.tHeroEnd), 0, 1);
-          camScale = 1.06 * Math.pow(3.55 / 1.06, easeInCubic(u));
-          alpha = clamp(1 - Math.pow(Math.max(0, (u - 0.18) / 0.82), 1.35), 0, 1);
+        if (u < 0.14) {
+          alpha = 0.5 - 0.5 * Math.cos((u / 0.14) * Math.PI);
+        } else if (u > 0.76) {
+          const outU = clamp((u - 0.76) / 0.24, 0, 1);
+          alpha = 0.5 + 0.5 * Math.cos(outU * Math.PI);
         }
 
-        const tx = vw * 0.5 - mon.scxLocal * camScale;
-        const ty = vh * 0.5 - mon.scyLocal * camScale + yShift;
-        mon.unitEl.style.transform = `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) scale(${camScale.toFixed(4)})`;
-        mon.unitEl.style.opacity = alpha.toFixed(3);
+        // Pure GPU sub-pixel centered optical scaling (zero translate jitter!)
+        mon.unitEl.style.transform = `scale3d(${camScale.toFixed(5)}, ${camScale.toFixed(5)}, 1)`;
+        mon.unitEl.style.opacity = alpha.toFixed(4);
       }
 
       // 2. Render Strictly Vertical 3D Street Corridor (top->mid->bottom OR bottom->mid->top)
@@ -833,26 +1069,27 @@ class AgentRunResult:
         }
         p.el.style.visibility = 'visible';
 
-        // If an "啊" toss becomes active on this side, smoothly accelerate vertical exit off-screen!
+        // If an "啊" toss becomes active on this side, only gently nudge pieces already past initial dwell
         const dt = Math.max(0, Math.min(0.05, t - p.lastT));
         p.lastT = t;
-        if (isSideBusyNow(p.side, t)) {
-          p.extraU += dt * 1.45;
+        if (isSideBusyNow(p.side, t) && age / p.dur > 0.35) {
+          p.extraU += dt * 0.38;
         }
 
         const u = clamp(age / p.dur + p.extraU, 0, 1);
         const z = p.z0 + age * CAMERA_Z_SPEED;
-        if (u >= 1 || z >= 460) {
+        if (u >= 1 || z >= 520) {
           p.el.remove();
           streetPieces.splice(i, 1);
           continue;
         }
 
-        // Smooth C-infinity vertical pass-through curve:
-        // Enters briskly from outside TOP (or BOTTOM), lingers gracefully around middle,
-        // and accelerates straight out the OPPOSITE vertical edge! ZERO mid-air fade!
+        // Smooth C-infinity quintic vertical pass-through curve:
+        // Enters cleanly from outside TOP (or BOTTOM), lingers generously across the middle (~60% of stay),
+        // and exits smoothly out the OPPOSITE vertical edge! ZERO mid-air fade!
         const s = 2 * u - 1; // [-1 .. +1]
-        const curve = 0.28 * s + 0.72 * s * s * s; // [-1 .. +1], strictly monotonic!
+        const s2 = s * s;
+        const curve = 0.14 * s + 0.86 * s * s2 * s2; // [-1 .. +1], long serene dwell!
         const y = p.midOffsetY + p.dirY * curve * p.halfTravelY;
 
         p.el.style.transform =
@@ -878,11 +1115,26 @@ class AgentRunResult:
 
         b.el.style.transform = `translate3d(${(x - b.halfW).toFixed(1)}px, ${(y - b.halfH).toFixed(1)}px, 0) rotate(${theta.toFixed(3)}rad)`;
       }
+
+      // 4. Render Ground-Plane Vanishing-Point Heavy Sans Characters via exact Z=0 matrix3d homography!
+      //    Strictly BELOW monitors (z-index 15 < 20, Z=0), ZERO swaps, ZERO mid-air fade-in!
+      for (let i = activeGlyphs.length - 1; i >= 0; i--) {
+        const g = activeGlyphs[i];
+        const age = t - g.ev.t;
+        if (age < 0) continue;
+        const u = age / GLYPH_DUR;
+        if (u >= 1) {
+          g.el.remove();
+          activeGlyphs.splice(i, 1);
+          continue;
+        }
+        g.el.style.transform = buildFloorTransform(u);
+      }
     }
 
+    renderAt(initialT);
     if (freezeAt !== null) {
-      renderAt(freezeAt);
-      return root;
+      return { mask, stage: root };
     }
 
     function loop() {
@@ -895,7 +1147,7 @@ class AgentRunResult:
     }
 
     requestAnimationFrame(loop);
-    return root;
+    return { mask, stage: root };
   }
 
   window.MicCheckPV = { preload, start };

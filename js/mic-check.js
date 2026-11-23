@@ -4,16 +4,15 @@
   const CHAIN_PROBABILITY = 0.35;
   const MONITOR_SRC = './items/screens/016_cutout.png';
   // Exact measured pixel geometry of items/screens/016_cutout.png (1009x708, transparent cut-out inner glass)
+  // Screen hole tucked 2px inside the opaque black bezel so the portal behind it can NEVER bleed outside!
   const MONITOR_GEOM = {
     aspect: 1009 / 708,
     panel: { x0: 0.0129, y0: 0.0169, x1: 0.9366, y1: 0.7514 },
-    screen: { x0: 0.0347, y0: 0.0480, x1: 0.9148, y1: 0.7444, cx: 0.4747, cy: 0.3962 },
+    screen: { x0: 0.0365, y0: 0.0500, x1: 0.9125, y1: 0.7420, cx: 0.4745, cy: 0.3960 },
   };
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-
-  let audioCtx = null;
-  const bufferCache = new Map();
-  const pendingLoads = new Map();
+  const blobUrlCache = new Map();
+  const blobPromises = new Map();
+  const audioElCache = new Map();
   let currentVoice = null;
   let finaleStarted = false;
   let finalePreloaded = false;
@@ -22,50 +21,109 @@
   const stageEl = document.getElementById('stage');
   const entries = [];
 
-  function ensureAudio() {
-    if (!audioCtx) audioCtx = new AudioCtx();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    return audioCtx;
+  function fetchWithRetry(url, responseType, retries) {
+    const maxRetries = typeof retries === 'number' ? retries : 3;
+    let attempt = 0;
+    function run() {
+      return fetch(url)
+        .then((r) => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          if (responseType === 'json') return r.json();
+          if (responseType === 'blob') return r.blob();
+          return r.arrayBuffer();
+        })
+        .catch((err) => {
+          if (attempt < maxRetries) {
+            attempt++;
+            return new Promise((res) => setTimeout(res, 180 * attempt)).then(run);
+          }
+          throw err;
+        });
+    }
+    return run();
   }
 
-  function loadBuffer(url) {
-    if (bufferCache.has(url)) return Promise.resolve(bufferCache.get(url));
-    if (pendingLoads.has(url)) return pendingLoads.get(url);
-    const ac = ensureAudio();
-    const p = fetch(url)
-      .then((r) => {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.arrayBuffer();
+  function attachImgRetry(img, url, retries) {
+    const maxRetries = typeof retries === 'number' ? retries : 3;
+    let tries = 0;
+    img.onerror = () => {
+      if (tries < maxRetries) {
+        tries++;
+        const sep = url.indexOf('?') >= 0 ? '&' : '?';
+        setTimeout(() => {
+          img.src = url + sep + '_r=' + tries;
+        }, 200 * tries);
+      }
+    };
+    img.src = url;
+    return img;
+  }
+
+  function preloadMonitorImg() {
+    if (monitorImgPreload) return monitorImgPreload;
+    monitorImgPreload = new Image();
+    monitorImgPreload.decoding = 'async';
+    attachImgRetry(monitorImgPreload, MONITOR_SRC, 3);
+    monitorImgPreload.addEventListener('load', () => {
+      if (typeof monitorImgPreload.decode === 'function') {
+        monitorImgPreload.decode().catch(() => {});
+      }
+    }, { once: true });
+    return monitorImgPreload;
+  }
+
+  // Preload 320kbps MP3 into an in-memory Blob URL so ALL browsers (Chrome, Safari, Arc, Firefox)
+  // play and seek instantaneously from RAM with ZERO 206 Range-request issues and ZERO AudioContext silence!
+  function preloadAudioBlob(url) {
+    if (!url) return Promise.resolve(null);
+    if (blobUrlCache.has(url)) return Promise.resolve(blobUrlCache.get(url));
+    if (blobPromises.has(url)) return blobPromises.get(url);
+    const p = fetchWithRetry(url, 'blob', 3)
+      .then((blob) => {
+        const bUrl = URL.createObjectURL(blob);
+        blobUrlCache.set(url, bUrl);
+        blobPromises.delete(url);
+        const existing = audioElCache.get(url);
+        if (existing && existing.paused && existing.src !== bUrl) {
+          existing.src = bUrl;
+          try { existing.load(); } catch {}
+        }
+        return bUrl;
       })
-      .then((ab) => ac.decodeAudioData(ab))
-      .then((buf) => {
-        bufferCache.set(url, buf);
-        pendingLoads.delete(url);
-        return buf;
-      })
-      .catch((err) => {
-        pendingLoads.delete(url);
-        throw err;
+      .catch(() => {
+        blobPromises.delete(url);
+        return null;
       });
-    pendingLoads.set(url, p);
+    blobPromises.set(url, p);
     return p;
   }
 
+  function getAudioEl(url) {
+    const cachedBlob = blobUrlCache.get(url);
+    let a = audioElCache.get(url);
+    if (!a) {
+      a = new Audio();
+      a.preload = 'auto';
+      a.playsInline = true;
+      a.src = cachedBlob || url;
+      audioElCache.set(url, a);
+    } else if (cachedBlob && a.paused && a.src !== cachedBlob) {
+      a.src = cachedBlob;
+    }
+    return a;
+  }
+
   function preloadFinaleIfReady() {
-    if (!monitorImgPreload) {
-      monitorImgPreload = new Image();
-      monitorImgPreload.src = MONITOR_SRC;
+    preloadMonitorImg();
+    if (!finalePreloaded && entries.length) {
+      const last = entries[entries.length - 1];
+      if (last && last.phrase.isFinale) {
+        finalePreloaded = true;
+        preloadAudioBlob(last.phrase.audio);
+      }
     }
     if (window.MicCheckPV) {
       window.MicCheckPV.preload();
-    }
-    if (finalePreloaded || !audioCtx || !entries.length) return;
-    const last = entries[entries.length - 1];
-    if (last && last.phrase.isFinale) {
-      finalePreloaded = true;
-      loadBuffer(last.phrase.audio).catch(() => {
-        finalePreloaded = false;
-      });
     }
   }
 
@@ -149,36 +207,40 @@
     return { boxW, boxH };
   }
 
+  function fadeAndStopAudio(a, fadeMs) {
+    if (!a) return;
+    const gen = (a._fadeGen = (a._fadeGen || 0) + 1);
+    if (a.paused) {
+      try { a.currentTime = 0; } catch {}
+      return;
+    }
+    const startVol = a.volume;
+    const t0 = performance.now();
+    function tick(now) {
+      if (a._fadeGen !== gen) return;
+      const u = clamp((now - t0) / fadeMs, 0, 1);
+      a.volume = Math.max(0, startVol * (1 - u));
+      if (u < 1 && !a.paused) {
+        requestAnimationFrame(tick);
+      } else if (a._fadeGen === gen) {
+        try {
+          a.pause();
+          a.currentTime = 0;
+          a.volume = 1;
+        } catch {}
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
   function stopCurrent() {
     if (!currentVoice) return;
     const v = currentVoice;
     currentVoice = null;
     if (v.raf) cancelAnimationFrame(v.raf);
-    if (v.handoverTimer) clearTimeout(v.handoverTimer);
-    if (v.dropTimer) clearTimeout(v.dropTimer);
-    if (v.scheduledNext && v.scheduledNext.src) {
-      try { v.scheduledNext.src.stop(); } catch {}
+    if (v.audio && !v.keepPlaying) {
+      fadeAndStopAudio(v.audio, 110);
     }
-    if (audioCtx && v.gain && v.src) {
-      const now = audioCtx.currentTime;
-      const curVal = Math.max(0.0001, v.gain.gain.value || v.linearGain || 0.5);
-      try {
-        v.gain.gain.cancelScheduledValues(now);
-        v.gain.gain.setValueAtTime(curVal, now);
-        v.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-        v.src.stop(now + 0.155);
-      } catch {}
-    }
-  }
-
-  function scheduleTailFade(ac, gainNode, linearGain, startAt, dur, isContiguousCut) {
-    const fadeSec = isContiguousCut ? Math.min(0.24, dur * 0.25) : Math.min(0.14, dur * 0.2);
-    const endAt = startAt + dur;
-    const fadeStart = Math.max(ac.currentTime + 0.005, endAt - fadeSec);
-    if (fadeStart >= endAt - 0.01) return;
-    const level = Math.max(0.0001, linearGain);
-    gainNode.gain.setValueAtTime(level, fadeStart);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, endAt);
   }
 
   function ensureInViewQuietly(entry) {
@@ -208,7 +270,7 @@
   // - Beat 10 (+5.376s) -> Beat 15 (+8.362s): Exponential cinema dolly-in
   //   straight into the monitor's black LCD -> pure #000000 black
   // =========================================================================
-  function triggerDrumDrop(drumDropAtAudioTime) {
+  function triggerDrumDrop(drumDropAtAudioTime, externalElapsedFn) {
     if (finaleStarted) return;
     finaleStarted = true;
     if (window.MicCheckPV) {
@@ -217,7 +279,7 @@
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const BEAT = 60 / 100.45; // 0.59731s
+    const BEAT = 60 / 101.0; // Exact measured tempo: 101.00 BPM (0.594059s)
 
     const rig = document.createElement('div');
     rig.className = 'camera-rig';
@@ -227,25 +289,36 @@
     rig.appendChild(layer);
 
     // --- Monitor setup ---
+    // Center screen hole dead-on viewport center (50%, 50%) so portal handoff has ZERO vertical jump/flash!
     const monW = Math.min(vw * (vw <= 640 ? 0.84 : 0.58), 720, vh * 0.72 * MONITOR_GEOM.aspect);
     const monH = monW / MONITOR_GEOM.aspect;
     const screenCxLocal = monW * MONITOR_GEOM.screen.cx;
     const screenCyLocal = monH * MONITOR_GEOM.screen.cy;
     const monRestLeft = vw * 0.5 - screenCxLocal;
-    const monRestTop = vh * 0.54 - screenCyLocal;
-    const monStartTop = vh + 48;
+    const monRestTop = vh * 0.5 - screenCyLocal;
+    const monStartTop = vh + 64;
 
     const monEl = document.createElement('div');
     monEl.className = 'monitor-actor';
     monEl.style.width = monW.toFixed(1) + 'px';
     monEl.style.height = monH.toFixed(1) + 'px';
+    // Pre-position & hide offscreen BEFORE appending to DOM so 016_cutout NEVER flashes on mount!
+    monEl.style.transform = `translate3d(${monRestLeft.toFixed(1)}px, ${monStartTop.toFixed(1)}px, 0)`;
+    monEl.style.visibility = 'hidden';
 
-    const monImg = document.createElement('img');
-    monImg.src = MONITOR_SRC;
+    const preloaded = preloadMonitorImg();
+    const monImg = preloaded.complete && preloaded.naturalWidth > 0
+      ? preloaded.cloneNode(false)
+      : document.createElement('img');
+    if (!monImg.src) monImg.src = MONITOR_SRC;
     monImg.alt = '';
     monImg.decoding = 'sync';
     monEl.appendChild(monImg);
     layer.appendChild(monEl);
+
+    // Pre-promote camera-rig GPU layer from frame 0 so ZOOM_START NEVER triggers a layer-allocation flash!
+    rig.style.transformOrigin = `${(monRestLeft + screenCxLocal).toFixed(1)}px ${(monRestTop + screenCyLocal).toFixed(1)}px`;
+    rig.style.transform = 'scale(1)';
 
     const sg = MONITOR_GEOM.screen;
     const innerW = monW * (sg.x1 - sg.x0);
@@ -273,17 +346,22 @@
     aboveList.sort((a, b) => b.cy - a.cy);
 
     const bodies = [];
-    function spawnBody(info, x, y, vx, vy, omega, delaySec) {
+    function spawnBody(info, x, y, vx, vy, omega, delaySec, isVisibleNow) {
       const { entry, boxW, boxH } = info;
       const wrap = document.createElement('div');
       wrap.className = 'physics-body';
       wrap.style.width = boxW + 'px';
       wrap.style.height = boxH + 'px';
 
-      const cropClone = entry.crop.cloneNode(true);
-      const imgClone = cropClone.querySelector('img');
-      if (imgClone) imgClone.loading = 'eager';
-      wrap.appendChild(cropClone);
+      // Move the LIVE already-painted entry.crop node straight into the physics rig (NO cloneNode!)
+      // so the browser reuses its already-decoded GPU texture with ZERO 1-frame decode flash!
+      const cropNode = entry.crop;
+      const liveImg = cropNode.querySelector('img');
+      if (liveImg) {
+        liveImg.loading = 'eager';
+        liveImg.decoding = 'sync';
+      }
+      wrap.appendChild(cropNode);
       layer.appendChild(wrap);
 
       // True oriented rectangular collider (slightly inset to match sculptural silhouette)
@@ -313,17 +391,20 @@
         delay: delaySec,
         active: delaySec <= 0,
       };
-      wrap.style.transform = `translate3d(${(x - body.halfW).toFixed(1)}px, ${(y - body.halfH).toFixed(1)}px, 0)`;
+      wrap.style.transform = `translate3d(${(x - body.halfW).toFixed(2)}px, ${(y - body.halfH).toFixed(2)}px, 0)`;
+      if (!isVisibleNow) {
+        wrap.style.visibility = 'hidden';
+      }
       bodies.push(body);
     }
 
-    // Beat 1: currently visible foreground objects drop immediately from their exact screen coordinates
+    // Beat 1: currently visible foreground objects release smoothly from REST right at their exact pixel rects!
     visibleList.sort((a, b) => b.cy - a.cy);
-    visibleList.forEach((info, idx) => {
-      const vx = (Math.random() - 0.5) * 55;
-      const vy = 40 + idx * 50;
-      const omega = (Math.random() - 0.5) * 0.65;
-      spawnBody(info, info.cx, info.cy, vx, vy, omega, 0);
+    visibleList.forEach((info) => {
+      const vx = (Math.random() - 0.5) * 32;
+      const vy = 0; // start from exact rest so frame 0 -> frame 1 has ZERO vertical jump/flash!
+      const omega = (Math.random() - 0.5) * 0.42;
+      spawnBody(info, info.cx, info.cy, vx, vy, omega, 0, true);
     });
 
     // Above-viewport objects cascade across Beat 2..Beat 8 so they naturally meet & collide with the rising monitor!
@@ -336,14 +417,14 @@
     const panelSpan = panelRightTarget - panelLeftTarget;
 
     mainAbove.forEach((info, idx) => {
-      // Spread arrival times smoothly from +0.30s to +2.05s (meeting the faster rising monitor!)
+      // Spread arrival times smoothly from +0.30s to +2.05s (meeting the rising monitor!)
       const frac = mainAbove.length > 1 ? idx / (mainAbove.length - 1) : 0;
       const delay = 0.30 + frac * 1.75 + (Math.random() - 0.5) * 0.10;
       const spanMin = Math.max(info.boxW * 0.5 + 18, panelLeftTarget - 110);
       const spanMax = Math.min(vw - info.boxW * 0.5 - 18, panelRightTarget + 110);
       const startX = clamp(spanMin + Math.random() * (spanMax - spanMin), info.boxW * 0.5 + 18, vw - info.boxW * 0.5 - 18);
       const startY = -info.boxH * 0.65 - 24;
-      spawnBody(info, startX, startY, (Math.random() - 0.5) * 70, 120 + Math.random() * 120, (Math.random() - 0.5) * 0.9, Math.max(0, delay));
+      spawnBody(info, startX, startY, (Math.random() - 0.5) * 70, 120 + Math.random() * 120, (Math.random() - 0.5) * 0.9, Math.max(0, delay), false);
     });
 
     // 3 late straggler objects arriving right as the cut-out monitor settles (~2.35s - 2.95s)
@@ -355,9 +436,10 @@
         vw - info.boxW * 0.5 - 20
       );
       const delay = 2.35 + idx * 0.28;
-      spawnBody(info, startX, -info.boxH * 0.65 - 24, (Math.random() - 0.5) * 50, 110, (Math.random() - 0.5) * 0.6, delay);
+      spawnBody(info, startX, -info.boxH * 0.65 - 24, (Math.random() - 0.5) * 50, 110, (Math.random() - 0.5) * 0.6, delay, false);
     });
 
+    // Append rig BEFORE hiding stage/overflow so the live moved objects stay continuously painted!
     document.body.appendChild(rig);
     document.documentElement.classList.add('blackout');
     document.body.classList.add('blackout');
@@ -368,9 +450,9 @@
     // - Beat 6.6 (+3.345s) -> Beat 10 (+5.376s): Seamless camera push straight THROUGH the cut-out glass
     //   into the street (ZERO black curtain!), arriving in time for 1st "Mic Check" Showcase at Bar 4.1 (+7.17s)!
     const RISE_START = BEAT * 3.0;   // +1.792s = Beat 4
-    const RISE_DUR = BEAT * 2.0;     //  1.195s = brisk 2-beat rise (Beat 4 -> Beat 6)
-    const ZOOM_START = BEAT * 5.6;   // +3.345s
-    const ZOOM_DUR = BEAT * 3.4;     //  2.031s = seamless push-through ending @ +5.376s
+    const RISE_DUR = BEAT * 2.2;     //  1.314s = silky decelerating rise
+    const ZOOM_START = BEAT * 4.8;   // +2.867s = blends seamlessly out of rise (zero dead pause!)
+    const ZOOM_DUR = BEAT * 3.8;     //  2.270s = fluid optical push-through ending @ +5.137s
 
     const GRAVITY = 2350;
     const RESTITUTION = 0.32;
@@ -381,8 +463,8 @@
 
     const fallbackStartMs = performance.now();
     function getAudioElapsed() {
-      if (audioCtx && typeof drumDropAtAudioTime === 'number') {
-        return Math.max(0, audioCtx.currentTime - drumDropAtAudioTime);
+      if (typeof externalElapsedFn === 'function') {
+        return Math.max(0, externalElapsedFn());
       }
       return (performance.now() - fallbackStartMs) / 1000;
     }
@@ -403,8 +485,6 @@
     let monRecoilV = 0;
     let lastTs = performance.now();
 
-    monEl.style.transform = `translate3d(${monRestLeft.toFixed(1)}px, ${monTop.toFixed(1)}px, 0)`;
-
     function simulate(now) {
       const rawDt = Math.min(0.033, Math.max(0.001, (now - lastTs) / 1000));
       lastTs = now;
@@ -417,10 +497,12 @@
       for (let s = 0; s < SUBSTEPS; s++) {
         elapsed += stepDelta;
 
-        // 1. Update slow, heavy rising monitor starting right on Beat 4 (+1.792s)
+        // 1. Update C2-smooth rising monitor starting right on Beat 4 (+1.792s)
+        // Smootherstep ramps velocity smoothly from 0 -> peak -> 0 (zero abrupt frame-1 pop!)
         const prevMonTop = monTop;
         const riseU = clamp((elapsed - RISE_START) / RISE_DUR, 0, 1);
-        const baseTop = monStartTop + (monRestTop - monStartTop) * easeInOutCubic(riseU);
+        const riseEase = riseU * riseU * riseU * (riseU * (6 * riseU - 15) + 10);
+        const baseTop = monStartTop + (monRestTop - monStartTop) * riseEase;
 
         // Subtle physical weight recoil spring when hit from above
         const springAcc = -240 * monRecoilY - 26 * monRecoilV;
@@ -652,25 +734,26 @@
         }
       }
 
-      // Render monitor
+      // Render monitor (only reveal once entering viewport so offscreen texture never flashes)
+      monEl.style.visibility = monTop < vh + 12 ? 'visible' : 'hidden';
       monEl.style.transform = `translate3d(${monRestLeft.toFixed(1)}px, ${monTop.toFixed(1)}px, 0)`;
 
-      // Render falling objects
+      // Render falling objects (reveal delayed upper objects right as they become active)
       for (let i = 0; i < bodies.length; i++) {
         const b = bodies[i];
-        b.el.style.transform = `translate3d(${(b.x - b.halfW).toFixed(1)}px, ${(b.y - b.halfH).toFixed(1)}px, 0) rotate(${b.theta.toFixed(3)}rad)`;
+        if (!b.active) continue;
+        if (b.el.style.visibility === 'hidden') b.el.style.visibility = 'visible';
+        b.el.style.transform = `translate3d(${(b.x - b.halfW).toFixed(2)}px, ${(b.y - b.halfH).toFixed(2)}px, 0) rotate(${b.theta.toFixed(3)}rad)`;
       }
 
-      // Seamless camera push-in straight THROUGH the cut-out transparent glass of 016_cutout.png!
+      // Seamless silky camera push-in straight THROUGH the cut-out transparent glass of 016_cutout.png!
       const zoomU = clamp((elapsed - ZOOM_START) / ZOOM_DUR, 0, 1);
       const originX = monRestLeft + screenCxLocal;
       const originY = monTop + screenCyLocal;
-      const camScale = zoomU > 0 ? Math.pow(targetScale, easeInOutQuart(zoomU)) : 1;
+      const camScale = zoomU > 0 ? Math.pow(targetScale, easeInOutCubic(zoomU)) : 1;
 
-      if (zoomU > 0) {
-        rig.style.transformOrigin = `${originX.toFixed(1)}px ${originY.toFixed(1)}px`;
-        rig.style.transform = `scale(${camScale.toFixed(4)})`;
-      }
+      rig.style.transformOrigin = `${originX.toFixed(1)}px ${originY.toFixed(1)}px`;
+      rig.style.transform = `scale(${camScale.toFixed(4)})`;
 
       // Sync exact portal window of the live 3D street scaled right inside 016_cutout.png's hole!
       if (pvCtrl) {
@@ -682,9 +765,9 @@
         const sy0 = originY + (wy0 - originY) * camScale;
         const sx1 = originX + (wx1 - originX) * camScale;
         const sy1 = originY + (wy1 - originY) * camScale;
-        if (sy0 >= vh - 1) {
+        if (sy0 >= vh - 2) {
           pvCtrl.setPortalWindow({ hidden: true });
-        } else if (sx0 <= 0.5 && sy0 <= 0.5 && sx1 >= vw - 0.5 && sy1 >= vh - 0.5) {
+        } else if (sx0 <= -2 && sy0 <= -2 && sx1 >= vw + 2 && sy1 >= vh + 2) {
           pvCtrl.setPortalWindow({ open: true });
         } else {
           pvCtrl.setPortalWindow({ x0: sx0, y0: sy0, x1: sx1, y1: sy1 });
@@ -703,195 +786,180 @@
     requestAnimationFrame(simulate);
   }
 
-  function startVoice(entry, src, gain, startAt, dur, isChained, linearGain) {
-    const ac = ensureAudio();
-    const waypoints = buildWaypoints(entry);
+  // Silky 60fps phase-locked clock anchored to a native <audio> element (zero 20ms stair-stepping, zero drift!)
+  function makeSmoothMediaClock(audioEl) {
+    let lastMediaT = -1;
+    let anchorMediaT = 0;
+    let anchorPerfMs = performance.now();
+    return function getMediaTime() {
+      const nowMs = performance.now();
+      const rawT = audioEl.currentTime || 0;
+      if (audioEl.paused || audioEl.ended) {
+        anchorMediaT = rawT;
+        anchorPerfMs = nowMs;
+        lastMediaT = rawT;
+        return rawT;
+      }
+      if (rawT !== lastMediaT) {
+        lastMediaT = rawT;
+        const est = anchorMediaT + (nowMs - anchorPerfMs) / 1000;
+        if (Math.abs(rawT - est) > 0.045 || rawT < est - 0.02) {
+          anchorMediaT = rawT;
+          anchorPerfMs = nowMs;
+        } else {
+          anchorMediaT = est + (rawT - est) * 0.25;
+          anchorPerfMs = nowMs;
+        }
+      }
+      const smooth = anchorMediaT + (nowMs - anchorPerfMs) / 1000;
+      return Math.max(0, clamp(smooth, rawT - 0.04, rawT + 0.06));
+    };
+  }
+
+  // 100% Native <audio> playback for ALL 23 320kbps MP3 phrases:
+  // Called SYNCHRONOUSLY inside click -> 0ms Web Audio overhead, ZERO AudioContext silence!
+  function playEntry(entry, isChained) {
+    if (finaleStarted) return;
+    stopCurrent();
+
     const isFinale = Boolean(entry.phrase.isFinale);
     const drumDropSec = isFinale ? (entry.phrase.drumDropSec || 1.648) : null;
-    const motionDur = isFinale ? drumDropSec : dur;
+
+    if (isFinale) {
+      preloadMonitorImg();
+      if (window.MicCheckPV) window.MicCheckPV.preload();
+    } else if (entry.order >= 12) {
+      preloadFinaleIfReady();
+    }
 
     if (isChained) {
       entry.slot.classList.add('visible');
       ensureInViewQuietly(entry);
     }
 
-    const voice = {
-      entry,
-      src,
-      gain,
-      linearGain,
-      startAt,
-      dur,
-      raf: null,
-      handoverTimer: null,
-      dropTimer: null,
-      scheduledNext: null,
-      handedOver: false,
-      dropped: false,
-    };
-    currentVoice = voice;
+    const audioEl = getAudioEl(entry.phrase.audio);
+    audioEl._fadeGen = (audioEl._fadeGen || 0) + 1; // cancel any pending fade-out on re-click
+    try { audioEl.currentTime = 0; } catch {}
+    audioEl.volume = 1.0;
+    audioEl.muted = false;
 
-    // Eagerly preload the finale full track once user is in the second half
-    if (entry.order >= 14) {
-      preloadFinaleIfReady();
-    }
+    const waypoints = buildWaypoints(entry);
+    const fallbackDur = entry.phrase.durationSec || 3.5;
+    const getMediaT = makeSmoothMediaClock(audioEl);
 
-    // Finale: schedule drum-impact physics drop on exact Web Audio clock!
-    if (isFinale) {
-      const dropAt = startAt + drumDropSec;
-      const waitMs = Math.max(0, (dropAt - ac.currentTime) * 1000);
-      voice.dropTimer = setTimeout(() => {
-        if (currentVoice === voice && !voice.dropped) {
-          voice.dropped = true;
-          triggerDrumDrop(dropAt);
-        }
-      }, waitMs + 4);
-    }
-
-    // Preload next phrase immediately so either manual click or 35% chain has 0ms gap
-    const nextEntry = entries[entry.order + 1];
+    const nextEntry = !isFinale ? entries[entry.order + 1] : null;
     const isContiguousWithNext = Boolean(
       nextEntry && (nextEntry.phrase.startSec - entry.phrase.endSec) <= 0.05
     );
-    const willChain = Boolean(!isFinale && nextEntry && Math.random() < CHAIN_PROBABILITY);
+    const willChain = Boolean(nextEntry && Math.random() < CHAIN_PROBABILITY);
 
-    if (!willChain && !isFinale) {
-      scheduleTailFade(ac, gain, linearGain, startAt, dur, isContiguousWithNext);
+    if (nextEntry) {
+      preloadAudioBlob(nextEntry.phrase.audio);
     }
 
-    if (nextEntry && !isFinale) {
-      const bufPromise = loadBuffer(nextEntry.phrase.audio);
+    const voice = {
+      entry,
+      audio: audioEl,
+      raf: null,
+      dropped: false,
+      handedOver: false,
+      keepPlaying: false,
+    };
+    currentVoice = voice;
 
-      if (willChain) {
-        bufPromise
-          .then((nextBuf) => {
-            if (currentVoice !== voice || voice.handedOver) return;
-
-            const overlap = isContiguousWithNext ? 0.036 : 0.008;
-            const targetStart = Math.max(ac.currentTime + 0.005, startAt + dur - overlap);
-
-            const nextSrc = ac.createBufferSource();
-            nextSrc.buffer = nextBuf;
-            const nextGain = ac.createGain();
-            const nextLinear = Math.pow(10, (nextEntry.phrase.gainDb || 0) / 20);
-            if (isContiguousWithNext && Math.abs(nextLinear - linearGain) > 0.05) {
-              nextGain.gain.setValueAtTime(linearGain, targetStart);
-              nextGain.gain.linearRampToValueAtTime(nextLinear, targetStart + 0.45);
-            } else {
-              nextGain.gain.setValueAtTime(nextLinear, targetStart);
-            }
-            nextSrc.connect(nextGain).connect(ac.destination);
-            nextSrc.start(targetStart);
-
-            voice.scheduledNext = {
-              entry: nextEntry,
-              src: nextSrc,
-              gain: nextGain,
-              linearGain: nextLinear,
-              startAt: targetStart,
-              dur: nextBuf.duration,
-            };
-
-            const waitMs = Math.max(0, (targetStart - ac.currentTime) * 1000);
-            voice.handoverTimer = setTimeout(() => {
-              handoverToNext(voice);
-            }, waitMs + 8);
-          })
-          .catch(() => {
-            if (currentVoice === voice && !voice.handedOver) {
-              scheduleTailFade(ac, gain, linearGain, startAt, dur, isContiguousWithNext);
-            }
-          });
-      }
+    const playPromise = audioEl.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch((err) => {
+        console.warn('[mic-check] Audio play failed:', entry.phrase.audio, err);
+      });
     }
 
-    function handoverToNext(fromVoice) {
-      if (currentVoice !== fromVoice || fromVoice.handedOver || !fromVoice.scheduledNext) return;
-      fromVoice.handedOver = true;
-      if (fromVoice.raf) cancelAnimationFrame(fromVoice.raf);
-      if (fromVoice.handoverTimer) clearTimeout(fromVoice.handoverTimer);
-
+    function handoverToNext() {
+      if (currentVoice !== voice || voice.handedOver || !nextEntry || finaleStarted) return;
+      voice.handedOver = true;
       const lastPt = waypoints[waypoints.length - 1];
       entry.currentPct = lastPt.x;
       entry.btn.style.left = lastPt.x.toFixed(3) + '%';
-
-      const nxt = fromVoice.scheduledNext;
-      startVoice(nxt.entry, nxt.src, nxt.gain, nxt.startAt, nxt.dur, true, nxt.linearGain);
+      playEntry(nextEntry, true);
     }
 
     function step() {
       if (currentVoice !== voice) return;
-      const now = ac.currentTime;
+      const t = getMediaT();
+      const dur = (audioEl.duration && isFinite(audioEl.duration) && audioEl.duration > 0.2)
+        ? audioEl.duration
+        : fallbackDur;
 
-      if (isFinale && !voice.dropped && now >= startAt + drumDropSec) {
-        voice.dropped = true;
-        if (voice.dropTimer) clearTimeout(voice.dropTimer);
-        triggerDrumDrop(startAt + drumDropSec);
+      if (isFinale) {
+        if (!voice.dropped && t >= drumDropSec) {
+          voice.dropped = true;
+          voice.keepPlaying = true; // keep 23.mp3 playing uninterrupted through entire PV!
+          triggerDrumDrop(null, () => Math.max(0, getMediaT() - drumDropSec));
+          return;
+        }
+        const progress = clamp(t / drumDropSec, 0, 1);
+        let seg = 0;
+        while (seg < waypoints.length - 2 && progress > waypoints[seg + 1].t) seg++;
+        const p0 = waypoints[seg];
+        const p1 = waypoints[seg + 1];
+        const localT = p1.t > p0.t ? clamp((progress - p0.t) / (p1.t - p0.t), 0, 1) : 1;
+        const x = p0.x + (p1.x - p0.x) * easeInOutCubic(localT);
+        entry.currentPct = x;
+        entry.btn.style.left = x.toFixed(3) + '%';
+        voice.raf = requestAnimationFrame(step);
         return;
       }
 
-      if (voice.scheduledNext && now >= voice.scheduledNext.startAt) {
-        handoverToNext(voice);
-        return;
+      // 35% smooth recursive chain into next entry right before clip ends
+      if (willChain && !voice.handedOver) {
+        const overlap = isContiguousWithNext ? 0.055 : 0.025;
+        if (t >= dur - overlap) {
+          handoverToNext();
+          return;
+        }
+      } else if (!willChain) {
+        // Silky tail fade-out when stopping at end of phrase
+        const fadeSec = isContiguousWithNext ? Math.min(0.22, dur * 0.24) : Math.min(0.14, dur * 0.20);
+        const rem = dur - t;
+        if (rem < fadeSec && rem > 0) {
+          audioEl.volume = clamp(rem / fadeSec, 0, 1);
+        }
       }
 
-      const progress = clamp((now - startAt) / motionDur, 0, 1);
+      const progress = clamp(t / dur, 0, 1);
       let seg = 0;
-      while (seg < waypoints.length - 2 && progress > waypoints[seg + 1].t) {
-        seg++;
-      }
+      while (seg < waypoints.length - 2 && progress > waypoints[seg + 1].t) seg++;
       const p0 = waypoints[seg];
       const p1 = waypoints[seg + 1];
       const localT = p1.t > p0.t ? clamp((progress - p0.t) / (p1.t - p0.t), 0, 1) : 1;
       const x = p0.x + (p1.x - p0.x) * easeInOutCubic(localT);
-
       entry.currentPct = x;
       entry.btn.style.left = x.toFixed(3) + '%';
 
-      if (progress < 1 || voice.scheduledNext || (isFinale && !voice.dropped)) {
+      if (progress < 1 && !audioEl.ended) {
         voice.raf = requestAnimationFrame(step);
+      } else {
+        if (willChain && !voice.handedOver) {
+          handoverToNext();
+          return;
+        }
+        currentVoice = null;
+        audioEl.volume = 1.0;
       }
     }
 
-    voice.raf = requestAnimationFrame(step);
-
-    src.onended = () => {
+    audioEl.onended = () => {
       if (currentVoice !== voice) return;
-      if (voice.scheduledNext && !voice.handedOver) {
-        handoverToNext(voice);
+      if (willChain && !voice.handedOver && !isFinale) {
+        handoverToNext();
         return;
       }
       if (voice.raf) cancelAnimationFrame(voice.raf);
-      if (voice.handoverTimer) clearTimeout(voice.handoverTimer);
-      if (voice.dropTimer) clearTimeout(voice.dropTimer);
       currentVoice = null;
+      audioEl.volume = 1.0;
     };
-  }
 
-  async function playEntry(entry) {
-    if (finaleStarted) return;
-    stopCurrent();
-    const ac = ensureAudio();
-
-    let buf;
-    try {
-      buf = await loadBuffer(entry.phrase.audio);
-    } catch {
-      return;
-    }
-
-    if (finaleStarted) return;
-
-    const src = ac.createBufferSource();
-    src.buffer = buf;
-    const gain = ac.createGain();
-    const linearGain = Math.pow(10, (entry.phrase.gainDb || 0) / 20);
-    gain.gain.value = linearGain;
-    src.connect(gain).connect(ac.destination);
-
-    const t0 = ac.currentTime;
-    src.start(t0);
-    startVoice(entry, src, gain, t0, buf.duration, false, linearGain);
+    voice.raf = requestAnimationFrame(step);
   }
 
   function build(data) {
@@ -917,10 +985,10 @@
       crop.className = 'crop';
 
       const img = document.createElement('img');
-      img.src = imgMeta.src;
       img.alt = '';
       img.decoding = 'async';
-      img.loading = i < 4 ? 'eager' : 'lazy';
+      img.loading = i < 6 ? 'eager' : 'lazy';
+      attachImgRetry(img, imgMeta.src, 3);
 
       layoutCrop(imgMeta, crop, img);
       crop.appendChild(img);
@@ -931,7 +999,7 @@
       const entry = { order: i, phrase, imgMeta, slot, btn, crop, img, currentPct: xPct };
       entries.push(entry);
 
-      btn.addEventListener('click', () => playEntry(entry));
+      btn.addEventListener('click', () => playEntry(entry, false));
     });
 
     const obs = new IntersectionObserver(
@@ -939,15 +1007,31 @@
         list.forEach((ev) => {
           if (ev.isIntersecting) {
             ev.target.classList.add('visible');
+            const idx = parseInt(ev.target.dataset.order || '-1', 10);
+            if (idx >= 0 && entries[idx]) {
+              // Preload visible item's 320kbps MP3 (~200KB) into RAM Blob so click starts at 0ms!
+              preloadAudioBlob(entries[idx].phrase.audio);
+            }
             if (ev.target === entries[entries.length - 1]?.slot || ev.target === entries[Math.max(0, entries.length - 6)]?.slot) {
               preloadFinaleIfReady();
             }
           }
         });
       },
-      { rootMargin: '80px 0px -40px 0px', threshold: 0.06 }
+      { rootMargin: '120px 0px -40px 0px', threshold: 0.05 }
     );
-    entries.forEach((e) => obs.observe(e.slot));
+    entries.forEach((e) => {
+      e.slot.dataset.order = String(e.order);
+      obs.observe(e.slot);
+    });
+
+    // Staged background preloading: 01.mp3 + 02.mp3 + 016_cutout immediately, 23.mp3 (4.8MB) + PV assets right after!
+    preloadMonitorImg();
+    if (entries[0]) preloadAudioBlob(entries[0].phrase.audio);
+    if (entries[1]) preloadAudioBlob(entries[1].phrase.audio);
+    setTimeout(() => {
+      if (!finaleStarted) preloadFinaleIfReady();
+    }, 350);
 
     // Optional direct PV scene inspection via URL query (?scene=pv&t=15.0[&freeze=1])
     const qs = new URLSearchParams(window.location.search);
@@ -955,10 +1039,44 @@
       finaleStarted = true;
       const startT = parseFloat(qs.get('t') || '10.5');
       const freeze = qs.get('freeze') === '1';
-      const wallT0 = performance.now();
+      let wallT0 = performance.now();
+      let previewAudio = null;
+      let previewClock = null;
+      let previewDropSec = 1.648;
+      const getPreviewT = () => {
+        if (previewAudio && previewClock && !previewAudio.paused) {
+          return Math.max(0, previewClock() - previewDropSec);
+        }
+        return startT + (performance.now() - wallT0) / 1000;
+      };
+      // In non-frozen preview mode, clicking anywhere starts synced native <audio> from 23.mp3
+      if (!freeze) {
+        const lastPhrase = phrases[phrases.length - 1];
+        if (lastPhrase && lastPhrase.audio) {
+          previewDropSec = lastPhrase.drumDropSec || 1.648;
+          preloadAudioBlob(lastPhrase.audio);
+          window.addEventListener(
+            'pointerdown',
+            () => {
+              const a = getAudioEl(lastPhrase.audio);
+              const curT = getPreviewT();
+              const offset = previewDropSec + curT;
+              try { a.currentTime = Math.max(0, offset); } catch {}
+              a.volume = 1.0;
+              a.muted = false;
+              a.play().then(() => {
+                previewAudio = a;
+                previewClock = makeSmoothMediaClock(a);
+              }).catch(() => {});
+            },
+            { once: true }
+          );
+        }
+      }
       window.MicCheckPV.preload().then(() => {
+        wallT0 = performance.now();
         window.MicCheckPV.start({
-          getElapsedSec: () => startT + (performance.now() - wallT0) / 1000,
+          getElapsedSec: getPreviewT,
           fallenItems: pickedItems,
           freezeAt: freeze ? startT : null,
         });
@@ -971,7 +1089,9 @@
     entries.forEach((e) => layoutCrop(e.imgMeta, e.crop, e.img));
   });
 
-  fetch('./data/mic_check_stage.json')
-    .then((r) => r.json())
-    .then(build);
+  fetchWithRetry('./data/mic_check_stage.json', 'json', 3)
+    .then(build)
+    .catch((err) => {
+      console.warn('[mic-check] Failed to load stage data:', err);
+    });
 })();

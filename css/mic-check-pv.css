@@ -5,11 +5,12 @@
    ========================================================================= */
 
 :root {
-  --song-thin: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --song-thin: 'Cormorant Garamond', 'ZCOOL XiaoWei', 'STFangsong', 'FangSong', 'Songti SC', serif;
   --pure-white: #ffffff;
 }
 
-.pv-stage {
+/* Outer non-transformed portal mask prevents clip-path + transform + preserve-3d compositor flash */
+.pv-portal-mask {
   position: fixed;
   inset: 0;
   background: #000000;
@@ -21,6 +22,20 @@
   will-change: clip-path;
 }
 
+.pv-stage {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  overflow: hidden;
+  isolation: isolate;
+  transform-style: flat;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+}
+
 /* True one-point 3D perspective converging onto dead screen center (50% 50%) */
 .pv-corridor-layer {
   position: absolute;
@@ -30,6 +45,7 @@
   perspective: 820px;
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
+  pointer-events: none;
 }
 
 .pv-street-item {
@@ -56,11 +72,57 @@
   -webkit-user-drag: none;
 }
 
+/* Pure 2D-plane projective ground-plane launcher (Source Han Sans Heavy / 思源黑体 900)
+   Uses exact Z=0 matrix3d homography (NO preserve-3d, NO perspective, NO contain:paint culling!)
+   so glyphs are 100% guaranteed visible AND 100% strictly BELOW .pv-monitor-layer (z-index 15 < 20)! */
+.pv-floor-text-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.pv-floor-glyph {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 500px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Sans SC', 'Source Han Sans SC', 'Hiragino Sans GB', 'STHeiti', 'PingFang SC', sans-serif;
+  font-weight: 900;
+  font-size: 460px;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
+  transform-origin: 0 0;
+  will-change: transform;
+  pointer-events: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pv-floor-glyph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pv-floor-glyph svg text {
+  fill: #ffffff;
+  font-family: 'Noto Sans SC', 'Source Han Sans SC', 'Hiragino Sans GB', 'STHeiti', 'PingFang SC', sans-serif;
+  font-weight: 900;
+}
+
 .pv-monitor-layer {
   position: absolute;
   inset: 0;
   overflow: hidden;
   z-index: 20;
+  isolation: isolate;
 }
 
 .pv-toss-layer {
@@ -97,11 +159,11 @@
 
 .pv-monitor-unit {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 50%;
+  top: 45%;
   will-change: transform, opacity;
-  transform-origin: 0 0;
-  display: none;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .pv-monitor-frame {
@@ -247,17 +309,17 @@
 .m-fit text {
   fill: #ffffff;
   font-family: var(--song-thin);
-  font-weight: 200;
+  font-weight: 300;
 }
 
-/* Tightly packed, fully legible pure #ffffff ultra-thin Songti prose block */
+/* Tightly packed, fully legible pure #ffffff slender Songti prose block */
 .m-prose {
   background: #000000;
   color: #ffffff;
-  font-family: var(--song-thin);
-  font-weight: 200;
-  font-size: 13.5px;
-  line-height: 1.38;
+  font-family: 'Cormorant Garamond', 'STFangsong', 'FangSong', 'Songti SC', serif;
+  font-weight: 300;
+  font-size: 14.2px;
+  line-height: 1.36;
   letter-spacing: 0.015em;
   text-align: justify;
   text-justify: inter-ideograph;
@@ -269,13 +331,13 @@
 }
 
 .m-prose.sm {
-  font-size: 12.2px;
-  line-height: 1.34;
+  font-size: 13.0px;
+  line-height: 1.33;
 }
 
 .m-prose.md {
-  font-size: 14.5px;
-  line-height: 1.40;
+  font-size: 15.2px;
+  line-height: 1.38;
 }
 
 .m-prose.en {
