@@ -1012,12 +1012,12 @@ class AgentRunResult:
 
     // ---------------------------------------------------------------------
     // 4.8 BAR 17 "ONE! TWO! THREE! FOUR!" BEAT-ANTICIPATED WALL-TO-WALL FLOOD
-    //     -> SEAMLESS HANDOFF INTO COOL 2.5D ARCHITECTURAL STREET & SECTION TOWER (BAR 18.1+)!
+    //     -> SEAMLESS HANDOFF INTO 60FPS+ 3D SURREAL OBJECT-COLLAGE T-JUNCTION (BAR 18.1+)!
     // ---------------------------------------------------------------------
     const T_FLOOD_BEAT1 = BAR * 16;         // +38.020s = EXACT Bar 17.1 ("ONE!")
     const T_FLOOD_LEAD = 0.12;              // 120ms anticipation so tiles slam ON the vocal beat (not late!)
     const T_FLOOD_START = T_FLOOD_BEAT1 - T_FLOOD_LEAD;
-    const T_SKETCH_START = BAR * 17;        // +40.396s = EXACT Bar 18.1 (top-down road -> dead-center architectural lift!)
+    const T_SKETCH_START = BAR * 17;        // +40.396s = EXACT Bar 18.1 (top-down road -> 60fps rotating pull-up!)
 
     function getFloodImage(rawUrl) {
       const url = safeEncodeUrl(rawUrl);
@@ -1029,8 +1029,11 @@ class AgentRunResult:
       return im;
     }
 
+    // Lazy-init WebGL 3D stage AFTER Beat-1 drum-drop physics & portal zoom finish
+    // so creating 200+ 3D CanvasTextures NEVER stalls the instant Beat-1 object drop!
     let sketch3d = null;
-    if (window.MicCheckSketch3D) {
+    function ensureSketch3D(deferTextures) {
+      if (sketch3d || !window.MicCheckSketch3D) return sketch3d;
       sketch3d = window.MicCheckSketch3D.create({
         parentEl: root,
         vw,
@@ -1045,7 +1048,9 @@ class AgentRunResult:
         kicks3d: data.kicks3d || [],
         cues3d: data.cues3d || {},
         getImage: getFloodImage,
+        deferTextures: Boolean(deferTextures),
       });
+      return sketch3d;
     }
 
     function makeCodeCardSprite(title, lines) {
@@ -1129,12 +1134,9 @@ class AgentRunResult:
     ((data.assets && data.assets.cars) || []).slice(0, 8).forEach((m) => {
       accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
     });
-    ((data.assets && (data.assets.signalsClean || data.assets.signals)) || [])
-      .filter((m) => m && m.src && !/(005|006|008|011|017|020)\.png$/.test(m.src))
-      .slice(0, 8)
-      .forEach((m) => {
-        accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-      });
+    ((data.assets && data.assets.signals) || []).slice(0, 8).forEach((m) => {
+      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
     ((data.assets && data.assets.poles) || []).slice(0, 6).forEach((m) => {
       accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
     });
@@ -1311,7 +1313,8 @@ class AgentRunResult:
       }
     }
 
-    const SCENE_END = BAR * 49.0; // Runs all the way through next '1 2 3 4' (Bar 41) and 'STAAAAAR' climax (~116.4s)!
+    const SCENE_END = BAR * 55.0; // Runs all the way through next '1 2 3 4' (Bar 41) & full START Sun/Moon finale (~130.7s)!
+    let glbPreloadStarted = false;
 
     function renderAt(t) {
       while (nextPluckIdx < plucks.length && plucks[nextPluckIdx].t <= t) {
@@ -1433,8 +1436,17 @@ class AgentRunResult:
           if (floodCanvas.style.visibility !== 'hidden') {
             floodCanvas.style.visibility = 'hidden';
           }
+          // Preload all 15 low-poly white-model GLBs lazily after Beat-1 physics (t >= 10s)!
+          if (!glbPreloadStarted && t >= 10.0 && window.MicCheckGLB && window.THREE) {
+            glbPreloadStarted = true;
+            window.MicCheckGLB.preloadAll(window.THREE);
+          }
+          // Warm up 3D WebGL stage quietly starting at t >= 18s (well after Beat-1 physics & Monitor 1!)
+          if (t >= 18.0) ensureSketch3D(true);
           if (sketch3d) sketch3d.render(t, floodCanvas);
         } else if (t < T_SKETCH_START) {
+          ensureSketch3D(true);
+          if (sketch3d) sketch3d.render(t, floodCanvas);
           if (floodCanvas.style.visibility !== 'visible') {
             floodCanvas.style.visibility = 'visible';
           }
@@ -1469,6 +1481,7 @@ class AgentRunResult:
             monitorLayer.style.visibility = 'hidden';
             tossLayer.style.visibility = 'hidden';
           }
+          ensureSketch3D(false);
           if (sketch3d) {
             sketch3d.render(t, floodCanvas);
             if (floodCanvas.style.visibility !== 'hidden') {

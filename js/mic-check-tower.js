@@ -2,768 +2,690 @@
   'use strict';
 
   // =========================================================================
-  // MIC CHECK — FRONTAL 2.5D ARCHITECTURAL SECTION TOWER (Bar 26–40)
+  // MIC CHECK — 13-STORY EXAGGERATED 3D WHITE-MODEL (白模) + PACKED STICKER
+  // COLLAGE SKYSCRAPER (Staircase Formation -> Mid-Chorus Cuboid Convergence)
   //
-  // Strict Editorial & Spatial Discipline:
-  //   - Pure frontal architectural cutaway (正面建筑剖面图, rotation.y = 0)
-  //   - ZERO floating low-poly CylinderGeometry mesa
-  //   - ZERO crossed-plane 3D cutouts (no addCrossedPiece)
-  //   - ZERO carousel / orbital / toy spinning animations
-  //   - ZERO humans, humanoids, or cartoon elements
-  //   - 100% solid rectangular architectural materials for every slab & column
-  //     (zero jagged cutout silhouettes on structural frames!)
-  //   - 13 ordered personal theme floors (01_anhui_noodles -> 13_jiaomian_temple)
-  //     composed as 3-layer Z-offset monograph collage boxes inside a crisp
-  //     horizontal-slab + slender-column architectural section grid.
+  // Features:
+  //   - Massive, dense, exaggerated 3D GLB white models occupying >60% of every
+  //     floor (all 15 items/lowpoly/**/*.glb + sculptural white-clay F12/F13)
+  //   - Every floor plastered full of photo stickers (per-floor 1024x1024
+  //     sticker-wrapped white-clay atlas + 28-36 3D cutout collage stickers)
+  //   - ZERO velocity zero-points: every floor, white model & sticker moves on
+  //     C∞ differentiable continuous trajectories from age = 0 onward
+  //   - Exact vocal sync:
+  //       * Every "MIC CHECK" triggers smooth C∞ arrival of new model batches
+  //       * Every stereo Left/Right "啊 啊" smoothly rotates a target floor L/R
+  //       * Mid-chorus (SNAP_AGE = 38.02s) smoothly converges the forward-upward
+  //         staircase into ONE unified rectangular cuboid skyscraper
+  //       * START chant (57.03s+) smoothly turns the entire skyscraper into a
+  //         razor-sharp backlit silhouette against the Sun's expanding light
   // =========================================================================
 
-  function buildSectionTower(ctx) {
+  function makeRng(seed) {
+    let s = seed >>> 0;
+    return () => {
+      s = (Math.imul(1664525, s) + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+
+  function clamp(v, lo, hi) {
+    return Math.max(lo, Math.min(hi, v));
+  }
+
+  function tanhStep(t, t0, w) {
+    return 0.5 * (1 + Math.tanh((t - t0) / w));
+  }
+
+  // Exact measured "MIC CHECK" vocal hits (age in seconds from Bar 18.1 = 40.396s)
+  const MIC_CHECK_HITS = [
+    19.01, 20.49, 21.68, 22.87, 23.76, 25.25,
+    26.14, 27.62, 28.51, 30.00, 30.89, 32.38,
+    33.27, 34.75, 35.64, 37.13,
+    // Second half of chorus (after cuboid convergence at 38.02s)
+    38.02, 39.50, 40.39, 41.88, 42.77, 44.26,
+    45.15, 46.04, 47.52, 49.01, 49.90, 50.79,
+    52.28, 53.46, 54.65, 55.84,
+  ];
+
+  // Exact measured stereo LEFT / RIGHT "啊 啊" hits from 01_vocals.wav
+  // dir = -1 (Left <<<L) rotates floor left, dir = +1 (Right R>>>) rotates floor right
+  const AH_STEREO_ROT_HITS = [
+    { t: 19.90, dir: -1, floorIdx: 0 },
+    { t: 20.20, dir: +1, floorIdx: 0 },
+    { t: 21.09, dir: -1, floorIdx: 1 },
+    { t: 21.39, dir: +1, floorIdx: 1 },
+    { t: 22.28, dir: -1, floorIdx: 1 },
+    { t: 22.57, dir: +1, floorIdx: 2 },
+    { t: 24.65, dir: -1, floorIdx: 2 },
+    { t: 24.95, dir: +1, floorIdx: 3 },
+    { t: 27.03, dir: -1, floorIdx: 3 },
+    { t: 27.33, dir: +1, floorIdx: 4 },
+    { t: 29.41, dir: +1, floorIdx: 4 },
+    { t: 29.70, dir: -1, floorIdx: 4 },
+    { t: 31.78, dir: +1, floorIdx: 5 },
+    { t: 32.08, dir: -1, floorIdx: 5 },
+    { t: 32.97, dir: +1, floorIdx: 5 },
+    { t: 34.16, dir: +1, floorIdx: 6 },
+    { t: 34.45, dir: -1, floorIdx: 6 },
+    { t: 36.53, dir: +1, floorIdx: 6 },
+    { t: 36.83, dir: -1, floorIdx: 5 },
+    // Second half of chorus (unified rectangular cuboid — floors twist left & right on every Ah!)
+    { t: 38.91, dir: -1, floorIdx: 7 },
+    { t: 39.21, dir: +1, floorIdx: 7 },
+    { t: 41.29, dir: -1, floorIdx: 8 },
+    { t: 41.58, dir: +1, floorIdx: 8 },
+    { t: 43.66, dir: -1, floorIdx: 9 },
+    { t: 43.96, dir: +1, floorIdx: 9 },
+    { t: 44.85, dir: -1, floorIdx: 10 },
+    { t: 48.41, dir: +1, floorIdx: 10 },
+    { t: 48.71, dir: -1, floorIdx: 11 },
+    { t: 49.60, dir: +1, floorIdx: 11 },
+    { t: 52.28, dir: +1, floorIdx: 12 },
+    { t: 53.46, dir: -1, floorIdx: 12 },
+  ];
+
+  function buildStaircaseToCuboidTower(ctx) {
     const {
-      THREE, scene, TOWER_X, TOWER_Z, BAR, BEAT,
-      MIC_CHECK_AGE, TOWER_START, TOWER_FINISH,
-      makeCutout, getCutoutTex, findBySrc,
+      THREE, scene, TOWER_X, CUBOID_Z, STAIR_Z0, SNAP_AGE,
+      makeCutout, getCutoutTex, getImage, findBySrc, pickMeta,
       towerThemes, concreteTextures, brickTextures, archTextures,
-      buildingsClean, streetsPool, polesPool, itemsPool,
+      buildingsClean, streetsPool, screensPool, signsPool, itemsPool,
+      onTextureReady,
     } = ctx;
 
-    // -----------------------------------------------------------------------
-    // 1. 100% SOLID RECTANGULAR ARCHITECTURAL TEXTURES (ZERO JAGGED EDGES!)
-    // -----------------------------------------------------------------------
-    const conc02 = findBySrc('水泥纹理/02.webp', concreteTextures, 1); // smooth poured concrete
-    const conc03 = findBySrc('水泥纹理/03.webp', concreteTextures, 2); // clean light concrete
-    const conc06 = findBySrc('水泥纹理/06.webp', concreteTextures, 4); // Tadao Ando form-tie concrete (top 65% UV)
-    const conc08 = findBySrc('水泥纹理/08.webp', concreteTextures, 6); // matte pale concrete
-    const conc09 = findBySrc('水泥纹理/09.webp', concreteTextures, 7); // cool dark slate concrete
-    const brick01 = findBySrc('红砖纹理/01.webp', brickTextures, 0);
-    const brick07 = findBySrc('红砖纹理/07.webp', brickTextures, 5);
-    const brick08 = findBySrc('红砖纹理/08.webp', brickTextures, 6);
-    const brick05 = findBySrc('红砖纹理/05.png', brickTextures, 3);
-    const stone08 = findBySrc('建筑纹理/08.webp', archTextures, 7);
-    const stone09 = findBySrc('建筑纹理/09.webp', archTextures, 8);
-    const stone10 = findBySrc('建筑纹理/10.webp', archTextures, 9);
-    const archZig = findBySrc('建筑纹理/06.png', archTextures, 5);
-
-    const FORM_TIE_CROP = { u0: 0.0, v0: 0.0, u1: 1.0, v1: 0.62 };
-
-    function themeMetas(idx) {
-      const th = towerThemes[idx];
-      return (th && th.items && th.items.length) ? th.items : [conc02];
-    }
-
-    // Crisp architectural hairline & archival mat materials
-    const hairlineMat = new THREE.MeshBasicMaterial({ color: 0x161c24, side: THREE.DoubleSide });
-    const matFrameDark = new THREE.MeshBasicMaterial({ color: 0x181e26, side: THREE.DoubleSide });
-    const matFrameSubtle = new THREE.MeshBasicMaterial({ color: 0x2a323c, side: THREE.DoubleSide });
-
-    function addSolidRect(parent, w, h, x, yCenter, z, mat) {
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
-      mesh.position.set(x, yCenter, z);
-      parent.add(mesh);
-      return mesh;
-    }
-
-    function addHorizontalDeck(parent, w, d, y, meta, tintHex, uvCrop) {
-      const tex = getCutoutTex(meta || conc03, { maxDim: 512, tone: 'arch', uvCrop: uvCrop || null });
-      const mat = new THREE.MeshBasicMaterial({
-        map: tex,
-        color: tintHex ?? 0xc4ccd4,
-        side: THREE.DoubleSide,
-      });
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat);
-      mesh.rotation.x = -Math.PI / 2;
-      mesh.position.set(0, y, 0);
-      parent.add(mesh);
-      return mesh;
-    }
-
-    // Crisp frontal elevation architectural frame (100% solid rectilinear slabs & columns)
-    function addSectionFrame(shellGrp, w, d, h, cfg) {
-      const slabMeta = cfg.slabMeta || conc03;
-      const slabCrop = cfg.slabCrop || null;
-      const colMeta = cfg.colMeta || conc02;
-      const colCrop = cfg.colCrop || null;
-      const backMeta = cfg.backMeta || conc09;
-      const mullions = cfg.mullions || [-4.2, +4.2];
-      const recessTint = cfg.recessTint ?? 0x626c76;
-      const slabTint = cfg.slabTint ?? 0xd8dfe6;
-      const colTint = cfg.colTint ?? 0xd0d7de;
-      const isCrown = Boolean(cfg.isCrown);
-
-      const botSlabH = 0.28;
-      const topSlabH = isCrown ? 0.26 : 0.34;
-      const innerH = h - botSlabH - topSlabH;
-      const frontZ = d * 0.5;
-      const backZ = -d * 0.5;
-
-      // 1. Recessed matte architectural interior back wall
-      if (cfg.solidBackColor !== undefined) {
-        const backMat = new THREE.MeshBasicMaterial({ color: cfg.solidBackColor, side: THREE.DoubleSide });
-        addSolidRect(shellGrp, w - 0.50, h - 0.20, 0, h * 0.5, backZ, backMat);
-      } else {
-        const backPlate = makeCutout(backMeta, h - 0.24, {
-          fixedW: w - 0.52,
-          maxDim: 512,
-          pivot: 'bottom',
-          tone: 'arch',
-          color: recessTint,
-          alphaTest: 0.01,
-        });
-        backPlate.mesh.position.set(0, 0.12, backZ);
-        shellGrp.add(backPlate.mesh);
-      }
-
-      // 2. Floor deck & ceiling soffit planes
-      addHorizontalDeck(shellGrp, w + 0.44, d, 0.02, slabMeta, 0xb8c2cc, slabCrop);
-      if (!isCrown) {
-        addHorizontalDeck(shellGrp, w + 0.44, d, h - 0.02, slabMeta, 0xaab5c0, slabCrop);
-      }
-
-      // 3. Bottom & Top horizontal structural slab elevation fascias (frontal, razor-straight!)
-      const botBeam = makeCutout(slabMeta, botSlabH, {
-        fixedW: w + 0.48,
-        maxDim: 384,
-        pivot: 'bottom',
-        tone: 'arch',
-        color: slabTint,
-        uvCrop: slabCrop,
-        alphaTest: 0.01,
-      });
-      botBeam.mesh.position.set(0, 0, frontZ);
-      shellGrp.add(botBeam.mesh);
-      addSolidRect(shellGrp, w + 0.48, 0.055, 0, botSlabH + 0.02, frontZ + 0.02, hairlineMat);
-
-      const topBeam = makeCutout(slabMeta, topSlabH, {
-        fixedW: w + (isCrown ? 0.64 : 0.54),
-        maxDim: 384,
-        pivot: 'bottom',
-        tone: 'arch',
-        color: slabTint,
-        uvCrop: slabCrop,
-        alphaTest: 0.01,
-      });
-      topBeam.mesh.position.set(0, h - topSlabH, frontZ);
-      shellGrp.add(topBeam.mesh);
-      addSolidRect(shellGrp, w + (isCrown ? 0.64 : 0.54), 0.055, 0, h - topSlabH - 0.025, frontZ + 0.02, hairlineMat);
-
-      // 4. Outer left & right structural section walls (100% solid rectangular stone/concrete/brick!)
-      const outerW = 0.70;
-      [-1, 1].forEach((side) => {
-        const cx = side * (w * 0.5 - outerW * 0.5);
-        const col = makeCutout(colMeta, innerH, {
-          fixedW: outerW,
-          maxDim: 256,
-          pivot: 'bottom',
-          tone: 'arch',
-          color: colTint,
-          uvCrop: colCrop,
-          alphaTest: 0.01,
-        });
-        col.mesh.position.set(cx, botSlabH, frontZ - 0.04);
-        shellGrp.add(col.mesh);
-        // Clean inner & outer dark architectural edge hairlines
-        addSolidRect(shellGrp, 0.05, innerH, cx - side * (outerW * 0.5 + 0.02), botSlabH + innerH * 0.5, frontZ + 0.01, hairlineMat);
-        addSolidRect(shellGrp, 0.045, h, side * (w * 0.5 + 0.01), h * 0.5, frontZ + 0.01, hairlineMat);
-      });
-
-      // 5. Slender interior architectural grid mullions dividing bays cleanly
-      const mulW = cfg.mullionW || 0.24;
-      for (let i = 0; i < mullions.length; i++) {
-        const mx = mullions[i];
-        const mul = makeCutout(colMeta, innerH, {
-          fixedW: mulW,
-          maxDim: 224,
-          pivot: 'bottom',
-          tone: 'arch',
-          color: colTint,
-          uvCrop: colCrop,
-          alphaTest: 0.01,
-        });
-        mul.mesh.position.set(mx, botSlabH, frontZ - 0.06);
-        shellGrp.add(mul.mesh);
-        addSolidRect(shellGrp, 0.036, innerH, mx - mulW * 0.5 - 0.015, botSlabH + innerH * 0.5, frontZ - 0.03, hairlineMat);
-        addSolidRect(shellGrp, 0.036, innerH, mx + mulW * 0.5 + 0.015, botSlabH + innerH * 0.5, frontZ - 0.03, hairlineMat);
-      }
-    }
-
-    // Layer 1: Background architectural / atmospheric bay plate (z ~ -0.92 .. -0.70)
-    function addBackPlate(parent, meta, x, yBottom, w, h, opts) {
-      if (!meta) return null;
-      const o = opts || {};
-      const c = makeCutout(meta, h, {
-        fixedW: w,
-        maxDim: o.maxDim || 512,
-        pivot: 'bottom',
-        tone: o.tone || 'arch',
-        color: o.color ?? 0xc6cfd8,
-        uvCrop: o.uvCrop || null,
-        alphaTest: o.alphaTest ?? 0.03,
-      });
-      c.mesh.position.set(x, yBottom, o.z ?? -0.88);
-      parent.add(c.mesh);
-      return c.mesh;
-    }
-
-    // Layer 2: Midground hero curated theme plate (z ~ -0.10 .. +0.26)
-    function addHeroPlate(parent, meta, x, yBottom, targetH, opts) {
-      if (!meta) return null;
-      const o = opts || {};
-      const grp = new THREE.Group();
-      grp.position.set(x, yBottom, o.z ?? 0.08);
-      const c = makeCutout(meta, targetH, {
-        fixedW: o.fixedW,
-        maxW: o.maxW || 9.0,
-        maxDim: o.maxDim || 512,
-        pivot: 'bottom',
-        tone: o.tone || 'theme',
-        color: o.color ?? 0xf2f4f7,
-        uvCrop: o.uvCrop || null,
-        alphaTest: o.alphaTest ?? 0.06,
-      });
-      if (o.matBorder) {
-        const pad = o.matPad ?? 0.09;
-        const frameMat = o.matBorder === 'subtle' ? matFrameSubtle : matFrameDark;
-        const bg = new THREE.Mesh(new THREE.PlaneGeometry(c.w + pad * 2, c.h + pad * 2), frameMat);
-        bg.position.set(0, c.h * 0.5, -0.04);
-        grp.add(bg);
-      }
-      grp.add(c.mesh);
-      parent.add(grp);
-      return grp;
-    }
-
-    // Layer 3: Foreground gallery found-object or framing prop (z ~ +0.72 .. +1.00)
-    function addForeObj(parent, meta, x, yPos, targetH, opts) {
-      if (!meta) return null;
-      const o = opts || {};
-      const c = makeCutout(meta, targetH, {
-        fixedW: o.fixedW,
-        maxW: o.maxW || targetH * 1.6,
-        maxDim: o.maxDim || 256,
-        pivot: o.pivot || 'bottom',
-        tone: o.tone || 'obj',
-        color: o.color ?? 0xf2f4f7,
-        flipX: Boolean(o.flipX),
-        alphaTest: o.alphaTest ?? 0.12,
-      });
-      c.mesh.position.set(x, yPos, o.z ?? 0.84);
-      parent.add(c.mesh);
-      return c.mesh;
-    }
-
-    // -----------------------------------------------------------------------
-    // 2. GROUNDED ARCHITECTURAL FOUNDATION PLINTH (ZERO FLOATING MESA!)
-    // -----------------------------------------------------------------------
-    const PLINTH_H = 0.82;
+    const rng = makeRng(20261125);
     const towerRoot = new THREE.Group();
-    towerRoot.position.set(TOWER_X, 0, TOWER_Z);
-    towerRoot.visible = false;
     scene.add(towerRoot);
 
-    const plinthGrp = new THREE.Group();
-    plinthGrp.visible = false;
-    const plinthW = 24.8;
-    const plinthFront = makeCutout(stone08 || conc09, PLINTH_H, {
-      fixedW: plinthW,
-      maxDim: 512,
-      pivot: 'bottom',
-      tone: 'arch',
-      color: 0xbac3cc,
-      alphaTest: 0.01,
-    });
-    plinthFront.mesh.position.set(0, 0, 1.48);
-    plinthGrp.add(plinthFront.mesh);
-    addHorizontalDeck(plinthGrp, plinthW, 3.2, PLINTH_H, conc03, 0xc2cbd4);
-    addSolidRect(plinthGrp, plinthW, 0.06, 0, PLINTH_H + 0.01, 1.50, hairlineMat);
-    // Subtle neutral-grey ground contact strip beneath plinth
-    const plinthShadowMat = new THREE.MeshBasicMaterial({
-      color: 0x1a2028,
-      transparent: true,
-      opacity: 0.22,
-      depthWrite: false,
-    });
-    const plinthShadow = new THREE.Mesh(new THREE.PlaneGeometry(plinthW + 3.2, 4.2), plinthShadowMat);
-    plinthShadow.rotation.x = -Math.PI / 2;
-    plinthShadow.position.set(0, 0.012, 0.5);
-    plinthGrp.add(plinthShadow);
-    towerRoot.add(plinthGrp);
-
     // -----------------------------------------------------------------------
-    // 3. ALL 13 ORDERED THEME FLOORS (FRONTAL 2.5D MONOGRAPH SECTION BOXES)
-    //    Strict bay discipline: zero plates crossing mullions, solid columns!
+    // 1. SHARED WHITE-CLAY (白模) & SILHOUETTE-CAPABLE MATERIALS
     // -----------------------------------------------------------------------
-    const towerBlueprint = [
-      { id: '01_anhui_noodles',   w: 22.0, d: 2.8, h: 4.65 },
-      { id: '02_metal_chains',    w: 22.0, d: 2.8, h: 4.65 },
-      { id: '03_badminton',       w: 22.0, d: 2.8, h: 4.65 },
-      { id: '04_whale',           w: 22.0, d: 2.8, h: 4.65 },
-      { id: '05_jasmine',         w: 22.0, d: 2.8, h: 4.65 },
-      { id: '06_onion',           w: 22.0, d: 2.8, h: 4.65 },
-      { id: '07_shark',           w: 22.0, d: 2.8, h: 4.65 },
-      { id: '08_cat',             w: 22.0, d: 2.8, h: 4.65 },
-      { id: '09_minecraft',       w: 22.0, d: 2.8, h: 4.65 },
-      { id: '10_flamingo',        w: 22.0, d: 2.8, h: 4.65 },
-      { id: '11_beer',            w: 22.0, d: 2.8, h: 4.65 },
-      { id: '12_soviet',          w: 22.0, d: 2.8, h: 4.90 },
-      { id: '13_jiaomian_temple', w: 18.2, d: 2.6, h: 5.50 },
-    ];
+    const silhouetteTargets = []; // { mat, baseColor: THREE.Color, kind: 'lit'|'unlit' }
+    const pendingAtlasPainters = [];
 
-    const STAGE_COUNT = towerBlueprint.length;
-    const floorAnimators = [];
-    const towerFloors = [];
-    let curY = PLINTH_H;
+    function trackMat(mat, hex, kind) {
+      silhouetteTargets.push({ mat, baseColor: new THREE.Color(hex), kind });
+      return mat;
+    }
 
-    towerBlueprint.forEach((bp, idx) => {
-      const floorRoot = new THREE.Group();
-      floorRoot.position.set(0, curY, 0);
-      floorRoot.visible = false;
+    // Crisp matte alabaster plaster white-model shader (catches dramatic sculptural shadows!)
+    const pureWhiteClayMat = trackMat(new THREE.MeshStandardMaterial({
+      color: 0xf4f5f8,
+      roughness: 0.72,
+      metalness: 0.06,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    }), 0xf4f5f8, 'lit');
 
-      const shellGrp = new THREE.Group();
-      const interiorGrp = new THREE.Group();
+    const warmWhiteClayMat = trackMat(new THREE.MeshStandardMaterial({
+      color: 0xe6e8ee,
+      roughness: 0.80,
+      metalness: 0.04,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    }), 0xe6e8ee, 'lit');
 
-      const th = themeMetas(idx);
-      const { w, d, h } = bp;
-      const sillY = 0.30;
-      const clearH = h - 0.68;
+    const slabWhiteMat = trackMat(new THREE.MeshStandardMaterial({
+      color: 0xdce0e8,
+      roughness: 0.78,
+      metalness: 0.08,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    }), 0xdce0e8, 'lit');
 
-      if (idx === 0) {
-        // FLOOR 1: 安徽板面 — Warm-muted stone & brick 3-bay culinary archive (mullions ±3.9)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: stone08, colMeta: brick08, backMeta: brick01,
-          mullions: [-3.9, +3.9], recessTint: 0x5c6168, slabTint: 0xd0d5da, colTint: 0xc5c0bc,
-        });
-        addBackPlate(interiorGrp, findBySrc('buildings/050.png', buildingsClean, 36), -7.1, sillY, 5.6, clearH, { tone: 'arch', color: 0xbac2ca, z: -0.92 });
-        addBackPlate(interiorGrp, findBySrc('streets/022.png', streetsPool, 0), +7.1, sillY, 5.6, clearH, { tone: 'arch', color: 0xb4bcc4, z: -0.92 });
-        const centerPot = addHeroPlate(interiorGrp, th[1] || th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 6.6, tone: 'themeCalm', matBorder: 'dark', z: 0.08,
-        });
-        addHeroPlate(interiorGrp, th[0], -7.1, sillY + 0.20, clearH - 0.40, {
-          maxW: 4.6, tone: 'themeCalm', matBorder: 'dark', z: 0.05,
-        });
-        addHeroPlate(interiorGrp, th[0], +7.1, sillY + 0.20, clearH - 0.40, {
-          maxW: 4.6, tone: 'themeCalm', matBorder: 'dark', z: 0.05,
-        });
-        const bowlL = addForeObj(interiorGrp, findBySrc('items/029.png', itemsPool, 28), -5.0, sillY, 1.15, { z: 0.86 });
-        const bowlR = addForeObj(interiorGrp, findBySrc('items/030.png', itemsPool, 29), +5.1, sillY, 1.18, { z: 0.86 });
-        addForeObj(interiorGrp, findBySrc('items/047.png', itemsPool, 46), 0.0, sillY, 0.72, { maxW: 3.1, z: 0.92 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (centerPot) centerPot.position.y = sillY + 0.14 + Math.sin(age * 1.15) * 0.045;
-            if (bowlL) bowlL.position.y = sillY + Math.sin(age * 1.15 + 0.8) * 0.025;
-            if (bowlR) bowlR.position.y = sillY + Math.sin(age * 1.15 + 2.1) * 0.025;
-          },
-        });
+    const darkEdgeMat = trackMat(new THREE.MeshBasicMaterial({
+      color: 0x1a1e26,
+      side: THREE.DoubleSide,
+    }), 0x1a1e26, 'unlit');
 
-      } else if (idx === 1) {
-        // FLOOR 2: 金属锁链 — Brutalist Tadao Ando form-tie concrete gallery + muted silver-gelatin chains
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc03, colMeta: conc06, colCrop: FORM_TIE_CROP,
-          solidBackColor: 0x1b2028, mullions: [-4.4, +4.4], slabTint: 0xd0d6dc, colTint: 0xc2c9d0,
-        });
-        addBackPlate(interiorGrp, conc06, 0, sillY, 8.2, clearH, {
-          tone: 'arch', color: 0x86909a, uvCrop: FORM_TIE_CROP, z: -0.92,
-        });
-        // Taut vertical chain strips + muted cool archival silver-gelatin graphic prints (no glaring white!)
-        const chainStrips = [];
-        const stripXs = [-9.2, -5.5, -3.1, +3.1, +5.5, +9.2];
-        stripXs.forEach((sx, k) => {
-          const st = addHeroPlate(interiorGrp, th[1] || th[0], sx, sillY + 0.04, clearH - 0.08, {
-            fixedW: 0.84, maxDim: 384, tone: 'themeCalm', color: 0xcbd3dc, z: (k % 2 === 0 ? 0.12 : -0.14),
-          });
-          if (st) chainStrips.push({ obj: st, baseY: sillY + 0.04, phase: k * 0.9 });
-        });
-        addHeroPlate(interiorGrp, th[0], 0.0, sillY + 0.18, clearH - 0.36, {
-          maxW: 4.5, tone: 'themeCalm', color: 0xcfd7e0, matBorder: 'dark', z: 0.14,
-        });
-        addHeroPlate(interiorGrp, th[0], -7.35, sillY + 0.32, clearH - 0.64, {
-          maxW: 2.9, tone: 'themeCalm', color: 0xc6cfd8, matBorder: 'dark', z: -0.22,
-        });
-        addHeroPlate(interiorGrp, th[0], +7.35, sillY + 0.32, clearH - 0.64, {
-          maxW: 2.9, tone: 'themeCalm', color: 0xc6cfd8, matBorder: 'dark', z: -0.22,
-        });
-        addForeObj(interiorGrp, findBySrc('items/038.png', itemsPool, 37), -2.8, sillY, 1.50, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/039.png', itemsPool, 38), +2.9, sillY, 1.58, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/014.png', itemsPool, 13), -8.6, sillY, 1.72, { z: 0.82 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            for (let k = 0; k < chainStrips.length; k++) {
-              chainStrips[k].obj.position.y = chainStrips[k].baseY + Math.sin(age * 1.35 + chainStrips[k].phase) * 0.04;
-            }
-          },
-        });
+    // Create a dense 1024x1024 photo-sticker collage atlas plastered onto a white-plaster base!
+    function createFloorStickerAtlasMat(floorIdx, themeList) {
+      const cnv = document.createElement('canvas');
+      cnv.width = 512;
+      cnv.height = 512;
+      const g = cnv.getContext('2d');
+      const tex = new THREE.CanvasTexture(cnv);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
 
-      } else if (idx === 2) {
-        // FLOOR 3: 羽毛球 — Human-free emerald court geometry + ceramic lattice net + porcelain shuttle
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc08, colMeta: conc02,
-          solidBackColor: 0x1b2b28, mullions: [-5.5, +5.5], slabTint: 0xd8dfe5, colTint: 0xcad2da,
-        });
-        const courtCrop = { u0: 0.0, v0: 0.0, u1: 0.56, v1: 1.0 };
-        addBackPlate(interiorGrp, th[1] || th[0], 0.0, sillY, 10.4, clearH, {
-          tone: 'themeCalm', color: 0xdee8e3, uvCrop: courtCrop, z: -0.92,
-        });
-        addBackPlate(interiorGrp, th[1] || th[0], -8.0, sillY, 4.4, clearH, {
-          tone: 'themeCalm', color: 0xc4d3cc, uvCrop: courtCrop, z: -0.92,
-        });
-        addBackPlate(interiorGrp, th[1] || th[0], +8.0, sillY, 4.4, clearH, {
-          tone: 'themeCalm', color: 0xc4d3cc, uvCrop: courtCrop, z: -0.92,
-        });
-        // Ceramic net strictly inside [-5.0, +5.0]
-        addHeroPlate(interiorGrp, findBySrc('items/037.png', itemsPool, 36), 0.0, sillY + 0.14, 1.98, {
-          fixedW: 9.2, tone: 'obj', z: 0.16,
-        });
-        addHeroPlate(interiorGrp, findBySrc('buildings/008.png', buildingsClean, 4), -8.0, sillY + 0.16, clearH - 0.32, {
-          maxW: 3.4, tone: 'arch', matBorder: 'dark', z: 0.04,
-        });
-        addHeroPlate(interiorGrp, findBySrc('buildings/035.png', buildingsClean, 21), +8.0, sillY + 0.16, clearH - 0.32, {
-          maxW: 3.4, tone: 'arch', matBorder: 'dark', z: 0.04,
-        });
-        const shuttle = addForeObj(interiorGrp, findBySrc('items/016.png', itemsPool, 15), 0, sillY + 2.45, 1.15, {
-          pivot: 'center', z: 0.90,
-        });
-        addForeObj(interiorGrp, findBySrc('items/017.png', itemsPool, 16), -4.5, sillY, 1.82, { z: 0.82 });
-        addForeObj(interiorGrp, findBySrc('items/017.png', itemsPool, 16), +4.5, sillY, 1.82, { flipX: true, z: 0.82 });
-        addForeObj(interiorGrp, findBySrc('items/019.png', itemsPool, 18), -7.6, sillY, 0.86, { z: 0.88 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age, beatPos) => {
-            if (!shuttle) return;
-            const glide = Math.sin(beatPos * Math.PI * 0.25);
-            shuttle.position.x = glide * 3.8;
-            shuttle.position.y = sillY + 2.15 + (1 - glide * glide) * 0.68;
-            shuttle.rotation.z = -glide * 0.20;
-          },
-        });
+      // Gather rich pool of real images for this floor's sticker wrap
+      const srcPool = [];
+      (themeList || []).forEach((m) => { if (m && m.src) srcPool.push(m); });
+      for (let k = 0; k < 6; k++) {
+        const it = pickMeta(itemsPool, floorIdx * 5 + k * 3);
+        if (it) srcPool.push(it);
+      }
+      for (let k = 0; k < 4; k++) {
+        const b = pickMeta(buildingsClean, floorIdx * 3 + k * 2);
+        if (b) srcPool.push(b);
+      }
+      for (let k = 0; k < 3; k++) {
+        const sg = pickMeta(signsPool, floorIdx * 4 + k);
+        if (sg) srcPool.push(sg);
+      }
+      const imgs = srcPool.map((m) => ({ meta: m, im: getImage(m.src) }));
 
-      } else if (idx === 3) {
-        // FLOOR 4: 鲸鱼 — Pale-mist ocean observatory (solid cool concrete columns!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc02, colMeta: conc09,
-          solidBackColor: 0x20303e, mullions: [-5.2, +5.2], slabTint: 0xd0dae2, colTint: 0xbfc9d4,
-        });
-        addBackPlate(interiorGrp, th[0], -7.8, sillY, 4.6, clearH, { tone: 'theme', color: 0xd0dce6, z: -0.90 });
-        addBackPlate(interiorGrp, findBySrc('buildings/007.png', buildingsClean, 3), +7.8, sillY, 4.6, clearH, { tone: 'arch', color: 0xb6c4d0, z: -0.90 });
-        const podPlane = addHeroPlate(interiorGrp, th[1] || th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 8.6, tone: 'theme', matBorder: 'dark', z: 0.10,
-        });
-        addHeroPlate(interiorGrp, th[0], +7.8, sillY + 0.22, clearH - 0.44, {
-          maxW: 3.8, tone: 'theme', matBorder: 'dark', z: 0.06,
-        });
-        const opal = addForeObj(interiorGrp, findBySrc('items/010.png', itemsPool, 9), -6.6, sillY + 0.24, 1.42, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/027.png', itemsPool, 26), +6.0, sillY, 1.04, { z: 0.86 });
-        addForeObj(interiorGrp, findBySrc('items/028.png', itemsPool, 27), -4.1, sillY, 1.50, { z: 0.84 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (podPlane) podPlane.position.x = Math.sin(age * 0.42) * 0.42;
-            if (opal) opal.position.y = sillY + 0.24 + Math.sin(age * 0.95) * 0.06;
-          },
-        });
-
-      } else if (idx === 4) {
-        // FLOOR 5: 夜来香 — Quiet stone nocturnal conservatory & herbarium plates
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: stone09, colMeta: stone08,
-          solidBackColor: 0x161c1a, mullions: [-4.2, +4.2], slabTint: 0xd6d4ce, colTint: 0xc6c4be,
-        });
-        addBackPlate(interiorGrp, findBySrc('buildings/045.png', buildingsClean, 31), -7.2, sillY, 5.4, clearH, { tone: 'arch', color: 0x98a09d, z: -0.90 });
-        addBackPlate(interiorGrp, findBySrc('buildings/045.png', buildingsClean, 31), +7.2, sillY, 5.4, clearH, { tone: 'arch', color: 0x98a09d, z: -0.90 });
-        addHeroPlate(interiorGrp, th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 7.2, tone: 'theme', matBorder: 'dark', z: 0.10,
-        });
-        addHeroPlate(interiorGrp, th[1] || th[0], -7.2, sillY + 0.16, clearH - 0.32, {
-          maxW: 3.1, tone: 'theme', matBorder: 'dark', z: 0.08,
-        });
-        addHeroPlate(interiorGrp, th[1] || th[0], +7.2, sillY + 0.16, clearH - 0.32, {
-          maxW: 3.1, tone: 'theme', matBorder: 'dark', z: 0.08,
-        });
-        const vases = [
-          addForeObj(interiorGrp, findBySrc('items/003.png', itemsPool, 2),  -8.9, sillY, 2.00, { z: 0.86 }),
-          addForeObj(interiorGrp, findBySrc('items/026.png', itemsPool, 25), -4.9, sillY, 1.92, { z: 0.88 }),
-          addForeObj(interiorGrp, findBySrc('items/035.png', itemsPool, 34), +4.9, sillY, 2.10, { z: 0.88 }),
-          addForeObj(interiorGrp, findBySrc('items/036.png', itemsPool, 35), +8.7, sillY, 1.72, { z: 0.86 }),
-          addForeObj(interiorGrp, findBySrc('items/050.png', itemsPool, 49), -2.4, sillY, 1.60, { z: 0.92 }),
-        ].filter(Boolean);
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            for (let k = 0; k < vases.length; k++) {
-              vases[k].rotation.z = Math.sin(age * 0.85 + k * 1.1) * 0.016;
-            }
-          },
-        });
-
-      } else if (idx === 5) {
-        // FLOOR 6: 洋葱 — Calm limestone geometric triptych (solid concrete/stone columns!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: stone09, colMeta: conc08, backMeta: conc02,
-          mullions: [-3.8, +3.8], recessTint: 0x8e959c, slabTint: 0xd6d6d4, colTint: 0xcac8c6,
-        });
-        addBackPlate(interiorGrp, conc02, 0.0, sillY, 7.0, clearH, { tone: 'arch', color: 0xb6bcc2, z: -0.92 });
-        addHeroPlate(interiorGrp, th[0], -7.1, sillY + 0.16, clearH - 0.32, {
-          maxW: 5.0, tone: 'themeCalm', matBorder: 'subtle', z: 0.08,
-        });
-        const midOnion = addHeroPlate(interiorGrp, th[1] || th[0], 0.0, sillY + 0.16, clearH - 0.32, {
-          maxW: 6.4, tone: 'themeCalm', matBorder: 'dark', z: 0.14,
-        });
-        addHeroPlate(interiorGrp, th[2] || th[0], +7.1, sillY + 0.16, clearH - 0.32, {
-          maxW: 5.0, tone: 'themeCalm', matBorder: 'dark', z: 0.08,
-        });
-        addForeObj(interiorGrp, findBySrc('items/032.png', itemsPool, 31), -4.9, sillY, 1.42, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/023.png', itemsPool, 22), +5.0, sillY, 1.36, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/002.png', itemsPool, 1),  -9.0, sillY, 1.18, { z: 0.84 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (midOnion) midOnion.position.x = Math.sin(age * 0.55) * 0.20;
-          },
-        });
-
-      } else if (idx === 6) {
-        // FLOOR 7: 鲨鱼 — Cool dark-slate deep-water viewing tank (solid concrete columns, calm glide!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc09, colMeta: conc06, colCrop: FORM_TIE_CROP,
-          solidBackColor: 0x142536, mullions: [-5.4, +5.4], slabTint: 0xbec8d2, colTint: 0xb0bcc8,
-        });
-        addBackPlate(interiorGrp, th[2] || th[0], 0.0, sillY, 10.2, clearH, { tone: 'themeCalm', color: 0xb4cadc, z: -0.92 });
-        addBackPlate(interiorGrp, th[2] || th[0], -7.9, sillY, 4.4, clearH, { tone: 'themeCalm', color: 0x94aec2, z: -0.92 });
-        addBackPlate(interiorGrp, th[2] || th[0], +7.9, sillY, 4.4, clearH, { tone: 'themeCalm', color: 0x94aec2, z: -0.92 });
-        const sharkMain = addHeroPlate(interiorGrp, th[0], -0.3, sillY + 0.22, clearH - 0.44, {
-          maxW: 5.8, tone: 'themeCalm', matBorder: 'dark', z: 0.14,
-        });
-        addHeroPlate(interiorGrp, th[1] || th[0], +7.9, sillY + 0.22, clearH - 0.44, {
-          maxW: 3.6, tone: 'themeCalm', matBorder: 'dark', z: 0.06,
-        });
-        addHeroPlate(interiorGrp, th[0], -7.9, sillY + 0.22, clearH - 0.44, {
-          maxW: 3.6, tone: 'themeCalm', matBorder: 'dark', z: 0.06,
-        });
-        addForeObj(interiorGrp, findBySrc('items/046.png', itemsPool, 45), -4.1, sillY, 1.46, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/039.png', itemsPool, 38), +4.3, sillY, 1.56, { z: 0.88 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (sharkMain) sharkMain.position.x = -0.3 + Math.sin(age * 0.50) * 0.85;
-          },
-        });
-
-      } else if (idx === 7) {
-        // FLOOR 8: 猫 — Symmetrical modernist stone apartment triptych (dark hairline frames, solid stone columns!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: stone09, colMeta: stone10, backMeta: conc03,
-          mullions: [-3.6, +3.6], recessTint: 0x828990, slabTint: 0xd6d4d0, colTint: 0xc8c6c2,
-        });
-        addBackPlate(interiorGrp, findBySrc('buildings/049.png', buildingsClean, 35), -7.0, sillY, 5.8, clearH, { tone: 'arch', color: 0xb0b8be, z: -0.92 });
-        addBackPlate(interiorGrp, findBySrc('buildings/048.png', buildingsClean, 34), +7.0, sillY, 5.8, clearH, { tone: 'arch', color: 0xb0b8be, z: -0.92 });
-        const catA = addHeroPlate(interiorGrp, th[0], -7.0, sillY + 0.16, clearH - 0.32, {
-          maxW: 4.8, tone: 'theme', matBorder: 'dark', matPad: 0.08, z: 0.10,
-        });
-        const catB = addHeroPlate(interiorGrp, th[1] || th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 5.2, tone: 'theme', matBorder: 'dark', matPad: 0.08, z: 0.16,
-        });
-        const catC = addHeroPlate(interiorGrp, th[2] || th[0], +7.0, sillY + 0.16, clearH - 0.32, {
-          maxW: 4.8, tone: 'theme', matBorder: 'dark', matPad: 0.08, z: 0.10,
-        });
-        addForeObj(interiorGrp, findBySrc('items/040.png', itemsPool, 39), -4.5, sillY, 1.04, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/049.png', itemsPool, 48), +4.6, sillY, 1.10, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/048.png', itemsPool, 47), -9.2, sillY, 0.96, { z: 0.86 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age, beatPos) => {
-            const pulse = Math.exp(-9.0 * (((beatPos * 0.5) % 1 + 1) % 1)) * 0.04;
-            if (catA) catA.position.y = sillY + 0.16 + pulse;
-            if (catB) catB.position.y = sillY + 0.14;
-            if (catC) catC.position.y = sillY + 0.16 + pulse;
-          },
-        });
-
-      } else if (idx === 8) {
-        // FLOOR 9: 我的世界 — Brutalist cellular voxel archive (solid concrete columns, zero mullion overlap!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc02, colMeta: conc09,
-          solidBackColor: 0x1d232b, mullions: [-4.8, +4.8], slabTint: 0xcfd6dc, colTint: 0xbec6ce,
-        });
-        addBackPlate(interiorGrp, th[0], -7.5, sillY, 4.8, clearH, { tone: 'themeCalm', color: 0xb4c0c8, z: -0.92 });
-        addBackPlate(interiorGrp, th[0], +7.5, sillY, 4.8, clearH, { tone: 'themeCalm', color: 0xb4c0c8, z: -0.92 });
-        addHeroPlate(interiorGrp, th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 7.4, tone: 'themeCalm', matBorder: 'dark', z: 0.06,
-        });
-        const strataPlate = addHeroPlate(interiorGrp, th[1] || th[0], -7.55, sillY + 0.40, clearH - 0.80, {
-          maxW: 4.3, tone: 'themeCalm', matBorder: 'dark', uvCrop: { u0: 0.0, v0: 0.0, u1: 0.78, v1: 1.0 }, z: 0.14,
-        });
-        addHeroPlate(interiorGrp, findBySrc('buildings/038.png', buildingsClean, 24), +7.55, sillY + 0.18, clearH - 0.36, {
-          maxW: 3.8, tone: 'arch', matBorder: 'dark', z: 0.10,
-        });
-        const voxSculpt = addForeObj(interiorGrp, findBySrc('items/044.png', itemsPool, 43), +3.4, sillY, 1.90, { z: 0.90 });
-        addForeObj(interiorGrp, findBySrc('items/045.png', itemsPool, 44), -3.5, sillY, 1.60, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/022.png', itemsPool, 21), +8.7, sillY, 1.42, { z: 0.86 });
-        addForeObj(interiorGrp, findBySrc('items/020.png', itemsPool, 19), -8.9, sillY, 1.02, { z: 0.86 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age, beatPos) => {
-            const step = (Math.floor(beatPos * 0.5) % 2 === 0) ? -0.09 : 0.09;
-            if (voxSculpt) voxSculpt.position.x = 3.4 + step;
-            if (strataPlate) strataPlate.position.x = -7.55 - step * 0.45;
-          },
-        });
-
-      } else if (idx === 9) {
-        // FLOOR 10: 火烈鸟 — Pale concrete lagoon gallery (widened ±4.6 mullions = ZERO overlap!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc08, colMeta: conc03,
-          solidBackColor: 0x243646, mullions: [-4.6, +4.6], slabTint: 0xdce2e6, colTint: 0xd0d6dc,
-        });
-        const lagoonBg = addBackPlate(interiorGrp, th[1] || th[0], 0.0, sillY, 8.6, clearH, {
-          tone: 'theme', color: 0xcfdce6, z: -0.92,
-        });
-        addHeroPlate(interiorGrp, th[0], -7.45, sillY + 0.16, clearH - 0.32, {
-          maxW: 4.4, tone: 'themeCalm', matBorder: 'dark', z: 0.10,
-        });
-        addHeroPlate(interiorGrp, th[1] || th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 6.4, tone: 'theme', matBorder: 'dark', z: 0.16,
-        });
-        addHeroPlate(interiorGrp, th[2] || th[0], +7.45, sillY + 0.16, clearH - 0.32, {
-          maxW: 4.4, tone: 'themeCalm', matBorder: 'dark', z: 0.10,
-        });
-        addForeObj(interiorGrp, findBySrc('items/007.png', itemsPool, 6),  -3.6, sillY, 2.00, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/026.png', itemsPool, 25), +3.6, sillY, 1.92, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/035.png', itemsPool, 34), +9.2, sillY, 1.82, { z: 0.84 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (lagoonBg) lagoonBg.position.x = Math.sin(age * 0.38) * 0.22;
-          },
-        });
-
-      } else if (idx === 10) {
-        // FLOOR 11: 啤酒 — Muted brick & dark glass minimalist taproom archive (mullions ±4.0)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: stone08, colMeta: brick08, backMeta: brick07,
-          mullions: [-4.0, +4.0], recessTint: 0x56595e, slabTint: 0xcfcac4, colTint: 0xc2b8b2,
-        });
-        addBackPlate(interiorGrp, brick01, -7.1, sillY, 5.6, clearH, { tone: 'arch', color: 0x9aa0a6, z: -0.92 });
-        addBackPlate(interiorGrp, findBySrc('streets/022.png', streetsPool, 0), +7.1, sillY, 5.6, clearH, { tone: 'arch', color: 0xadb6be, z: -0.92 });
-        addHeroPlate(interiorGrp, th[0], -7.1, sillY + 0.16, clearH - 0.32, {
-          maxW: 4.6, tone: 'themeCalm', matBorder: 'dark', z: 0.08,
-        });
-        const beerHero = addHeroPlate(interiorGrp, th[1] || th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 6.2, tone: 'themeCalm', matBorder: 'dark', z: 0.14,
-        });
-        addHeroPlate(interiorGrp, findBySrc('buildings/018.png', buildingsClean, 9), +7.1, sillY + 0.16, clearH - 0.32, {
-          maxW: 4.1, tone: 'arch', matBorder: 'dark', z: 0.08,
-        });
-        addForeObj(interiorGrp, findBySrc('items/012.png', itemsPool, 11), -3.1, sillY, 1.12, { z: 0.90 });
-        addForeObj(interiorGrp, findBySrc('items/021.png', itemsPool, 20), +5.0, sillY, 1.28, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/018.png', itemsPool, 17), +8.7, sillY, 1.10, { z: 0.86 });
-        addForeObj(interiorGrp, findBySrc('items/031.png', itemsPool, 30), -9.0, sillY, 1.44, { z: 0.84 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (beerHero) beerHero.position.y = sillY + 0.14 + Math.sin(age * 0.9) * 0.032;
-          },
-        });
-
-      } else if (idx === 11) {
-        // FLOOR 12: 苏联美学设计 — Monumental Constructivist concrete & terracotta cantilever (ZERO humans!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: conc03, colMeta: conc06, colCrop: FORM_TIE_CROP,
-          solidBackColor: 0x20262e, mullions: [-5.6, +5.6], slabTint: 0xd0d4d8, colTint: 0xc0c6cc,
-        });
-        addBackPlate(interiorGrp, archZig, -8.0, sillY, 4.4, clearH, { tone: 'arch', color: 0xb6bec6, z: -0.92 });
-        addBackPlate(interiorGrp, brick05, +8.0, sillY, 4.4, clearH, { tone: 'arch', color: 0xb8b2ae, z: -0.92 });
-        const sovMonument = addHeroPlate(interiorGrp, th[0], 0.0, sillY + 0.14, clearH - 0.28, {
-          maxW: 9.2, tone: 'theme', matBorder: 'dark', z: 0.14,
-        });
-        addHeroPlate(interiorGrp, findBySrc('buildings/003.png', buildingsClean, 0), -8.0, sillY + 0.18, clearH - 0.36, {
-          maxW: 4.0, tone: 'arch', matBorder: 'dark', z: 0.08,
-        });
-        addHeroPlate(interiorGrp, findBySrc('buildings/025.png', buildingsClean, 13), +8.0, sillY + 0.16, clearH - 0.32, {
-          maxW: 3.6, tone: 'themeCalm', matBorder: 'dark', z: 0.10,
-        });
-        addForeObj(interiorGrp, findBySrc('items/001.png', itemsPool, 0),  -4.3, sillY, 1.44, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/011.png', itemsPool, 10), +4.4, sillY, 1.30, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/034.png', itemsPool, 33), +9.0, sillY, 1.15, { z: 0.86 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (sovMonument) sovMonument.position.x = Math.sin(age * 0.45) * 0.28;
-          },
-        });
-
-      } else {
-        // FLOOR 13 (TOP CROWN): 郊眠寺 — Setback dark-brick sanctuary (wide unobstructed center bay ±5.6!)
-        addSectionFrame(shellGrp, w, d, h, {
-          slabMeta: brick08, colMeta: brick07,
-          solidBackColor: 0x0d1016, mullions: [-5.6, +5.6], isCrown: true,
-          slabTint: 0xc2bab6, colTint: 0xb6aea8,
-        });
-        [-1, 1].forEach((side) => {
-          const spire = makeCutout(findBySrc('poles/019.png', polesPool, 18), 3.3, {
-            maxW: 0.90, maxDim: 224, pivot: 'bottom', tone: 'arch', color: 0xbac4ce,
-          });
-          spire.mesh.position.set(side * (w * 0.5 - 0.34), h - 0.10, d * 0.5 - 0.05);
-          shellGrp.add(spire.mesh);
-        });
-        addBackPlate(interiorGrp, th[1] || brick07, 0.0, sillY, w - 1.5, clearH + 0.14, {
-          tone: 'theme', color: 0xc6cbd2, z: -0.90,
-        });
-        const emblem = addHeroPlate(interiorGrp, th[0], 0.0, sillY + 0.30, clearH - 0.42, {
-          maxW: 7.2, tone: 'theme', matBorder: 'dark', z: 0.16,
-        });
-        addForeObj(interiorGrp, findBySrc('items/018.png', itemsPool, 17), -6.9, sillY, 1.32, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/019.png', itemsPool, 18), -3.8, sillY, 1.08, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/033.png', itemsPool, 32), +3.8, sillY, 1.12, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/034.png', itemsPool, 33), +6.9, sillY, 1.28, { z: 0.88 });
-        addForeObj(interiorGrp, findBySrc('items/005.png', itemsPool, 4),  0.0,  sillY, 1.02, { z: 0.92 });
-        floorAnimators.push({
-          stageIdx: idx,
-          fn: (age) => {
-            if (emblem) emblem.position.y = sillY + 0.30 + Math.sin(age * 0.72) * 0.09;
-          },
+      // Deterministic sticker layout (48 dense overlapping photo stickers plastered on white clay!)
+      const arng = makeRng(88001 + floorIdx * 997);
+      const stamps = [];
+      for (let s = 0; s < 48; s++) {
+        const isTheme = s < 24 && themeList && themeList.length;
+        const pickIdx = isTheme ? (s % themeList.length) : (Math.floor(arng() * imgs.length));
+        stamps.push({
+          idx: pickIdx % Math.max(1, imgs.length),
+          cx: arng() * 512,
+          cy: arng() * 512,
+          size: isTheme ? (105 + arng() * 115) : (58 + arng() * 88),
+          rot: (arng() - 0.5) * 0.95,
         });
       }
 
-      floorRoot.add(shellGrp);
-      floorRoot.add(interiorGrp);
+      let paintedReadyCount = -1;
+      function repaint() {
+        if (!g) return true;
+        let readyCount = 0;
+        for (let i = 0; i < imgs.length; i++) {
+          if (imgs[i].im && imgs[i].im.complete && imgs[i].im.naturalWidth > 0) readyCount++;
+        }
+        if (readyCount === paintedReadyCount && paintedReadyCount > 0) {
+          return readyCount >= imgs.length;
+        }
+        paintedReadyCount = readyCount;
+
+        // Crisp white plaster clay base so white-model facets peek through stickers!
+        g.fillStyle = '#eceff4';
+        g.fillRect(0, 0, 512, 512);
+        // Subtle architectural pencil grid lines on white clay
+        g.strokeStyle = 'rgba(20, 26, 36, 0.14)';
+        g.lineWidth = 1;
+        for (let p = 64; p < 512; p += 64) {
+          g.beginPath(); g.moveTo(p, 0); g.lineTo(p, 512); g.stroke();
+          g.beginPath(); g.moveTo(0, p); g.lineTo(512, p); g.stroke();
+        }
+
+        for (let s = 0; s < stamps.length; s++) {
+          const st = stamps[s];
+          const entry = imgs[st.idx];
+          if (!entry || !entry.im || !entry.im.complete || !entry.im.naturalWidth) continue;
+          const m = entry.meta;
+          const sx = m.x0 || 0;
+          const sy = m.y0 || 0;
+          const sw = m.bw || entry.im.naturalWidth;
+          const sh = m.bh || entry.im.naturalHeight;
+          const ar = sw / Math.max(1, sh);
+          const dw = ar >= 1 ? st.size : st.size * ar;
+          const dh = ar >= 1 ? st.size / ar : st.size;
+          g.save();
+          g.translate(st.cx, st.cy);
+          g.rotate(st.rot);
+          g.drawImage(entry.im, sx, sy, sw, sh, -dw * 0.5, -dh * 0.5, dw, dh);
+          g.restore();
+        }
+        tex.needsUpdate = true;
+        if (onTextureReady) onTextureReady();
+        return readyCount >= imgs.length;
+      }
+
+      if (!repaint()) {
+        pendingAtlasPainters.push(repaint);
+        imgs.forEach((entry) => {
+          if (entry.im && !entry.im.complete) {
+            entry.im.addEventListener('load', () => { repaint(); }, { once: true });
+          }
+        });
+      }
+
+      const mat = trackMat(new THREE.MeshStandardMaterial({
+        map: tex,
+        color: 0xffffff,
+        roughness: 0.68,
+        metalness: 0.05,
+        flatShading: true,
+        side: THREE.DoubleSide,
+      }), 0xffffff, 'lit');
+      return mat;
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. GLB WHITE-MODEL INSTANCE HELPER (Async Geometry Binding, Shared VBO!)
+    // -----------------------------------------------------------------------
+    const glbBindings = []; // { mesh, url }
+    const fallbackGeo = new THREE.IcosahedronGeometry(0.45, 0);
+    fallbackGeo.translate(0, 0.45, 0);
+
+    function createWhiteGlbInstance(url, scaleVec, mat) {
+      const mesh = new THREE.Mesh(fallbackGeo, mat);
+      if (typeof scaleVec === 'number') mesh.scale.set(scaleVec, scaleVec, scaleVec);
+      else mesh.scale.set(scaleVec[0], scaleVec[1], scaleVec[2]);
+      glbBindings.push({ mesh, url });
+      return mesh;
+    }
+
+    // Kick off non-blocking load of all 15 GLBs (only ~1.3MB total!) and bind immediately on resolve
+    function loadAllWhiteModels() {
+      if (!window.MicCheckGLB) return;
+      const urls = new Set(glbBindings.map((b) => b.url));
+      urls.forEach((url) => {
+        window.MicCheckGLB.loadGeometry(THREE, url).then((geo) => {
+          if (!geo) return;
+          for (let i = 0; i < glbBindings.length; i++) {
+            if (glbBindings[i].url === url) {
+              glbBindings[i].mesh.geometry = geo;
+            }
+          }
+          if (onTextureReady) onTextureReady();
+        });
+      });
+    }
+
+    // Sculptural white-clay procedural geometries for Floor 12 (Soviet) & Floor 13 (JiaoMian Temple)
+    const sovietConesGeo = new THREE.ConeGeometry(0.5, 1.0, 6);
+    sovietConesGeo.translate(0, 0.5, 0);
+    const sovietRingGeo = new THREE.TorusGeometry(0.45, 0.11, 6, 16);
+    sovietRingGeo.translate(0, 0.5, 0);
+    const sovietSlabGeo = new THREE.BoxGeometry(0.85, 1.0, 0.28);
+    sovietSlabGeo.translate(0, 0.5, 0);
+    const templeRoofGeo = new THREE.ConeGeometry(0.72, 0.55, 4);
+    templeRoofGeo.rotateY(Math.PI * 0.25);
+    templeRoofGeo.translate(0, 0.72, 0);
+    const templePillarGeo = new THREE.CylinderGeometry(0.14, 0.18, 1.0, 6);
+    templePillarGeo.translate(0, 0.5, 0);
+
+    // -----------------------------------------------------------------------
+    // 3. BUILD ALL 13 FLOORS: HUGE WHITE MODELS (>60% VOLUME) + FULL STICKERS!
+    // -----------------------------------------------------------------------
+    const FLOOR_W = 21.0;
+    const FLOOR_D = 17.6;
+    const FLOOR_H = 5.25;
+    const STAGE_COUNT = 13;
+
+    const FLOOR_GLB_SPECS = [
+      // F00 安徽板面 — colossal steaming ramen bowls crowding >70% of deck!
+      { id: '01_anhui_noodles',  glbs: ['./items/lowpoly/安徽板面/ramen.glb'], count: 24, heroScale: 13.8, swarmMin: 4.8, swarmMax: 8.8 },
+      // F01 金属锁链 — colossal thick overlapping iron chain sculptures!
+      { id: '02_metal_chains',   glbs: ['./items/lowpoly/金属锁链/chain.glb'], count: 32, heroScale: 16.5, swarmMin: 6.8, swarmMax: 12.2 },
+      // F02 羽毛球 — monumental rackets + massive dense swarm of giant shuttlecocks!
+      { id: '03_badminton',      glbs: ['./items/lowpoly/羽毛球/racket.glb', './items/lowpoly/羽毛球/shuttlecock.glb', './items/lowpoly/羽毛球/shuttlecock.glb'], count: 28, heroScale: 14.8, swarmMin: 4.6, swarmMax: 9.2 },
+      // F03 鲸鱼 — giant breaching whale + surging colossal whale pod!
+      { id: '04_whale',          glbs: ['./items/lowpoly/鲸鱼/whale.glb'], count: 20, heroScale: 18.6, swarmMin: 6.8, swarmMax: 12.5 },
+      // F04 夜来香 — gigantic overflowing white-clay jasmine jungle!
+      { id: '05_jasmine',        glbs: ['./items/lowpoly/夜来香/night-jasmine.glb'], count: 26, heroScale: 14.2, swarmMin: 5.5, swarmMax: 10.0 },
+      // F05 洋葱 — colossal nested white-model onion cathedral!
+      { id: '06_onion',          glbs: ['./items/lowpoly/洋葱/onion.glb'], count: 26, heroScale: 13.6, swarmMin: 5.0, swarmMax: 9.4 },
+      // F06 鲨鱼 — ferocious dense colossal shark swarm!
+      { id: '07_shark',          glbs: ['./items/lowpoly/鲨鱼/shark.glb'], count: 22, heroScale: 17.5, swarmMin: 7.2, swarmMax: 12.4 },
+      // F07 猫 — exaggerated army of colossal white-clay cats!
+      { id: '08_cat',            glbs: ['./items/lowpoly/猫/cat.glb'], count: 24, heroScale: 13.8, swarmMin: 5.0, swarmMax: 9.2 },
+      // F08 我的世界 — dense 36-piece voxel mountain of giant trees, stone, dirt, wood!
+      { id: '09_minecraft',      glbs: ['./items/lowpoly/我的世界/tree.glb', './items/lowpoly/我的世界/stone.glb', './items/lowpoly/我的世界/dirt-grass.glb', './items/lowpoly/我的世界/wood.glb'], count: 36, heroScale: 11.8, swarmMin: 4.0, swarmMax: 7.6 },
+      // F09 火烈鸟 — towering dense flock of exaggerated white-clay flamingos!
+      { id: '10_flamingo',       glbs: ['./items/lowpoly/火烈鸟/flamingo.glb'], count: 24, heroScale: 14.2, swarmMin: 5.8, swarmMax: 10.2 },
+      // F10 啤酒 — monumental banquet of giant white-clay beer mugs!
+      { id: '11_beer',           glbs: ['./items/lowpoly/啤酒/beer-mug.glb'], count: 24, heroScale: 13.8, swarmMin: 5.0, swarmMax: 9.4 },
+      // F11 苏联美学设计 — Constructivist white-clay monuments + chain tension struts!
+      { id: '12_soviet',         glbs: ['./items/lowpoly/金属锁链/chain.glb'], count: 24, heroScale: 14.5, swarmMin: 5.4, swarmMax: 9.8, procedural: 'soviet' },
+      // F12 郊眠寺 — Monumental white-clay Temple Sanctuary Crown + jasmine garlands!
+      { id: '13_jiaomian_temple',glbs: ['./items/lowpoly/夜来香/night-jasmine.glb'], count: 22, heroScale: 15.2, swarmMin: 5.6, swarmMax: 9.6, procedural: 'temple' },
+    ];
+
+    // Assign exact MIC CHECK emergence batches across all 13 floors:
+    //   Floors 0..6 (Staircase Half): MIC CHECK hits 0..15 (19.01s -> 37.13s)
+    //   Floors 7..12 (Cuboid Upper Half): MIC CHECK hits 16..31 (38.02s -> 55.84s)
+    const towerFloors = [];
+    const trackedStickers = [];
+
+    function makeTrackedCutout(meta, targetH, opts2) {
+      const c = makeCutout(meta, targetH, opts2);
+      trackMat(c.mat, 0xffffff, 'unlit');
+      return c;
+    }
+
+    FLOOR_GLB_SPECS.forEach((spec, idx) => {
+      const thObj = towerThemes[idx];
+      const th = (thObj && thObj.items && thObj.items.length) ? thObj.items : [findBySrc('水泥纹理/01.png', concreteTextures, 0)];
+      const stickerAtlasMat = createFloorStickerAtlasMat(idx, th);
+
+      const floorRoot = new THREE.Group();
+      const rotPivot = new THREE.Group(); // Dedicated smooth L/R rotation pivot for stereo "啊 啊"!
+      floorRoot.add(rotPivot);
       towerRoot.add(floorRoot);
 
-      const startAge = TOWER_START + idx * BAR;
-      const contentAge = startAge + BEAT * 0.92;
-      const finishAge = idx === STAGE_COUNT - 1 ? Math.min(TOWER_FINISH - 2.6, contentAge + 0.48) : (contentAge + 0.42);
+      // Floor slab & ceiling beam frame (crisp white-clay architectural slabs plastered with stickers!)
+      const slabGroup = new THREE.Group();
+      const w = idx === 12 ? FLOOR_W * 0.88 : FLOOR_W;
+      const d = idx === 12 ? FLOOR_D * 0.88 : FLOOR_D;
+      const h = idx === 12 ? FLOOR_H * 1.15 : FLOOR_H;
+
+      const botSlab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.52, d), stickerAtlasMat);
+      botSlab.position.y = 0.26;
+      slabGroup.add(botSlab);
+      const topSlab = new THREE.Mesh(new THREE.BoxGeometry(w + 0.4, 0.42, d + 0.4), slabWhiteMat);
+      topSlab.position.y = h - 0.21;
+      slabGroup.add(topSlab);
+
+      // 4 crisp corner architectural white-clay columns
+      const colGeo = new THREE.BoxGeometry(0.95, h - 0.5, 0.95);
+      [-1, 1].forEach((sx) => {
+        [-1, 1].forEach((sz) => {
+          const col = new THREE.Mesh(colGeo, pureWhiteClayMat);
+          col.position.set(sx * (w * 0.5 - 0.55), h * 0.5, sz * (d * 0.5 - 0.55));
+          slabGroup.add(col);
+        });
+      });
+
+      // Plaster ALL 4 perimeter slab edges with dense photo collage stickers!
+      const hw = w * 0.5, hd = d * 0.5;
+      for (let side = 0; side < 4; side++) {
+        const isFB = side < 2;
+        const span = isFB ? w : d;
+        const nSt = 5;
+        for (let s = 0; s < nSt; s++) {
+          const frac = ((s + 0.5) / nSt - 0.5) * (span * 0.92);
+          const meta = (s % 2 === 0) ? th[s % th.length] : pickMeta(s % 3 === 0 ? signsPool : buildingsClean, idx * 7 + side * 3 + s);
+          if (!meta) continue;
+          const card = makeTrackedCutout(meta, 1.55 + (s % 2) * 0.75, {
+            maxW: 3.8, maxDim: 256, pivot: 'bottom', alphaTest: 0.08,
+          });
+          if (side === 0) { card.mesh.position.set(frac, 0.15, +hd + 0.12); card.mesh.rotation.y = 0; }
+          else if (side === 1) { card.mesh.position.set(frac, 0.15, -hd - 0.12); card.mesh.rotation.y = Math.PI; }
+          else if (side === 2) { card.mesh.position.set(+hw + 0.12, 0.15, frac); card.mesh.rotation.y = Math.PI * 0.5; }
+          else { card.mesh.position.set(-hw - 0.12, 0.15, frac); card.mesh.rotation.y = -Math.PI * 0.5; }
+          slabGroup.add(card.mesh);
+        }
+      }
+      rotPivot.add(slabGroup);
+
+      // Determine exact MIC CHECK wave timestamps for this floor (2–3 batches per floor!)
+      const isUpper = idx >= 7;
+      const baseHitIdx = isUpper
+        ? (16 + Math.floor(((idx - 7) / 6) * 15))
+        : Math.floor((idx / 7) * 16);
+      const hit0 = MIC_CHECK_HITS[clamp(baseHitIdx, 0, MIC_CHECK_HITS.length - 1)];
+      const hit1 = MIC_CHECK_HITS[clamp(baseHitIdx + 1, 0, MIC_CHECK_HITS.length - 1)];
+      const hit2 = MIC_CHECK_HITS[clamp(baseHitIdx + 2, 0, MIC_CHECK_HITS.length - 1)];
+      const waveHits = [hit0, hit1, hit2];
+
+      // Build 3 kinetic emergence batches per floor (each triggered smoothly on a MIC CHECK!)
+      const batches = [
+        { grp: new THREE.Group(), tHit: waveHits[0], items: [], stickers: [] },
+        { grp: new THREE.Group(), tHit: waveHits[1], items: [], stickers: [] },
+        { grp: new THREE.Group(), tHit: waveHits[2], items: [], stickers: [] },
+      ];
+      batches.forEach((b) => rotPivot.add(b.grp));
+
+      // --- A. MASSIVE, EXAGGERATED 3D WHITE MODELS (Occupying >60% of each floor!) ---
+      for (let m = 0; m < spec.count; m++) {
+        const batchIdx = m === 0 ? 0 : (1 + (m % 2));
+        const batch = batches[batchIdx];
+        const isHero = m === 0 || m === 1;
+        // ~55% crisp alabaster white-clay, ~45% dense sticker-wrapped white-clay!
+        const mat = (m % 5 === 1 || m % 5 === 3) ? stickerAtlasMat : (m % 2 === 0 ? pureWhiteClayMat : warmWhiteClayMat);
+
+        let obj3d = null;
+        const sc = isHero
+          ? (m === 0 ? spec.heroScale : spec.heroScale * 0.72)
+          : (spec.swarmMin + rng() * (spec.swarmMax - spec.swarmMin));
+
+        if (spec.procedural === 'soviet' && m % 3 !== 2) {
+          const geoPick = m % 3 === 0 ? (m === 0 ? sovietRingGeo : sovietConesGeo) : sovietSlabGeo;
+          obj3d = new THREE.Mesh(geoPick, mat);
+          obj3d.scale.set(sc * 0.85, sc * 0.95, sc * 0.85);
+        } else if (spec.procedural === 'temple' && m % 3 !== 2) {
+          const geoPick = m % 2 === 0 ? templeRoofGeo : templePillarGeo;
+          obj3d = new THREE.Mesh(geoPick, mat);
+          obj3d.scale.set(sc * 0.92, sc * 0.90, sc * 0.92);
+        } else {
+          const url = spec.glbs[m % spec.glbs.length];
+          obj3d = createWhiteGlbInstance(url, sc, mat);
+        }
+
+        // Pack tightly & dramatically across the entire floor footprint (even overhanging edges!)
+        const ang = (m / Math.max(1, spec.count)) * Math.PI * 2 + idx * 0.5;
+        const radFrac = isHero ? (m === 0 ? 0.04 : 0.24) : (0.28 + rng() * 0.62);
+        const homeX = Math.cos(ang) * (hw * 0.88 * radFrac);
+        const homeZ = Math.sin(ang) * (hd * 0.88 * radFrac);
+        const homeY = isHero ? 0.35 : (0.35 + rng() * (h * 0.42));
+
+        // Wrap in a kinetic container so every model ALWAYS has continuous C∞ motion (v != 0)!
+        const holder = new THREE.Group();
+        holder.add(obj3d);
+
+        // Plaster 1-2 crisp 3D cutout stickers DIRECTLY ONTO the surface of larger white models!
+        if (m < 10) {
+          const stMeta = th[m % th.length];
+          const stCard = makeTrackedCutout(stMeta, clamp(sc * 0.42, 1.6, 3.8), {
+            maxW: clamp(sc * 0.52, 1.8, 4.4), maxDim: 256, pivot: 'center', alphaTest: 0.08,
+          });
+          stCard.mesh.position.set(0, sc * 0.38, sc * 0.36);
+          holder.add(stCard.mesh);
+          if (m < 5) {
+            const stCard2 = makeTrackedCutout(pickMeta(itemsPool, idx * 9 + m * 3), clamp(sc * 0.36, 1.3, 3.0), {
+              maxW: 3.2, maxDim: 224, pivot: 'center', alphaTest: 0.08,
+            });
+            stCard2.mesh.position.set(sc * 0.32, sc * 0.50, -sc * 0.28);
+            stCard2.mesh.rotation.y = Math.PI * 0.5;
+            holder.add(stCard2.mesh);
+          }
+        }
+
+        batch.grp.add(holder);
+        batch.items.push({
+          obj: holder,
+          homeX, homeY, homeZ,
+          // Continuous eternal motion parameters (ZERO zero-velocity points!)
+          orbitSpeed: (m % 2 === 0 ? 1 : -1) * (0.14 + (m % 4) * 0.06),
+          spinSpeed: (m % 2 === 0 ? 1 : -1) * (0.28 + rng() * 0.38),
+          driftAmp: 0.35 + rng() * 0.65,
+          driftFreq: 0.65 + rng() * 0.55,
+          phase: rng() * 6.28,
+          tiltX: (rng() - 0.5) * 0.38,
+          tiltZ: (rng() - 0.5) * 0.38,
+          // Stream-in offset before MIC CHECK wave arrives (slides smoothly in from outer space!)
+          enterOffset: new THREE.Vector3(
+            Math.cos(ang) * (18 + rng() * 14),
+            (m % 2 === 0 ? 1 : -1) * (9 + rng() * 10),
+            Math.sin(ang) * (18 + rng() * 14) - 12
+          ),
+        });
+      }
+
+      // --- B. DENSE STICKER COLLAGE PLATES PLASTERED ALL OVER THE FLOOR (24 extra cutouts!) ---
+      for (let s = 0; s < 24; s++) {
+        const batchIdx = s % 3;
+        const batch = batches[batchIdx];
+        const useTheme = s < 14;
+        const meta = useTheme
+          ? th[s % th.length]
+          : pickMeta(s % 3 === 0 ? itemsPool : (s % 3 === 1 ? screensPool : buildingsClean), idx * 11 + s * 2);
+        if (!meta) continue;
+        const cardH = useTheme ? (2.6 + (s % 3) * 0.85) : (1.7 + (s % 3) * 0.55);
+        const card = makeTrackedCutout(meta, cardH, {
+          maxW: cardH * 1.45, maxDim: 288, pivot: 'center', alphaTest: 0.08,
+        });
+        const ang = (s / 24) * Math.PI * 2 + 0.22;
+        const rx = Math.cos(ang) * (hw * (0.55 + (s % 3) * 0.18));
+        const rz = Math.sin(ang) * (hd * (0.55 + (s % 3) * 0.18));
+        const ry = 1.15 + ((s * 37) % 100) / 100 * (h - 2.1);
+
+        batch.grp.add(card.mesh);
+        batch.stickers.push({
+          mesh: card.mesh,
+          homeX: rx, homeY: ry, homeZ: rz,
+          baseRotY: -ang + Math.PI * 0.5,
+          spinRate: (s % 2 === 0 ? 1 : -1) * (0.18 + (s % 4) * 0.07),
+          bobPhase: s * 0.72,
+          enterOffset: new THREE.Vector3(Math.cos(ang) * 20, (s % 2 === 0 ? 10 : -8), Math.sin(ang) * 20 - 10),
+        });
+        trackedStickers.push(card.mesh);
+      }
+
+      // Pre-bind all stereo Left/Right "啊" rotation events assigned to this floor
+      const myAhEvents = AH_STEREO_ROT_HITS.filter((ev) => ev.floorIdx === idx);
+
+      // Staircase position (ahead & above previous floor straight down T-junction!) vs Cuboid stack!
+      const stairX = Math.sin(idx * 0.85) * 1.4;
+      const stairY = 1.6 + idx * FLOOR_H;
+      const stairZ = STAIR_Z0 - idx * 18.5;
+
+      const cuboidX = TOWER_X;
+      const cuboidY = 1.2 + idx * FLOOR_H;
+      const cuboidZ = CUBOID_Z;
 
       towerFloors.push({
         idx,
-        id: bp.id,
+        id: spec.id,
         root: floorRoot,
-        shellGrp,
-        interiorGrp,
-        yBase: curY,
-        yMid: curY + h * 0.5,
-        w,
-        d,
-        h,
-        startAge,
-        contentAge,
-        finishAge,
+        rotPivot,
+        slabGroup,
+        batches,
+        myAhEvents,
+        baseSpin: (idx % 2 === 0 ? 1 : -1) * (0.09 + (idx % 3) * 0.03),
+        stairPos: new THREE.Vector3(stairX, stairY, stairZ),
+        cuboidPos: new THREE.Vector3(cuboidX, cuboidY, cuboidZ),
+        firstHitAge: waveHits[0],
+        w, d, h,
       });
-      curY += h;
     });
+
+    // Trigger background fetch of all 15 GLB white models right away
+    loadAllWhiteModels();
+
+    const BLACK_SIL = new THREE.Color(0x040508);
+    const tmpCol = new THREE.Color();
+
+    function setSilhouetteAmount(silU) {
+      const s = clamp(silU, 0, 1);
+      for (let i = 0; i < silhouetteTargets.length; i++) {
+        const t = silhouetteTargets[i];
+        tmpCol.copy(t.baseColor).lerp(BLACK_SIL, s);
+        t.mat.color.copy(tmpCol);
+      }
+    }
+
+    function flushStickerAtlases(budget) {
+      const limit = typeof budget === 'number' ? budget : pendingAtlasPainters.length;
+      let done = 0;
+      for (let i = pendingAtlasPainters.length - 1; i >= 0 && done < limit; i--) {
+        if (pendingAtlasPainters[i]()) {
+          pendingAtlasPainters.splice(i, 1);
+          done++;
+        }
+      }
+    }
+
+    // Update ALL 13 floors with C∞ differentiable continuous motion (ZERO zero-velocity points!)
+    function updateTower(age, beatPos, kickEnergy) {
+      if (pendingAtlasPainters.length > 0) flushStickerAtlases(2);
+
+      // Mid-chorus convergence curve (Bar 34.1 = 38.02s): staircase suddenly coalesces into ONE rectangular cuboid!
+      const snapU = tanhStep(age, SNAP_AGE, 0.44);
+      // Continuous eternal subtle upward breath so the skyscraper itself never freezes at v = 0
+      const eternalRise = age * 0.08;
+
+      for (let i = 0; i < towerFloors.length; i++) {
+        const fl = towerFloors[i];
+        // Smooth C∞ floor presence (starts emerging smoothly slightly ahead of its first MIC CHECK hit!)
+        const floorU = tanhStep(age, fl.firstHitAge - 0.55, 0.28);
+        if (floorU < 0.008) {
+          fl.root.visible = false;
+          continue;
+        }
+        fl.root.visible = true;
+
+        // Smooth C∞ Staircase -> Unified Rectangular Cuboid morph!
+        const fx = fl.stairPos.x + (fl.cuboidPos.x - fl.stairPos.x) * snapU;
+        const fy = fl.stairPos.y + (fl.cuboidPos.y - fl.stairPos.y) * snapU + eternalRise;
+        const fz = fl.stairPos.z + (fl.cuboidPos.z - fl.stairPos.z) * snapU;
+        fl.root.position.set(fx, fy, fz);
+
+        // Slab frame scale glides smoothly into full dimensions + subtle C∞ kick pulse
+        const slabScale = 0.08 + 0.92 * floorU;
+        const kickLift = 1.0 + kickEnergy * 0.03;
+        fl.slabGroup.scale.set(slabScale * kickLift, slabScale, slabScale * kickLift);
+
+        // Floor Y-rotation: crisp 90° Left/Right twists on EVERY stereo "啊 啊" hit!
+        // During staircase (snapU < 1) floors drift freely; after cuboid snap (snapU -> 1)
+        // they lock orthogonally into ONE crisp rectangular cuboid while still twisting +-90° on "啊 啊"!
+        let ahAngle = 0;
+        for (let a = 0; a < fl.myAhEvents.length; a++) {
+          const ev = fl.myAhEvents[a];
+          ahAngle += ev.dir * (Math.PI * 0.5) * tanhStep(age, ev.t, 0.11);
+        }
+        const stairDrift = (1 - snapU) * (fl.baseSpin * age);
+        const cuboidBreath = snapU * Math.sin(age * 0.55 + i * 0.7) * 0.025;
+        fl.rotPivot.rotation.y = stairDrift + cuboidBreath + ahAngle;
+
+        // Update all 3 MIC CHECK model & sticker emergence batches inside this floor!
+        for (let b = 0; b < fl.batches.length; b++) {
+          const batch = fl.batches[b];
+          const bU = tanhStep(age, batch.tHit, 0.30);
+          if (bU < 0.01) {
+            batch.grp.visible = false;
+            continue;
+          }
+          batch.grp.visible = true;
+          const invB = 1 - bU;
+
+          // Update exaggerated 3D white models (NEVER velocity 0 — constant smooth spin + drift!)
+          for (let m = 0; m < batch.items.length; m++) {
+            const it = batch.items[m];
+            const driftX = Math.cos(age * it.driftFreq + it.phase) * it.driftAmp;
+            const driftY = Math.sin(age * it.driftFreq * 1.13 + it.phase) * (it.driftAmp * 0.55);
+            const driftZ = Math.sin(age * it.driftFreq * 0.87 + it.phase) * it.driftAmp;
+            it.obj.position.set(
+              it.homeX + it.enterOffset.x * invB + driftX,
+              it.homeY + it.enterOffset.y * invB + driftY,
+              it.homeZ + it.enterOffset.z * invB + driftZ
+            );
+            it.obj.rotation.set(
+              it.tiltX + Math.sin(age * 0.7 + it.phase) * 0.14,
+              age * it.spinSpeed + it.phase + invB * 1.8,
+              it.tiltZ + Math.cos(age * 0.65 + it.phase) * 0.12
+            );
+            const sc = (0.12 + 0.88 * bU) * (1.0 + kickEnergy * 0.035);
+            it.obj.scale.set(sc, sc, sc);
+          }
+
+          // Update dense 3D cutout photo stickers (continuous smooth orbit/spin — never static!)
+          for (let s = 0; s < batch.stickers.length; s++) {
+            const st = batch.stickers[s];
+            const orb = age * st.spinRate;
+            const cosO = Math.cos(orb);
+            const sinO = Math.sin(orb);
+            const rx = st.homeX * cosO - st.homeZ * sinO;
+            const rz = st.homeX * sinO + st.homeZ * cosO;
+            st.mesh.position.set(
+              rx + st.enterOffset.x * invB,
+              st.homeY + st.enterOffset.y * invB + Math.sin(age * 1.2 + st.bobPhase) * 0.38,
+              rz + st.enterOffset.z * invB
+            );
+            st.mesh.rotation.y = st.baseRotY - orb;
+            const sc = 0.10 + 0.90 * bU;
+            st.mesh.scale.set(sc, sc, sc);
+          }
+        }
+      }
+    }
 
     return {
       towerRoot,
-      plinthGrp,
-      plinthH: PLINTH_H,
-      plinthStartAge: MIC_CHECK_AGE,
       towerFloors,
-      floorAnimators,
       STAGE_COUNT,
-      totalTowerTopY: curY,
-      maxWidth: 22.0,
+      FLOOR_H,
+      totalTowerTopY: 1.2 + STAGE_COUNT * FLOOR_H,
+      updateTower,
+      setSilhouetteAmount,
+      flushStickerAtlases,
+      MIC_CHECK_HITS,
+      AH_STEREO_ROT_HITS,
     };
   }
 
   window.MicCheckTower = {
-    buildSectionTower,
-    buildMesaAndTower: buildSectionTower,
+    buildStaircaseToCuboidTower,
+    buildMesaAndTower: buildStaircaseToCuboidTower,
   };
 })();
