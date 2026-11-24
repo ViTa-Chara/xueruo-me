@@ -74,20 +74,31 @@
   const highPriorityQueue = [];
   const normalPriorityQueue = [];
 
-  function enqueueImg(url, highPriority) {
-    if (!url || loadedImgUrls.has(url) || queuedImgUrls.has(url)) return;
+  function safeEncodeUrl(rawUrl) {
+    if (!rawUrl) return rawUrl;
+    try {
+      return encodeURI(decodeURI(rawUrl));
+    } catch (_) {
+      return encodeURI(rawUrl);
+    }
+  }
+
+  function enqueueImg(rawUrl, highPriority) {
+    if (!rawUrl) return;
+    const url = safeEncodeUrl(rawUrl);
+    if (loadedImgUrls.has(url) || queuedImgUrls.has(url)) return;
     queuedImgUrls.add(url);
     if (highPriority) highPriorityQueue.push({ url, tries: 0 });
     else normalPriorityQueue.push({ url, tries: 0 });
     pumpPreloadQueue();
   }
 
-  // Priority-tiered resilient preloader (max 3 concurrent sockets, automatic 3x retry + decode()!)
+  // Priority-tiered resilient preloader (max 5 concurrent sockets, automatic 3x retry + decode()!)
   function pumpPreloadQueue() {
     if (preloadQueueRunning) return;
     preloadQueueRunning = true;
     let inFlight = 0;
-    const MAX_CONCURRENT = 3;
+    const MAX_CONCURRENT = 5;
 
     function popNext() {
       if (highPriorityQueue.length > 0) return highPriorityQueue.shift();
@@ -139,11 +150,21 @@
       .then((d) => {
         // Tier 0 (critical): all 4 hero monitor frames
         Object.values(d.monitors || {}).forEach((m) => enqueueImg(m.src, true));
-        // Tier 1 (background): street corridor buildings, streets, and signs
+        // Tier 1 (background): real-photo road textures, non-human signals/signs/houses & street props
         const a = d.assets || {};
+        (a.roadTextures || []).forEach((x) => enqueueImg(x.src, false));
+        (a.signalsClean || a.signals || []).forEach((x) => enqueueImg(x.src, false));
+        (a.cars || []).forEach((x) => enqueueImg(x.src, false));
+        (a.poles || []).forEach((x) => enqueueImg(x.src, false));
+        (a.housesLow || []).forEach((x) => enqueueImg(x.src, false));
+        (a.signsClean || a.signs || []).forEach((x) => enqueueImg(x.src, false));
+        (a.concreteTextures || []).forEach((x) => enqueueImg(x.src, false));
+        (a.brickTextures || []).forEach((x) => enqueueImg(x.src, false));
+        (a.archTextures || []).forEach((x) => enqueueImg(x.src, false));
+        (a.towerThemes || []).forEach((th) => (th.items || []).forEach((x) => enqueueImg(x.src, false)));
         (a.buildings || []).forEach((x) => enqueueImg(x.src, false));
         (a.streets || []).forEach((x) => enqueueImg(x.src, false));
-        (a.signs || []).forEach((x) => enqueueImg(x.src, false));
+        (a.screens || []).slice(0, 24).forEach((x) => enqueueImg(x.src, false));
         return d;
       })
       .catch(() => null);
@@ -415,6 +436,7 @@ class AgentRunResult:
   function start(opts) {
     const getElapsedSec = opts.getElapsedSec;
     const fallenItems = (opts.fallenItems && opts.fallenItems.length) ? opts.fallenItems : [];
+    const allItems = (opts.allItems && opts.allItems.length) ? opts.allItems : fallenItems;
     const freezeAt = typeof opts.freezeAt === 'number' ? opts.freezeAt : null;
 
     let maskEl = null;
@@ -475,7 +497,7 @@ class AgentRunResult:
 
     loadPvData().then((data) => {
       if (!data || !alive) return;
-      const mounted = mountScene(data, getElapsedSec, fallenItems, freezeAt, () => alive, pendingPortal);
+      const mounted = mountScene(data, getElapsedSec, fallenItems, allItems, freezeAt, () => alive, pendingPortal);
       maskEl = mounted.mask;
       stageEl = mounted.stage;
       if (pendingPortal !== null) {
@@ -486,7 +508,7 @@ class AgentRunResult:
     return controller;
   }
 
-  function mountScene(data, getElapsedSec, fallenItems, freezeAt, isAlive, initialPortal) {
+  function mountScene(data, getElapsedSec, fallenItems, allItems, freezeAt, isAlive, initialPortal) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     // Exact measured tempo of Cornelius - Mic Check.wav: 101.00 BPM (+-3ms across 16 bars!)
@@ -517,12 +539,20 @@ class AgentRunResult:
     monitorLayer.className = 'pv-monitor-layer';
     const tossLayer = document.createElement('div');
     tossLayer.className = 'pv-toss-layer';
+    const floodCanvas = document.createElement('canvas');
+    floodCanvas.className = 'pv-flood-canvas';
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    floodCanvas.width = Math.round(vw * dpr);
+    floodCanvas.height = Math.round(vh * dpr);
+    const floodCtx = floodCanvas.getContext('2d');
+    if (floodCtx) floodCtx.scale(dpr, dpr);
 
-    // Strict stacking: Street (10) -> Floor Text Z=0 homography UNDER monitor (15) -> Monitors (20) -> Tossed (30)
+    // Strict stacking: Street (10) -> Floor Text Z=0 homography UNDER monitor (15) -> Monitors (20) -> Tossed (30) -> Flood Climax (40)
     root.appendChild(corridorLayer);
     root.appendChild(floorTextLayer);
     root.appendChild(monitorLayer);
     root.appendChild(tossLayer);
+    root.appendChild(floodCanvas);
     mask.appendChild(root);
     document.body.appendChild(mask);
 
@@ -878,59 +908,52 @@ class AgentRunResult:
     // ---------------------------------------------------------------------
     // 4.5 DRUM-LOCKED GROUND-PLANE VANISHING-POINT LAUNCHER
     //     Source Han Sans Heavy (Noto Sans SC 900) · Pure #ffffff · Minimalist
-    //     Strictly UNDERNEATH monitors (Z=0 matrix3d, z-index 15 < z-index 20).
-    //     Paced evenly with wider breathing intervals across Bar 3.1 (+4.75s) -> Bar 16.4 (+37.43s)
-    //     so the final character glides right into Bar 17.1 (+38.02s) "ONE! TWO! THREE! FOUR!"
-    //     Every single launch lands strictly on a REAL drum hit (b1 Kick, b2 Snare, b4 Snare — ZERO silent b3!)
+    //     - Starts AFTER Monitor 1 (AKPlugins) is already visible on screen (Bar 4.2, +7.72s)
+    //     - Interval DOUBLED: strict 2-beat snare groove (1.19s) for Chinese chars, zero 1-beat bursts
+    //     - Flight speed 30% SLOWER: GLYPH_DUR = 6 beats (3.564s)
+    //     - "Business Analytics" launches ONE LETTER AT A TIME (B, u, s, i, n, e, s, s, A, n, a, l, y, t, i, c, s)
+    //     - Cleanly completes right before Bar 17.1 (+38.02s) "ONE! TWO! THREE! FOUR!" flood!
     // ---------------------------------------------------------------------
     const floorSequence = [
-      // Bar 3 (+4.75s .. +6.53s): 薛若米｜
-      { beat: 8,  ch: '薛' },
-      { beat: 9,  ch: '若' },
-      { beat: 11, ch: '米' },
+      // Bar 4.2 -> Bar 5.2 (+7.72s .. +10.10s, after AKPlugins enters): 薛若米｜
+      { beat: 13,   ch: '薛' },
+      { beat: 15,   ch: '若' },
+      { beat: 17,   ch: '米' },
 
-      // Bar 4-6 (+7.13s .. +11.88s, AKPlugins): 莫纳什大学大一，
-      { beat: 12, ch: '莫' },
-      { beat: 13, ch: '纳' },
-      { beat: 15, ch: '什' },
-      { beat: 16, ch: '大' },
-      { beat: 17, ch: '学' },
-      { beat: 19, ch: '大' },
-      { beat: 20, ch: '一' },
+      // Bar 5.4 -> Bar 8.4 (+11.29s .. +18.42s): 莫纳什大学大一， (strict 2-beat snare spacing!)
+      { beat: 19,   ch: '莫' },
+      { beat: 21,   ch: '纳' },
+      { beat: 23,   ch: '什' },
+      { beat: 25,   ch: '大' },
+      { beat: 27,   ch: '学' },
+      { beat: 29,   ch: '大' },
+      { beat: 31,   ch: '一' },
 
-      // Bar 6-10 (+13.66s .. +21.39s, SatoInput): 商业分析（Business Analytics）专业在读。
-      { beat: 23, ch: '商' },
-      { beat: 24, ch: '业' },
-      { beat: 25, ch: '分' },
-      { beat: 27, ch: '析' },
-      { beat: 28, ch: 'Business' },
-      { beat: 31, ch: 'Analytics' },
-      { beat: 32, ch: '专' },
-      { beat: 33, ch: '业' },
-      { beat: 35, ch: '在' },
-      { beat: 36, ch: '读' },
+      // Bar 9.2 -> Bar 10.4 (+19.60s .. +23.17s): 商业分析
+      { beat: 33,   ch: '商' },
+      { beat: 35,   ch: '业' },
+      { beat: 37,   ch: '分' },
+      { beat: 39,   ch: '析' },
 
-      // Bar 10-12 (+23.17s .. +27.92s, SatoBot): 用数据理解商业，
-      { beat: 39, ch: '用' },
-      { beat: 40, ch: '数' },
-      { beat: 41, ch: '据' },
-      { beat: 43, ch: '理' },
-      { beat: 44, ch: '解' },
-      { beat: 45, ch: '商' },
-      { beat: 47, ch: '业' },
+      // Bar 11.2 -> Bar 16.4 (+24.36s .. +37.66s): B u s i n e s s  A n a l y t i c s (letter-by-letter!)
+      { beat: 41.0, ch: 'B' },
+      { beat: 42.3, ch: 'u' },
+      { beat: 43.6, ch: 's' },
+      { beat: 44.9, ch: 'i' },
+      { beat: 46.2, ch: 'n' },
+      { beat: 47.5, ch: 'e' },
+      { beat: 48.8, ch: 's' },
+      { beat: 50.1, ch: 's' },
 
-      // Bar 13-14 (+29.11s .. +32.67s, HiFiShifter): 保持好奇， (wide 2-beat backbeat spacing!)
-      { beat: 49, ch: '保' },
-      { beat: 51, ch: '持' },
-      { beat: 53, ch: '好' },
-      { beat: 55, ch: '奇' },
-
-      // Bar 15-16 (+33.27s .. +37.43s -> Bar 17 "ONE! TWO! THREE! FOUR!"): 持续探索中。
-      { beat: 56, ch: '持' },
-      { beat: 57, ch: '续' },
-      { beat: 59, ch: '探' },
-      { beat: 61, ch: '索' },
-      { beat: 63, ch: '中' },
+      { beat: 52.0, ch: 'A' },
+      { beat: 53.4, ch: 'n' },
+      { beat: 54.8, ch: 'a' },
+      { beat: 56.2, ch: 'l' },
+      { beat: 57.6, ch: 'y' },
+      { beat: 59.0, ch: 't' },
+      { beat: 60.4, ch: 'i' },
+      { beat: 61.8, ch: 'c' },
+      { beat: 63.2, ch: 's' },
     ];
     const floorScript = floorSequence.map((item) => ({
       t: item.beat * BEAT,
@@ -938,12 +961,12 @@ class AgentRunResult:
     }));
 
     const activeGlyphs = [];
-    // Slow, unhurried 4.25-beat (~2.52s) flight from vanishing point to bottom exit!
+    // 30% slower than 4.25 beats -> 6.0 beats (3.564s = 1.5 bars) serene, monumental glide!
     // Exact 2D-plane Z=0 projective homography (computeQuadMatrix3d) of a 60deg downward-tilted floor:
     // - ZERO CSS perspective / preserve-3d / contain:paint culling bugs!
     // - 100% guaranteed strictly UNDERNEATH all monitors (z-index 15 < 20, Z=0)!
     // - dBot stays strictly > 29px all the way to yTop = 105% (zero behind-camera singularity)!
-    const GLYPH_DUR = BEAT * 4.25;
+    const GLYPH_DUR = BEAT * 6.0;
     const FLOOR_P = vh * 0.36;
     const FLOOR_CX = vw * 0.50;
     const FLOOR_VP_Y = vh * 0.50;
@@ -988,9 +1011,282 @@ class AgentRunResult:
     }
 
     // ---------------------------------------------------------------------
+    // 4.8 BAR 17 "ONE! TWO! THREE! FOUR!" BEAT-ANTICIPATED WALL-TO-WALL FLOOD
+    //     -> SEAMLESS HANDOFF INTO COOL 2.5D ARCHITECTURAL STREET & SECTION TOWER (BAR 18.1+)!
+    // ---------------------------------------------------------------------
+    const T_FLOOD_BEAT1 = BAR * 16;         // +38.020s = EXACT Bar 17.1 ("ONE!")
+    const T_FLOOD_LEAD = 0.12;              // 120ms anticipation so tiles slam ON the vocal beat (not late!)
+    const T_FLOOD_START = T_FLOOD_BEAT1 - T_FLOOD_LEAD;
+    const T_SKETCH_START = BAR * 17;        // +40.396s = EXACT Bar 18.1 (top-down road -> dead-center architectural lift!)
+
+    function getFloodImage(rawUrl) {
+      const url = safeEncodeUrl(rawUrl);
+      if (decodedImgCache.has(url)) return decodedImgCache.get(url);
+      const im = new Image();
+      im.decoding = 'async';
+      attachImgWithRetry(im, url, 3);
+      decodedImgCache.set(url, im);
+      return im;
+    }
+
+    let sketch3d = null;
+    if (window.MicCheckSketch3D) {
+      sketch3d = window.MicCheckSketch3D.create({
+        parentEl: root,
+        vw,
+        vh,
+        beatSec: BEAT,
+        barSec: BAR,
+        startSec: T_SKETCH_START,
+        assets: data.assets,
+        monitors: data.monitors,
+        fallenItems: allItems,
+        portfolioAssets: PORTFOLIO_ASSETS,
+        kicks3d: data.kicks3d || [],
+        cues3d: data.cues3d || {},
+        getImage: getFloodImage,
+      });
+    }
+
+    function makeCodeCardSprite(title, lines) {
+      const c = document.createElement('canvas');
+      c.width = 460;
+      c.height = 300;
+      const g = c.getContext('2d');
+      if (!g) return c;
+      g.fillStyle = '#000000';
+      g.fillRect(0, 0, c.width, c.height);
+      g.strokeStyle = 'rgba(255,255,255,0.68)';
+      g.lineWidth = 3;
+      g.strokeRect(2, 2, c.width - 4, c.height - 4);
+      g.fillStyle = '#ffffff';
+      g.font = '300 26px "Cormorant Garamond", "STFangsong", serif';
+      g.fillText(title, 18, 38);
+      g.strokeStyle = 'rgba(255,255,255,0.32)';
+      g.lineWidth = 1.5;
+      g.beginPath();
+      g.moveTo(16, 52);
+      g.lineTo(c.width - 16, 52);
+      g.stroke();
+      g.font = '300 15px ui-monospace, "SF Mono", Menlo, monospace';
+      lines.forEach((ln, idx) => {
+        g.fillText(ln, 18, 80 + idx * 24);
+      });
+      return c;
+    }
+
+    const satoCodeSprites = [
+      makeCodeCardSprite('SATOBOT · AGENT HARNESS', [
+        '# sato_runtime/memory_store.py',
+        'RETENTION_DAYS = {1: 3, 2: 14, 3: 60, 5: 720}',
+        'def memory_clarity(item, *, score, now):',
+        '    life_frac = max(0.0, expire - now) / span',
+        '    if score >= 0.42 and life_frac >= 0.30:',
+        '        return "clear"',
+        '    if score >= 0.24 and life_frac >= 0.08:',
+        '        return "faded"',
+        '    return "gone"  # local decay eviction',
+      ]),
+      makeCodeCardSprite('SATOBOT · THINK · ACT · OBSERVE', [
+        '# sato_runtime/agent_core.py · llm_harness.py',
+        '@dataclass',
+        'class AgentRunResult:',
+        '    actions: List[Dict[str, Any]]',
+        '    declined: bool = False  # <NO_REPLY> gate',
+        '    steps_used: int = 0',
+        '    tool_trace: List[str]',
+        '    obliged_missed: List[str]',
+        '# layered_context: summary+bigram+thread+raw',
+      ]),
+    ];
+
+    // Build balanced sprite sources for solid gap-sealing base + dense collage mid/top layers
+    const solidSources = [];
+    PORTFOLIO_ASSETS.forEach((url) => {
+      solidSources.push({ kind: 'plate', url, img: getFloodImage(url) });
+    });
+    satoCodeSprites.forEach((cnv) => {
+      solidSources.push({ kind: 'canvas', img: cnv, sw: cnv.width, sh: cnv.height });
+    });
+    streetsPool.forEach((m) => {
+      solidSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
+    buildingsPool.forEach((m) => {
+      solidSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
+
+    const accentSources = [];
+    Object.values(data.monitors || {}).forEach((m) => {
+      accentSources.push({ kind: 'plate', url: m.src, img: getFloodImage(m.src) });
+    });
+    accentSources.push({ kind: 'plate', url: './items/screens/016_cutout.png', img: getFloodImage('./items/screens/016_cutout.png') });
+    tossPool.forEach((m) => {
+      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
+    signsPool.forEach((m) => {
+      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
+    ((data.assets && data.assets.cars) || []).slice(0, 8).forEach((m) => {
+      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
+    ((data.assets && (data.assets.signalsClean || data.assets.signals)) || [])
+      .filter((m) => m && m.src && !/(005|006|008|011|017|020)\.png$/.test(m.src))
+      .slice(0, 8)
+      .forEach((m) => {
+        accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+      });
+    ((data.assets && data.assets.poles) || []).slice(0, 6).forEach((m) => {
+      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
+    });
+    PORTFOLIO_ASSETS.forEach((url) => {
+      accentSources.push({ kind: 'plate', url, img: getFloodImage(url) });
+    });
+    satoCodeSprites.forEach((cnv) => {
+      accentSources.push({ kind: 'canvas', img: cnv, sw: cnv.width, sh: cnv.height });
+    });
+
+    // Generate 3 overlapping jittered coverage grids (~204 tiles!) sorted strictly outer-perimeter -> dead-center
+    // so "ONE! TWO! THREE! FOUR!" packs the viewport from ALL 4 EDGES inward to 99.9%+ ZERO-GAP fullness!
+    const floodRng = makeRng(12342026);
+    const floodTiles = [];
+
+    function addCoveragePass(cols, rows, scaleMult, sourcePool, passLayer) {
+      if (!sourcePool.length) return;
+      const cellW = vw / cols;
+      const cellH = vh / rows;
+      let cursor = Math.floor(floodRng() * sourcePool.length);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const tx = (c + 0.5 + (floodRng() - 0.5) * 0.62) * cellW;
+          const ty = (r + 0.5 + (floodRng() - 0.5) * 0.62) * cellH;
+          const nx = (tx / vw - 0.5) * 2; // [-1..+1]
+          const ny = (ty / vh - 0.5) * 2; // [-1..+1]
+          const edgeDist = Math.max(Math.abs(nx), Math.abs(ny)); // 1.0 = screen edges, 0.0 = dead center
+
+          // Determine nearest screen edge to fly inward from!
+          let sx = tx;
+          let sy = ty;
+          const targetMax = Math.max(cellW, cellH) * scaleMult * (0.88 + floodRng() * 0.34);
+          if (Math.abs(nx) >= Math.abs(ny)) {
+            sx = nx < 0 ? -targetMax * 0.72 : vw + targetMax * 0.72;
+            sy = ty + (floodRng() - 0.5) * cellH * 0.6;
+          } else {
+            sy = ny < 0 ? -targetMax * 0.72 : vh + targetMax * 0.72;
+            sx = tx + (floodRng() - 0.5) * cellW * 0.6;
+          }
+
+          const src = sourcePool[cursor % sourcePool.length];
+          cursor += 1 + Math.floor(floodRng() * 2);
+
+          floodTiles.push({
+            src,
+            passLayer,
+            edgeDist,
+            tx,
+            ty,
+            sx,
+            sy,
+            targetMax,
+            rot: (floodRng() - 0.5) * (passLayer === 0 ? 0.16 : 0.36),
+            tIn: 0,
+            inDur: 0.12 + floodRng() * 0.04,
+          });
+        }
+      }
+    }
+
+    // Pass 0: Oversized solid base grid (9x6 = 54) -> seals 100% of background gaps wall-to-wall!
+    addCoveragePass(9, 6, 1.95, solidSources, 0);
+    // Pass 1: Dense mid collage grid (9x6 = 54) -> overlapping buildings, streets, & project plates
+    addCoveragePass(9, 6, 1.55, solidSources.concat(accentSources), 1);
+    // Pass 2: Rich foreground collage layer (10x6 = 60) -> intro items, monitors, signs, code cards, screenshots!
+    addCoveragePass(10, 6, 1.28, accentSources, 2);
+    // Pass 3: Extra perimeter frame sealers (36) -> ensures zero slivers along top/bottom/left/right screen rims!
+    for (let i = 0; i < 36; i++) {
+      const side = i % 4;
+      const frac = ((i >> 2) + 0.5) / 9;
+      const tx = side === 0 || side === 2 ? frac * vw : (side === 1 ? vw * 0.96 : vw * 0.04);
+      const ty = side === 1 || side === 3 ? frac * vh : (side === 0 ? vh * 0.04 : vh * 0.96);
+      const targetMax = Math.max(vw, vh) * (0.20 + floodRng() * 0.08);
+      const sx = side === 1 ? vw + targetMax * 0.7 : (side === 3 ? -targetMax * 0.7 : tx);
+      const sy = side === 2 ? vh + targetMax * 0.7 : (side === 0 ? -targetMax * 0.7 : ty);
+      const src = solidSources[(i * 3) % solidSources.length];
+      floodTiles.push({
+        src,
+        passLayer: 0,
+        edgeDist: 1.04 + floodRng() * 0.06,
+        tx,
+        ty,
+        sx,
+        sy,
+        targetMax,
+        rot: (floodRng() - 0.5) * 0.14,
+        tIn: 0,
+        inDur: 0.12,
+      });
+    }
+
+    // Assign strict outer-to-inner beat-anticipated entry timestamps across the 4 shouts:
+    // Every wave starts ~120ms early with tight 140ms burst + 120ms snap so tiles IMPACT DEAD-ON
+    // "ONE!" (+38.02s), "TWO!" (+38.61s), "THREE!" (+39.21s), and "FOUR!" (+39.80s)!
+    floodTiles.sort((a, b) => b.edgeDist - a.edgeDist);
+    const totalFloodCount = floodTiles.length;
+    for (let i = 0; i < totalFloodCount; i++) {
+      const tile = floodTiles[i];
+      const rank = i / Math.max(1, totalFloodCount - 1); // 0 = outermost edge, 1 = dead center
+      const waveIdx = Math.min(3, Math.floor(rank * 4));  // 0="ONE", 1="TWO", 2="THREE", 3="FOUR"
+      const waveLocal = rank * 4 - waveIdx;               // [0..1) inside each shout beat
+      const waveSpan = BEAT * 0.24; // Tight 142ms surge right onto the beat!
+      tile.tIn = (T_FLOOD_BEAT1 - T_FLOOD_LEAD) + waveIdx * BEAT + waveLocal * waveSpan;
+    }
+
+    // Draw order: Pass 0 solid sealers first, then Pass 1 mid, then Pass 2 foreground cutouts (stable outer->inner)
+    const floodDrawList = floodTiles.slice().sort((a, b) => (a.passLayer - b.passLayer) || (a.tIn - b.tIn));
+    let behindFloodCleared = false;
+    let floodPackedFinal = false;
+
+    function drawFloodTile(tile, cx, cy, rot, sc) {
+      const s = tile.src;
+      const im = s.img;
+      let sx = 0, sy = 0, sw = 0, sh = 0;
+      if (s.kind === 'canvas') {
+        sw = s.sw; sh = s.sh;
+      } else {
+        if (!im || !im.complete || !im.naturalWidth) return;
+        if (s.kind === 'meta' && s.meta) {
+          sx = s.meta.x0; sy = s.meta.y0; sw = s.meta.bw; sh = s.meta.bh;
+        } else {
+          sw = im.naturalWidth; sh = im.naturalHeight;
+        }
+      }
+      if (sw <= 0 || sh <= 0) return;
+      // Pass 0 uses geometric-mean sizing so even tall/wide assets seal 100% of cell width & height with ZERO gaps!
+      const refDim = tile.passLayer === 0 ? Math.sqrt(sw * sh) : Math.max(sw, sh);
+      const fit = tile.targetMax / refDim;
+      const dw = sw * fit * sc;
+      const dh = sh * fit * sc;
+      floodCtx.save();
+      floodCtx.translate(cx, cy);
+      if (rot) floodCtx.rotate(rot);
+      floodCtx.drawImage(im, sx, sy, sw, sh, -dw * 0.5, -dh * 0.5, dw, dh);
+      floodCtx.restore();
+    }
+
+    function paintFullPackedFlood() {
+      if (!floodCtx) return;
+      floodCtx.fillStyle = '#000000';
+      floodCtx.fillRect(0, 0, vw, vh);
+      for (let i = 0; i < floodDrawList.length; i++) {
+        const tile = floodDrawList[i];
+        drawFloodTile(tile, tile.tx, tile.ty, tile.rot, 1.0);
+      }
+      floodPackedFinal = true;
+    }
+
+    // ---------------------------------------------------------------------
     // 5. EVENT CURSORS & SILKY 60FPS RENDER LOOP
     // ---------------------------------------------------------------------
-    const plucks = (data.organPlucks || []).filter((e) => e.t >= 2.0 && e.t <= 40.4);
+    const plucks = (data.organPlucks || []).filter((e) => e.t >= 2.0 && e.t < T_FLOOD_BEAT1);
     let nextPluckIdx = 0;
     let nextTossIdx = 0;
     let nextGlyphIdx = 0;
@@ -1015,7 +1311,7 @@ class AgentRunResult:
       }
     }
 
-    const SCENE_END = BAR * 18.2;
+    const SCENE_END = BAR * 49.0; // Runs all the way through next '1 2 3 4' (Bar 41) and 'STAAAAAR' climax (~116.4s)!
 
     function renderAt(t) {
       while (nextPluckIdx < plucks.length && plucks[nextPluckIdx].t <= t) {
@@ -1129,6 +1425,57 @@ class AgentRunResult:
           continue;
         }
         g.el.style.transform = buildFloorTransform(u);
+      }
+
+      // 5. Render Bar 17 "ONE! TWO! THREE! FOUR!" Wall-to-Wall Flood -> Seamless 3D Hand-Drawn Road Handoff (Bar 18.1+)!
+      if (floodCtx) {
+        if (t < T_FLOOD_START) {
+          if (floodCanvas.style.visibility !== 'hidden') {
+            floodCanvas.style.visibility = 'hidden';
+          }
+          if (sketch3d) sketch3d.render(t, floodCanvas);
+        } else if (t < T_SKETCH_START) {
+          if (floodCanvas.style.visibility !== 'visible') {
+            floodCanvas.style.visibility = 'visible';
+          }
+          if (!behindFloodCleared && t >= T_SKETCH_START - 0.16) {
+            behindFloodCleared = true;
+            corridorLayer.style.visibility = 'hidden';
+            floorTextLayer.style.visibility = 'hidden';
+            monitorLayer.style.visibility = 'hidden';
+            tossLayer.style.visibility = 'hidden';
+          }
+
+          floodCtx.clearRect(0, 0, vw, vh);
+          for (let i = 0; i < floodDrawList.length; i++) {
+            const tile = floodDrawList[i];
+            if (t < tile.tIn) continue;
+            const u = clamp((t - tile.tIn) / tile.inDur, 0, 1);
+            const ease = u >= 1 ? 1 : 1 - Math.pow(2, -10 * u);
+            const cx = tile.sx + (tile.tx - tile.sx) * ease;
+            const cy = tile.sy + (tile.ty - tile.sy) * ease;
+            const sc = 1.12 - 0.12 * ease;
+            drawFloodTile(tile, cx, cy, tile.rot, sc);
+          }
+        } else {
+          // Ensure floodCanvas has the 100%-packed final collage painted even if jumping directly via ?scene=pv&t=44!
+          if (!floodPackedFinal) {
+            paintFullPackedFlood();
+          }
+          if (!behindFloodCleared) {
+            behindFloodCleared = true;
+            corridorLayer.style.visibility = 'hidden';
+            floorTextLayer.style.visibility = 'hidden';
+            monitorLayer.style.visibility = 'hidden';
+            tossLayer.style.visibility = 'hidden';
+          }
+          if (sketch3d) {
+            sketch3d.render(t, floodCanvas);
+            if (floodCanvas.style.visibility !== 'hidden') {
+              floodCanvas.style.visibility = 'hidden';
+            }
+          }
+        }
       }
     }
 

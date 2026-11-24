@@ -20,6 +20,7 @@
 
   const stageEl = document.getElementById('stage');
   const entries = [];
+  let allStageItems = [];
 
   function fetchWithRetry(url, responseType, retries) {
     const maxRetries = typeof retries === 'number' ? retries : 3;
@@ -475,6 +476,7 @@
       pvCtrl = window.MicCheckPV.start({
         getElapsedSec: getAudioElapsed,
         fallenItems: entries.map((e) => e.imgMeta),
+        allItems: allStageItems,
       });
       pvCtrl.setPortalWindow({ hidden: true });
     }
@@ -964,7 +966,8 @@
 
   function build(data) {
     const phrases = data.phrases || [];
-    const pickedItems = shuffleUnique(data.items || []).slice(0, phrases.length);
+    allStageItems = data.items || [];
+    const pickedItems = shuffleUnique(allStageItems).slice(0, phrases.length);
 
     let prevX = null;
     phrases.forEach((phrase, i) => {
@@ -1078,6 +1081,7 @@
         window.MicCheckPV.start({
           getElapsedSec: getPreviewT,
           fallenItems: pickedItems,
+          allItems: allStageItems,
           freezeAt: freeze ? startT : null,
         });
       });

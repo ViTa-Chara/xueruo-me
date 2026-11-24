@@ -132,6 +132,35 @@
   z-index: 30;
 }
 
+/* Full-screen high-DPI canvas for the Bar 17 "ONE! TWO! THREE! FOUR!" wall-to-wall flood */
+.pv-flood-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 40;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* 3D Surreal Collage T-Junction Stage (Bar 18.1+, full crisp 60fps+, ZERO SVG boil filter!) */
+.pv-sketch3d-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background: #000000;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.pv-sketch3d-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .pv-toss-body {
   position: absolute;
   left: 0;

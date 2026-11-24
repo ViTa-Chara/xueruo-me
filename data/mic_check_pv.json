@@ -79,6 +79,28 @@
   "assets": {
     "buildings": [
       {
+        "src": "./items/buildings/001.png",
+        "kind": "building",
+        "w": 900,
+        "h": 1394,
+        "x0": 12,
+        "y0": 0,
+        "bw": 876,
+        "bh": 1382,
+        "lum": 30.3
+      },
+      {
+        "src": "./items/buildings/002.png",
+        "kind": "building",
+        "w": 539,
+        "h": 612,
+        "x0": 12,
+        "y0": 12,
+        "bw": 515,
+        "bh": 588,
+        "lum": 38.1
+      },
+      {
         "src": "./items/buildings/003.png",
         "kind": "building",
         "w": 1024,
@@ -87,7 +109,18 @@
         "y0": 12,
         "bw": 1012,
         "bh": 1134,
-        "lum": 26.6
+        "lum": 29.2
+      },
+      {
+        "src": "./items/buildings/004.png",
+        "kind": "building",
+        "w": 897,
+        "h": 1181,
+        "x0": 0,
+        "y0": 12,
+        "bw": 885,
+        "bh": 1157,
+        "lum": 50.8
       },
       {
         "src": "./items/buildings/005.png",
@@ -98,7 +131,18 @@
         "y0": 12,
         "bw": 621,
         "bh": 1295,
-        "lum": 55.2
+        "lum": 66.9
+      },
+      {
+        "src": "./items/buildings/006.png",
+        "kind": "building",
+        "w": 743,
+        "h": 1199,
+        "x0": 0,
+        "y0": 12,
+        "bw": 731,
+        "bh": 1187,
+        "lum": 43.4
       },
       {
         "src": "./items/buildings/007.png",
@@ -109,7 +153,7 @@
         "y0": 12,
         "bw": 1305,
         "bh": 1066,
-        "lum": 57.4
+        "lum": 59.4
       },
       {
         "src": "./items/buildings/008.png",
@@ -120,7 +164,18 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 33.1
+        "lum": 34.8
+      },
+      {
+        "src": "./items/buildings/009.png",
+        "kind": "building",
+        "w": 227,
+        "h": 891,
+        "x0": 12,
+        "y0": 0,
+        "bw": 203,
+        "bh": 879,
+        "lum": 15.7
       },
       {
         "src": "./items/buildings/010.png",
@@ -131,7 +186,7 @@
         "y0": 12,
         "bw": 1080,
         "bh": 1359,
-        "lum": 53.6
+        "lum": 52.2
       },
       {
         "src": "./items/buildings/011.png",
@@ -142,7 +197,18 @@
         "y0": 12,
         "bw": 1080,
         "bh": 1361,
-        "lum": 63.7
+        "lum": 67.7
+      },
+      {
+        "src": "./items/buildings/012.png",
+        "kind": "building",
+        "w": 419,
+        "h": 790,
+        "x0": 2,
+        "y0": 12,
+        "bw": 405,
+        "bh": 778,
+        "lum": 19.9
       },
       {
         "src": "./items/buildings/013.png",
@@ -153,7 +219,7 @@
         "y0": 12,
         "bw": 879,
         "bh": 846,
-        "lum": 67.1
+        "lum": 72.3
       },
       {
         "src": "./items/buildings/014.png",
@@ -164,7 +230,40 @@
         "y0": 12,
         "bw": 940,
         "bh": 1084,
-        "lum": 34.2
+        "lum": 41.0
+      },
+      {
+        "src": "./items/buildings/015.png",
+        "kind": "building",
+        "w": 682,
+        "h": 507,
+        "x0": 0,
+        "y0": 12,
+        "bw": 670,
+        "bh": 483,
+        "lum": 88.9
+      },
+      {
+        "src": "./items/buildings/016.png",
+        "kind": "building",
+        "w": 524,
+        "h": 934,
+        "x0": 12,
+        "y0": 12,
+        "bw": 500,
+        "bh": 922,
+        "lum": 29.5
+      },
+      {
+        "src": "./items/buildings/017.png",
+        "kind": "building",
+        "w": 322,
+        "h": 509,
+        "x0": 12,
+        "y0": 12,
+        "bw": 298,
+        "bh": 485,
+        "lum": 44.5
       },
       {
         "src": "./items/buildings/018.png",
@@ -175,7 +274,29 @@
         "y0": 12,
         "bw": 366,
         "bh": 767,
-        "lum": 55.0
+        "lum": 63.2
+      },
+      {
+        "src": "./items/buildings/019.png",
+        "kind": "building",
+        "w": 136,
+        "h": 217,
+        "x0": 12,
+        "y0": 12,
+        "bw": 112,
+        "bh": 193,
+        "lum": 55.7
+      },
+      {
+        "src": "./items/buildings/020.png",
+        "kind": "building",
+        "w": 510,
+        "h": 687,
+        "x0": 12,
+        "y0": 0,
+        "bw": 486,
+        "bh": 675,
+        "lum": 31.9
       },
       {
         "src": "./items/buildings/021.png",
@@ -186,7 +307,7 @@
         "y0": 12,
         "bw": 493,
         "bh": 448,
-        "lum": 66.3
+        "lum": 71.8
       },
       {
         "src": "./items/buildings/022.png",
@@ -197,7 +318,7 @@
         "y0": 3,
         "bw": 640,
         "bh": 850,
-        "lum": 136.7
+        "lum": 139.3
       },
       {
         "src": "./items/buildings/023.png",
@@ -208,7 +329,18 @@
         "y0": 9,
         "bw": 453,
         "bh": 844,
-        "lum": 33.5
+        "lum": 35.2
+      },
+      {
+        "src": "./items/buildings/024.png",
+        "kind": "building",
+        "w": 554,
+        "h": 263,
+        "x0": 0,
+        "y0": 12,
+        "bw": 542,
+        "bh": 239,
+        "lum": 90.7
       },
       {
         "src": "./items/buildings/025.png",
@@ -219,7 +351,7 @@
         "y0": 12,
         "bw": 468,
         "bh": 737,
-        "lum": 73.6
+        "lum": 82.2
       },
       {
         "src": "./items/buildings/026.png",
@@ -230,7 +362,29 @@
         "y0": 0,
         "bw": 640,
         "bh": 480,
-        "lum": 71.9
+        "lum": 72.7
+      },
+      {
+        "src": "./items/buildings/027.png",
+        "kind": "building",
+        "w": 640,
+        "h": 761,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 749,
+        "lum": 19.5
+      },
+      {
+        "src": "./items/buildings/028.png",
+        "kind": "building",
+        "w": 274,
+        "h": 490,
+        "x0": 12,
+        "y0": 12,
+        "bw": 250,
+        "bh": 466,
+        "lum": 151.3
       },
       {
         "src": "./items/buildings/029.png",
@@ -241,7 +395,7 @@
         "y0": 12,
         "bw": 520,
         "bh": 737,
-        "lum": 66.4
+        "lum": 68.5
       },
       {
         "src": "./items/buildings/030.png",
@@ -252,7 +406,7 @@
         "y0": 12,
         "bw": 616,
         "bh": 503,
-        "lum": 44.7
+        "lum": 49.7
       },
       {
         "src": "./items/buildings/031.png",
@@ -263,7 +417,238 @@
         "y0": 12,
         "bw": 505,
         "bh": 309,
-        "lum": 73.9
+        "lum": 79.9
+      },
+      {
+        "src": "./items/buildings/032.png",
+        "kind": "building",
+        "w": 309,
+        "h": 438,
+        "x0": 12,
+        "y0": 12,
+        "bw": 285,
+        "bh": 414,
+        "lum": 40.2
+      },
+      {
+        "src": "./items/buildings/033.png",
+        "kind": "building",
+        "w": 787,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 787,
+        "bh": 1400,
+        "lum": 84.1
+      },
+      {
+        "src": "./items/buildings/034.png",
+        "kind": "building",
+        "w": 1400,
+        "h": 788,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 788,
+        "lum": 86.8
+      },
+      {
+        "src": "./items/buildings/035.png",
+        "kind": "building",
+        "w": 1400,
+        "h": 788,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 788,
+        "lum": 134.7
+      },
+      {
+        "src": "./items/buildings/036.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 110.2
+      },
+      {
+        "src": "./items/buildings/037.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 91.4
+      },
+      {
+        "src": "./items/buildings/038.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 92.6
+      },
+      {
+        "src": "./items/buildings/039.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 123.9
+      },
+      {
+        "src": "./items/buildings/040.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 101.0
+      },
+      {
+        "src": "./items/buildings/041.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 86.5
+      },
+      {
+        "src": "./items/buildings/042.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 107.1
+      },
+      {
+        "src": "./items/buildings/043.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 112.5
+      },
+      {
+        "src": "./items/buildings/044.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 129.8
+      },
+      {
+        "src": "./items/buildings/045.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 143.5
+      },
+      {
+        "src": "./items/buildings/046.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 155.6
+      },
+      {
+        "src": "./items/buildings/047.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 126.4
+      },
+      {
+        "src": "./items/buildings/048.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 134.1
+      },
+      {
+        "src": "./items/buildings/049.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 137.7
+      },
+      {
+        "src": "./items/buildings/050.png",
+        "kind": "building",
+        "w": 1259,
+        "h": 839,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1259,
+        "bh": 839,
+        "lum": 126.2
+      },
+      {
+        "src": "./items/buildings/051.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1111,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1111,
+        "lum": 90.2
+      },
+      {
+        "src": "./items/buildings/052.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1043,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1043,
+        "lum": 105.3
       }
     ],
     "streets": [
@@ -276,7 +661,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 133.1
+        "lum": 133.3
       },
       {
         "src": "./items/streets/002.png",
@@ -287,7 +672,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 95.4
+        "lum": 94.6
       },
       {
         "src": "./items/streets/003.png",
@@ -295,10 +680,10 @@
         "w": 1080,
         "h": 1440,
         "x0": 0,
-        "y0": 2,
+        "y0": 1,
         "bw": 1080,
-        "bh": 1438,
-        "lum": 129.1
+        "bh": 1439,
+        "lum": 129.6
       },
       {
         "src": "./items/streets/004.png",
@@ -317,10 +702,10 @@
         "w": 1440,
         "h": 1063,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 1440,
-        "bh": 1059,
-        "lum": 40.9
+        "bh": 1060,
+        "lum": 40.6
       },
       {
         "src": "./items/streets/006.png",
@@ -331,7 +716,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 113.8
+        "lum": 114.4
       },
       {
         "src": "./items/streets/007.png",
@@ -339,10 +724,10 @@
         "w": 1080,
         "h": 1435,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 1080,
-        "bh": 1431,
-        "lum": 156.6
+        "bh": 1432,
+        "lum": 158.8
       },
       {
         "src": "./items/streets/008.png",
@@ -350,10 +735,10 @@
         "w": 1080,
         "h": 1315,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 1080,
-        "bh": 1311,
-        "lum": 137.2
+        "bh": 1312,
+        "lum": 137.7
       },
       {
         "src": "./items/streets/009.png",
@@ -364,7 +749,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 123.5
+        "lum": 124.0
       },
       {
         "src": "./items/streets/010.png",
@@ -372,10 +757,10 @@
         "w": 1080,
         "h": 1200,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 1080,
-        "bh": 1196,
-        "lum": 99.3
+        "bh": 1197,
+        "lum": 99.7
       },
       {
         "src": "./items/streets/011.png",
@@ -386,7 +771,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 114.0
+        "lum": 113.8
       },
       {
         "src": "./items/streets/012.png",
@@ -394,10 +779,10 @@
         "w": 640,
         "h": 747,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 640,
-        "bh": 743,
-        "lum": 62.4
+        "bh": 744,
+        "lum": 63.4
       },
       {
         "src": "./items/streets/013.png",
@@ -405,9 +790,9 @@
         "w": 640,
         "h": 1064,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 640,
-        "bh": 1060,
+        "bh": 1061,
         "lum": 94.1
       },
       {
@@ -419,7 +804,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 112.9
+        "lum": 114.1
       },
       {
         "src": "./items/streets/015.png",
@@ -438,10 +823,10 @@
         "w": 640,
         "h": 853,
         "x0": 0,
-        "y0": 2,
+        "y0": 1,
         "bw": 640,
-        "bh": 851,
-        "lum": 100.3
+        "bh": 852,
+        "lum": 101.6
       },
       {
         "src": "./items/streets/017.png",
@@ -452,7 +837,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 85.5
+        "lum": 86.0
       },
       {
         "src": "./items/streets/018.png",
@@ -474,7 +859,18 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 118.8
+        "lum": 120.3
+      },
+      {
+        "src": "./items/streets/020.png",
+        "kind": "street",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 65.2
       },
       {
         "src": "./items/streets/021.png",
@@ -482,10 +878,10 @@
         "w": 640,
         "h": 848,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 640,
-        "bh": 844,
-        "lum": 101.6
+        "bh": 845,
+        "lum": 102.3
       },
       {
         "src": "./items/streets/022.png",
@@ -496,7 +892,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 109.4
+        "lum": 109.6
       },
       {
         "src": "./items/streets/023.png",
@@ -507,7 +903,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 1137,
-        "lum": 58.3
+        "lum": 58.2
       },
       {
         "src": "./items/streets/024.png",
@@ -518,7 +914,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 117.7
+        "lum": 118.4
       },
       {
         "src": "./items/streets/025.png",
@@ -526,10 +922,10 @@
         "w": 640,
         "h": 848,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 640,
-        "bh": 844,
-        "lum": 107.7
+        "bh": 845,
+        "lum": 109.1
       },
       {
         "src": "./items/streets/026.png",
@@ -540,7 +936,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 132.8
+        "lum": 133.0
       },
       {
         "src": "./items/streets/027.png",
@@ -551,7 +947,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 146.3
+        "lum": 146.5
       },
       {
         "src": "./items/streets/028.png",
@@ -562,7 +958,18 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 84.5
+        "lum": 84.8
+      },
+      {
+        "src": "./items/streets/029.png",
+        "kind": "street",
+        "w": 640,
+        "h": 823,
+        "x0": 0,
+        "y0": 3,
+        "bw": 640,
+        "bh": 820,
+        "lum": 88.3
       },
       {
         "src": "./items/streets/030.png",
@@ -573,7 +980,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 854,
-        "lum": 123.4
+        "lum": 123.9
       },
       {
         "src": "./items/streets/031.png",
@@ -584,7 +991,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 361,
-        "lum": 122.7
+        "lum": 123.0
       },
       {
         "src": "./items/streets/032.png",
@@ -592,10 +999,10 @@
         "w": 640,
         "h": 776,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 640,
-        "bh": 772,
-        "lum": 137.9
+        "bh": 773,
+        "lum": 138.9
       },
       {
         "src": "./items/streets/033.png",
@@ -606,7 +1013,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 960,
-        "lum": 83.7
+        "lum": 84.3
       },
       {
         "src": "./items/streets/034.png",
@@ -614,10 +1021,10 @@
         "w": 640,
         "h": 609,
         "x0": 0,
-        "y0": 4,
+        "y0": 3,
         "bw": 640,
-        "bh": 605,
-        "lum": 140.5
+        "bh": 606,
+        "lum": 141.9
       },
       {
         "src": "./items/streets/035.png",
@@ -628,7 +1035,7 @@
         "y0": 0,
         "bw": 640,
         "bh": 853,
-        "lum": 81.9
+        "lum": 82.8
       }
     ],
     "signs": [
@@ -641,7 +1048,7 @@
         "y0": 12,
         "bw": 402,
         "bh": 1225,
-        "lum": 77.4
+        "lum": 76.9
       },
       {
         "src": "./items/signs/002.png",
@@ -652,7 +1059,18 @@
         "y0": 12,
         "bw": 1346,
         "bh": 196,
-        "lum": 168.7
+        "lum": 171.6
+      },
+      {
+        "src": "./items/signs/003.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1406,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1394,
+        "lum": 40.1
       },
       {
         "src": "./items/signs/004.png",
@@ -663,7 +1081,7 @@
         "y0": 12,
         "bw": 1440,
         "bh": 525,
-        "lum": 152.5
+        "lum": 154.1
       },
       {
         "src": "./items/signs/005.png",
@@ -674,7 +1092,7 @@
         "y0": 12,
         "bw": 335,
         "bh": 332,
-        "lum": 112.1
+        "lum": 113.4
       },
       {
         "src": "./items/signs/006.png",
@@ -685,7 +1103,18 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1057,
-        "lum": 103.8
+        "lum": 108.5
+      },
+      {
+        "src": "./items/signs/007.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1440,
+        "lum": 68.4
       },
       {
         "src": "./items/signs/008.png",
@@ -696,7 +1125,7 @@
         "y0": 12,
         "bw": 1080,
         "bh": 1424,
-        "lum": 65.8
+        "lum": 75.9
       },
       {
         "src": "./items/signs/009.png",
@@ -707,7 +1136,7 @@
         "y0": 12,
         "bw": 929,
         "bh": 1161,
-        "lum": 79.6
+        "lum": 85.8
       },
       {
         "src": "./items/signs/010.png",
@@ -718,7 +1147,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 49.4
+        "lum": 51.0
       },
       {
         "src": "./items/signs/011.png",
@@ -729,7 +1158,18 @@
         "y0": 12,
         "bw": 486,
         "bh": 463,
-        "lum": 104.7
+        "lum": 105.5
+      },
+      {
+        "src": "./items/signs/012.png",
+        "kind": "sign",
+        "w": 923,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 911,
+        "bh": 1440,
+        "lum": 75.1
       },
       {
         "src": "./items/signs/013.png",
@@ -740,7 +1180,29 @@
         "y0": 12,
         "bw": 596,
         "bh": 974,
-        "lum": 106.9
+        "lum": 108.1
+      },
+      {
+        "src": "./items/signs/014.png",
+        "kind": "sign",
+        "w": 458,
+        "h": 783,
+        "x0": 12,
+        "y0": 12,
+        "bw": 434,
+        "bh": 759,
+        "lum": 128.4
+      },
+      {
+        "src": "./items/signs/015.png",
+        "kind": "sign",
+        "w": 553,
+        "h": 633,
+        "x0": 12,
+        "y0": 12,
+        "bw": 529,
+        "bh": 609,
+        "lum": 140.0
       },
       {
         "src": "./items/signs/016.png",
@@ -751,7 +1213,29 @@
         "y0": 0,
         "bw": 742,
         "bh": 1336,
-        "lum": 162.7
+        "lum": 162.4
+      },
+      {
+        "src": "./items/signs/017.png",
+        "kind": "sign",
+        "w": 1038,
+        "h": 530,
+        "x0": 12,
+        "y0": 12,
+        "bw": 1020,
+        "bh": 506,
+        "lum": 100.3
+      },
+      {
+        "src": "./items/signs/018.png",
+        "kind": "sign",
+        "w": 999,
+        "h": 1349,
+        "x0": 12,
+        "y0": 0,
+        "bw": 975,
+        "bh": 1337,
+        "lum": 104.2
       },
       {
         "src": "./items/signs/019.png",
@@ -762,7 +1246,7 @@
         "y0": 0,
         "bw": 1043,
         "bh": 1440,
-        "lum": 106.8
+        "lum": 108.1
       },
       {
         "src": "./items/signs/020.png",
@@ -773,7 +1257,7 @@
         "y0": 0,
         "bw": 1080,
         "bh": 1440,
-        "lum": 85.4
+        "lum": 86.6
       },
       {
         "src": "./items/signs/021.png",
@@ -784,7 +1268,7 @@
         "y0": 12,
         "bw": 982,
         "bh": 898,
-        "lum": 64.0
+        "lum": 64.2
       },
       {
         "src": "./items/signs/022.png",
@@ -795,7 +1279,7 @@
         "y0": 0,
         "bw": 814,
         "bh": 1324,
-        "lum": 109.8
+        "lum": 106.3
       },
       {
         "src": "./items/signs/023.png",
@@ -806,7 +1290,7 @@
         "y0": 12,
         "bw": 239,
         "bh": 724,
-        "lum": 79.0
+        "lum": 78.6
       },
       {
         "src": "./items/signs/024.png",
@@ -817,7 +1301,29 @@
         "y0": 12,
         "bw": 594,
         "bh": 527,
-        "lum": 186.5
+        "lum": 210.6
+      },
+      {
+        "src": "./items/signs/025.png",
+        "kind": "sign",
+        "w": 563,
+        "h": 709,
+        "x0": 0,
+        "y0": 12,
+        "bw": 551,
+        "bh": 685,
+        "lum": 84.4
+      },
+      {
+        "src": "./items/signs/026.png",
+        "kind": "sign",
+        "w": 377,
+        "h": 588,
+        "x0": 12,
+        "y0": 12,
+        "bw": 353,
+        "bh": 576,
+        "lum": 108.6
       },
       {
         "src": "./items/signs/027.png",
@@ -828,7 +1334,18 @@
         "y0": 12,
         "bw": 357,
         "bh": 606,
-        "lum": 146.6
+        "lum": 149.3
+      },
+      {
+        "src": "./items/signs/028.png",
+        "kind": "sign",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 65.1
       },
       {
         "src": "./items/signs/029.png",
@@ -839,7 +1356,7 @@
         "y0": 12,
         "bw": 620,
         "bh": 185,
-        "lum": 65.8
+        "lum": 66.8
       },
       {
         "src": "./items/signs/030.png",
@@ -851,6 +1368,4221 @@
         "bw": 440,
         "bh": 792,
         "lum": 161.9
+      }
+    ],
+    "poles": [
+      {
+        "src": "./items/poles/001.png",
+        "kind": "pole",
+        "w": 1020,
+        "h": 1024,
+        "x0": 5,
+        "y0": 5,
+        "bw": 1015,
+        "bh": 1019,
+        "lum": 158.8
+      },
+      {
+        "src": "./items/poles/002.png",
+        "kind": "pole",
+        "w": 1020,
+        "h": 1025,
+        "x0": 5,
+        "y0": 5,
+        "bw": 1015,
+        "bh": 1018,
+        "lum": 158.6
+      },
+      {
+        "src": "./items/poles/003.png",
+        "kind": "pole",
+        "w": 662,
+        "h": 512,
+        "x0": 5,
+        "y0": 5,
+        "bw": 657,
+        "bh": 502,
+        "lum": 161.8
+      },
+      {
+        "src": "./items/poles/004.png",
+        "kind": "pole",
+        "w": 588,
+        "h": 1025,
+        "x0": 5,
+        "y0": 5,
+        "bw": 578,
+        "bh": 1015,
+        "lum": 158.4
+      },
+      {
+        "src": "./items/poles/005.png",
+        "kind": "pole",
+        "w": 490,
+        "h": 993,
+        "x0": 6,
+        "y0": 6,
+        "bw": 478,
+        "bh": 987,
+        "lum": 113.0
+      },
+      {
+        "src": "./items/poles/006.png",
+        "kind": "pole",
+        "w": 81,
+        "h": 656,
+        "x0": 6,
+        "y0": 6,
+        "bw": 69,
+        "bh": 644,
+        "lum": 127.5
+      },
+      {
+        "src": "./items/poles/007.png",
+        "kind": "pole",
+        "w": 85,
+        "h": 713,
+        "x0": 6,
+        "y0": 6,
+        "bw": 73,
+        "bh": 701,
+        "lum": 111.4
+      },
+      {
+        "src": "./items/poles/008.png",
+        "kind": "pole",
+        "w": 842,
+        "h": 1036,
+        "x0": 6,
+        "y0": 6,
+        "bw": 830,
+        "bh": 1024,
+        "lum": 107.5
+      },
+      {
+        "src": "./items/poles/009.png",
+        "kind": "pole",
+        "w": 280,
+        "h": 624,
+        "x0": 6,
+        "y0": 6,
+        "bw": 268,
+        "bh": 618,
+        "lum": 65.7
+      },
+      {
+        "src": "./items/poles/010.png",
+        "kind": "pole",
+        "w": 292,
+        "h": 638,
+        "x0": 6,
+        "y0": 6,
+        "bw": 280,
+        "bh": 632,
+        "lum": 164.6
+      },
+      {
+        "src": "./items/poles/011.png",
+        "kind": "pole",
+        "w": 387,
+        "h": 754,
+        "x0": 6,
+        "y0": 6,
+        "bw": 375,
+        "bh": 748,
+        "lum": 40.3
+      },
+      {
+        "src": "./items/poles/012.png",
+        "kind": "pole",
+        "w": 169,
+        "h": 582,
+        "x0": 6,
+        "y0": 6,
+        "bw": 157,
+        "bh": 570,
+        "lum": 81.0
+      },
+      {
+        "src": "./items/poles/013.png",
+        "kind": "pole",
+        "w": 292,
+        "h": 638,
+        "x0": 6,
+        "y0": 6,
+        "bw": 280,
+        "bh": 632,
+        "lum": 164.6
+      },
+      {
+        "src": "./items/poles/014.png",
+        "kind": "pole",
+        "w": 166,
+        "h": 925,
+        "x0": 6,
+        "y0": 6,
+        "bw": 154,
+        "bh": 913,
+        "lum": 177.6
+      },
+      {
+        "src": "./items/poles/015.png",
+        "kind": "pole",
+        "w": 210,
+        "h": 848,
+        "x0": 6,
+        "y0": 6,
+        "bw": 198,
+        "bh": 836,
+        "lum": 175.6
+      },
+      {
+        "src": "./items/poles/016.png",
+        "kind": "pole",
+        "w": 234,
+        "h": 1192,
+        "x0": 6,
+        "y0": 6,
+        "bw": 222,
+        "bh": 1180,
+        "lum": 85.8
+      },
+      {
+        "src": "./items/poles/017.png",
+        "kind": "pole",
+        "w": 186,
+        "h": 1038,
+        "x0": 6,
+        "y0": 6,
+        "bw": 174,
+        "bh": 1026,
+        "lum": 88.1
+      },
+      {
+        "src": "./items/poles/018.png",
+        "kind": "pole",
+        "w": 234,
+        "h": 1040,
+        "x0": 6,
+        "y0": 6,
+        "bw": 222,
+        "bh": 1028,
+        "lum": 128.5
+      },
+      {
+        "src": "./items/poles/019.png",
+        "kind": "pole",
+        "w": 314,
+        "h": 1087,
+        "x0": 6,
+        "y0": 6,
+        "bw": 302,
+        "bh": 1075,
+        "lum": 108.1
+      },
+      {
+        "src": "./items/poles/020.png",
+        "kind": "pole",
+        "w": 329,
+        "h": 1180,
+        "x0": 6,
+        "y0": 6,
+        "bw": 317,
+        "bh": 1168,
+        "lum": 84.1
+      }
+    ],
+    "signals": [
+      {
+        "src": "./items/signals/001.png",
+        "kind": "signal",
+        "w": 357,
+        "h": 683,
+        "x0": 0,
+        "y0": 5,
+        "bw": 352,
+        "bh": 678,
+        "lum": 91.0
+      },
+      {
+        "src": "./items/signals/002.png",
+        "kind": "signal",
+        "w": 278,
+        "h": 682,
+        "x0": 5,
+        "y0": 5,
+        "bw": 268,
+        "bh": 672,
+        "lum": 79.6
+      },
+      {
+        "src": "./items/signals/003.png",
+        "kind": "signal",
+        "w": 360,
+        "h": 504,
+        "x0": 5,
+        "y0": 5,
+        "bw": 350,
+        "bh": 494,
+        "lum": 92.5
+      },
+      {
+        "src": "./items/signals/004.png",
+        "kind": "signal",
+        "w": 237,
+        "h": 686,
+        "x0": 5,
+        "y0": 5,
+        "bw": 227,
+        "bh": 681,
+        "lum": 66.1
+      },
+      {
+        "src": "./items/signals/005.png",
+        "kind": "signal",
+        "w": 295,
+        "h": 448,
+        "x0": 5,
+        "y0": 5,
+        "bw": 285,
+        "bh": 443,
+        "lum": 151.3
+      },
+      {
+        "src": "./items/signals/006.png",
+        "kind": "signal",
+        "w": 230,
+        "h": 468,
+        "x0": 5,
+        "y0": 5,
+        "bw": 220,
+        "bh": 458,
+        "lum": 114.2
+      },
+      {
+        "src": "./items/signals/007.png",
+        "kind": "signal",
+        "w": 196,
+        "h": 471,
+        "x0": 5,
+        "y0": 3,
+        "bw": 186,
+        "bh": 463,
+        "lum": 99.7
+      },
+      {
+        "src": "./items/signals/008.png",
+        "kind": "signal",
+        "w": 592,
+        "h": 1051,
+        "x0": 5,
+        "y0": 5,
+        "bw": 587,
+        "bh": 1041,
+        "lum": 142.9
+      },
+      {
+        "src": "./items/signals/009.png",
+        "kind": "signal",
+        "w": 446,
+        "h": 1398,
+        "x0": 6,
+        "y0": 3,
+        "bw": 434,
+        "bh": 1389,
+        "lum": 81.8
+      },
+      {
+        "src": "./items/signals/010.png",
+        "kind": "signal",
+        "w": 199,
+        "h": 500,
+        "x0": 0,
+        "y0": 0,
+        "bw": 199,
+        "bh": 500,
+        "lum": 71.4
+      },
+      {
+        "src": "./items/signals/011.png",
+        "kind": "signal",
+        "w": 496,
+        "h": 1329,
+        "x0": 6,
+        "y0": 0,
+        "bw": 490,
+        "bh": 1323,
+        "lum": 127.7
+      },
+      {
+        "src": "./items/signals/012.png",
+        "kind": "signal",
+        "w": 406,
+        "h": 1183,
+        "x0": 5,
+        "y0": 5,
+        "bw": 396,
+        "bh": 1178,
+        "lum": 61.9
+      },
+      {
+        "src": "./items/signals/013.png",
+        "kind": "signal",
+        "w": 662,
+        "h": 663,
+        "x0": 5,
+        "y0": 5,
+        "bw": 652,
+        "bh": 653,
+        "lum": 104.4
+      },
+      {
+        "src": "./items/signals/014.png",
+        "kind": "signal",
+        "w": 662,
+        "h": 662,
+        "x0": 5,
+        "y0": 5,
+        "bw": 652,
+        "bh": 652,
+        "lum": 114.3
+      },
+      {
+        "src": "./items/signals/015.png",
+        "kind": "signal",
+        "w": 527,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 527,
+        "bh": 1400,
+        "lum": 104.6
+      },
+      {
+        "src": "./items/signals/016.png",
+        "kind": "signal",
+        "w": 975,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 975,
+        "bh": 1400,
+        "lum": 90.6
+      },
+      {
+        "src": "./items/signals/017.png",
+        "kind": "signal",
+        "w": 485,
+        "h": 1332,
+        "x0": 5,
+        "y0": 5,
+        "bw": 475,
+        "bh": 1327,
+        "lum": 103.1
+      },
+      {
+        "src": "./items/signals/018.png",
+        "kind": "signal",
+        "w": 480,
+        "h": 796,
+        "x0": 6,
+        "y0": 6,
+        "bw": 468,
+        "bh": 790,
+        "lum": 74.7
+      },
+      {
+        "src": "./items/signals/019.png",
+        "kind": "signal",
+        "w": 640,
+        "h": 1138,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1138,
+        "lum": 44.1
+      },
+      {
+        "src": "./items/signals/020.png",
+        "kind": "signal",
+        "w": 287,
+        "h": 790,
+        "x0": 6,
+        "y0": 6,
+        "bw": 275,
+        "bh": 778,
+        "lum": 143.8
+      }
+    ],
+    "cars": [
+      {
+        "src": "./items/cars/001.png",
+        "kind": "car",
+        "w": 1400,
+        "h": 527,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 527,
+        "lum": 172.2
+      },
+      {
+        "src": "./items/cars/002.png",
+        "kind": "car",
+        "w": 1400,
+        "h": 492,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 492,
+        "lum": 178.1
+      },
+      {
+        "src": "./items/cars/003.png",
+        "kind": "car",
+        "w": 1400,
+        "h": 468,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 468,
+        "lum": 107.8
+      },
+      {
+        "src": "./items/cars/004.png",
+        "kind": "car",
+        "w": 1400,
+        "h": 322,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 317,
+        "lum": 57.2
+      },
+      {
+        "src": "./items/cars/005.png",
+        "kind": "car",
+        "w": 1400,
+        "h": 468,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 466,
+        "lum": 65.2
+      },
+      {
+        "src": "./items/cars/006.png",
+        "kind": "car",
+        "w": 909,
+        "h": 255,
+        "x0": 5,
+        "y0": 5,
+        "bw": 899,
+        "bh": 245,
+        "lum": 82.2
+      },
+      {
+        "src": "./items/cars/007.png",
+        "kind": "car",
+        "w": 909,
+        "h": 255,
+        "x0": 5,
+        "y0": 5,
+        "bw": 899,
+        "bh": 245,
+        "lum": 84.2
+      },
+      {
+        "src": "./items/cars/008.png",
+        "kind": "car",
+        "w": 626,
+        "h": 201,
+        "x0": 6,
+        "y0": 6,
+        "bw": 614,
+        "bh": 189,
+        "lum": 108.6
+      },
+      {
+        "src": "./items/cars/009.png",
+        "kind": "car",
+        "w": 607,
+        "h": 233,
+        "x0": 6,
+        "y0": 6,
+        "bw": 595,
+        "bh": 221,
+        "lum": 90.5
+      },
+      {
+        "src": "./items/cars/010.png",
+        "kind": "car",
+        "w": 586,
+        "h": 232,
+        "x0": 6,
+        "y0": 6,
+        "bw": 574,
+        "bh": 220,
+        "lum": 109.7
+      },
+      {
+        "src": "./items/cars/011.png",
+        "kind": "car",
+        "w": 538,
+        "h": 183,
+        "x0": 6,
+        "y0": 6,
+        "bw": 526,
+        "bh": 171,
+        "lum": 112.4
+      },
+      {
+        "src": "./items/cars/012.png",
+        "kind": "car",
+        "w": 623,
+        "h": 601,
+        "x0": 6,
+        "y0": 6,
+        "bw": 611,
+        "bh": 589,
+        "lum": 39.9
+      },
+      {
+        "src": "./items/cars/013.png",
+        "kind": "car",
+        "w": 450,
+        "h": 244,
+        "x0": 0,
+        "y0": 5,
+        "bw": 445,
+        "bh": 234,
+        "lum": 117.3
+      },
+      {
+        "src": "./items/cars/014.png",
+        "kind": "car",
+        "w": 455,
+        "h": 214,
+        "x0": 0,
+        "y0": 5,
+        "bw": 450,
+        "bh": 204,
+        "lum": 144.5
+      },
+      {
+        "src": "./items/cars/015.png",
+        "kind": "car",
+        "w": 456,
+        "h": 210,
+        "x0": 0,
+        "y0": 5,
+        "bw": 451,
+        "bh": 200,
+        "lum": 123.8
+      },
+      {
+        "src": "./items/cars/016.png",
+        "kind": "car",
+        "w": 464,
+        "h": 231,
+        "x0": 0,
+        "y0": 5,
+        "bw": 459,
+        "bh": 221,
+        "lum": 103.6
+      },
+      {
+        "src": "./items/cars/017.png",
+        "kind": "car",
+        "w": 461,
+        "h": 225,
+        "x0": 0,
+        "y0": 5,
+        "bw": 456,
+        "bh": 215,
+        "lum": 142.2
+      },
+      {
+        "src": "./items/cars/018.png",
+        "kind": "car",
+        "w": 442,
+        "h": 226,
+        "x0": 5,
+        "y0": 5,
+        "bw": 432,
+        "bh": 216,
+        "lum": 153.4
+      },
+      {
+        "src": "./items/cars/019.png",
+        "kind": "car",
+        "w": 419,
+        "h": 227,
+        "x0": 5,
+        "y0": 5,
+        "bw": 409,
+        "bh": 217,
+        "lum": 98.9
+      },
+      {
+        "src": "./items/cars/020.png",
+        "kind": "car",
+        "w": 427,
+        "h": 200,
+        "x0": 5,
+        "y0": 5,
+        "bw": 417,
+        "bh": 190,
+        "lum": 122.4
+      }
+    ],
+    "screens": [
+      {
+        "src": "./items/screens/001.png",
+        "kind": "screen",
+        "w": 1064,
+        "h": 836,
+        "x0": 10,
+        "y0": 10,
+        "bw": 1044,
+        "bh": 816,
+        "lum": 88.3
+      },
+      {
+        "src": "./items/screens/002.png",
+        "kind": "screen",
+        "w": 998,
+        "h": 735,
+        "x0": 10,
+        "y0": 10,
+        "bw": 978,
+        "bh": 715,
+        "lum": 117.3
+      },
+      {
+        "src": "./items/screens/003.png",
+        "kind": "screen",
+        "w": 1007,
+        "h": 1337,
+        "x0": 10,
+        "y0": 10,
+        "bw": 987,
+        "bh": 1327,
+        "lum": 65.1
+      },
+      {
+        "src": "./items/screens/004.png",
+        "kind": "screen",
+        "w": 1400,
+        "h": 892,
+        "x0": 0,
+        "y0": 10,
+        "bw": 1400,
+        "bh": 872,
+        "lum": 16.4
+      },
+      {
+        "src": "./items/screens/005.png",
+        "kind": "screen",
+        "w": 1152,
+        "h": 961,
+        "x0": 10,
+        "y0": 10,
+        "bw": 1132,
+        "bh": 951,
+        "lum": 75.0
+      },
+      {
+        "src": "./items/screens/006.png",
+        "kind": "screen",
+        "w": 1010,
+        "h": 1052,
+        "x0": 10,
+        "y0": 10,
+        "bw": 990,
+        "bh": 1032,
+        "lum": 77.7
+      },
+      {
+        "src": "./items/screens/007.png",
+        "kind": "screen",
+        "w": 573,
+        "h": 471,
+        "x0": 10,
+        "y0": 10,
+        "bw": 553,
+        "bh": 451,
+        "lum": 76.3
+      },
+      {
+        "src": "./items/screens/008.png",
+        "kind": "screen",
+        "w": 1186,
+        "h": 631,
+        "x0": 0,
+        "y0": 10,
+        "bw": 1176,
+        "bh": 611,
+        "lum": 98.5
+      },
+      {
+        "src": "./items/screens/009.png",
+        "kind": "screen",
+        "w": 667,
+        "h": 592,
+        "x0": 10,
+        "y0": 10,
+        "bw": 647,
+        "bh": 572,
+        "lum": 73.4
+      },
+      {
+        "src": "./items/screens/010.png",
+        "kind": "screen",
+        "w": 640,
+        "h": 544,
+        "x0": 0,
+        "y0": 10,
+        "bw": 640,
+        "bh": 534,
+        "lum": 107.8
+      },
+      {
+        "src": "./items/screens/011.png",
+        "kind": "screen",
+        "w": 1253,
+        "h": 795,
+        "x0": 8,
+        "y0": 8,
+        "bw": 1245,
+        "bh": 779,
+        "lum": 42.1
+      },
+      {
+        "src": "./items/screens/012.png",
+        "kind": "screen",
+        "w": 1386,
+        "h": 1080,
+        "x0": 8,
+        "y0": 8,
+        "bw": 1378,
+        "bh": 1072,
+        "lum": 75.0
+      },
+      {
+        "src": "./items/screens/013.png",
+        "kind": "screen",
+        "w": 1037,
+        "h": 921,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1037,
+        "bh": 921,
+        "lum": 105.2
+      },
+      {
+        "src": "./items/screens/014.png",
+        "kind": "screen",
+        "w": 1080,
+        "h": 748,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 748,
+        "lum": 104.1
+      },
+      {
+        "src": "./items/screens/015.png",
+        "kind": "screen",
+        "w": 777,
+        "h": 584,
+        "x0": 0,
+        "y0": 6,
+        "bw": 777,
+        "bh": 578,
+        "lum": 59.4
+      },
+      {
+        "src": "./items/screens/016.png",
+        "kind": "screen",
+        "w": 1009,
+        "h": 708,
+        "x0": 8,
+        "y0": 8,
+        "bw": 1001,
+        "bh": 692,
+        "lum": 65.7
+      },
+      {
+        "src": "./items/screens/017.png",
+        "kind": "screen",
+        "w": 1036,
+        "h": 1199,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1036,
+        "bh": 1191,
+        "lum": 39.1
+      },
+      {
+        "src": "./items/screens/018.png",
+        "kind": "screen",
+        "w": 906,
+        "h": 795,
+        "x0": 8,
+        "y0": 0,
+        "bw": 898,
+        "bh": 787,
+        "lum": 67.4
+      },
+      {
+        "src": "./items/screens/019.png",
+        "kind": "screen",
+        "w": 922,
+        "h": 704,
+        "x0": 0,
+        "y0": 8,
+        "bw": 914,
+        "bh": 696,
+        "lum": 125.8
+      },
+      {
+        "src": "./items/screens/020.png",
+        "kind": "screen",
+        "w": 1070,
+        "h": 701,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1062,
+        "bh": 693,
+        "lum": 119.7
+      },
+      {
+        "src": "./items/screens/021.png",
+        "kind": "screen",
+        "w": 1376,
+        "h": 969,
+        "x0": 8,
+        "y0": 0,
+        "bw": 1360,
+        "bh": 961,
+        "lum": 155.4
+      },
+      {
+        "src": "./items/screens/022.png",
+        "kind": "screen",
+        "w": 969,
+        "h": 782,
+        "x0": 8,
+        "y0": 8,
+        "bw": 953,
+        "bh": 774,
+        "lum": 82.5
+      },
+      {
+        "src": "./items/screens/023.png",
+        "kind": "screen",
+        "w": 963,
+        "h": 955,
+        "x0": 0,
+        "y0": 8,
+        "bw": 955,
+        "bh": 947,
+        "lum": 79.7
+      },
+      {
+        "src": "./items/screens/024.png",
+        "kind": "screen",
+        "w": 1049,
+        "h": 907,
+        "x0": 8,
+        "y0": 8,
+        "bw": 1033,
+        "bh": 899,
+        "lum": 67.6
+      },
+      {
+        "src": "./items/screens/025.png",
+        "kind": "screen",
+        "w": 700,
+        "h": 596,
+        "x0": 8,
+        "y0": 8,
+        "bw": 684,
+        "bh": 580,
+        "lum": 135.5
+      },
+      {
+        "src": "./items/screens/026.png",
+        "kind": "screen",
+        "w": 1124,
+        "h": 1015,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1124,
+        "bh": 1015,
+        "lum": 133.0
+      },
+      {
+        "src": "./items/screens/027.png",
+        "kind": "screen",
+        "w": 1133,
+        "h": 981,
+        "x0": 8,
+        "y0": 0,
+        "bw": 1117,
+        "bh": 973,
+        "lum": 116.0
+      },
+      {
+        "src": "./items/screens/028.png",
+        "kind": "screen",
+        "w": 817,
+        "h": 882,
+        "x0": 8,
+        "y0": 0,
+        "bw": 801,
+        "bh": 874,
+        "lum": 123.1
+      },
+      {
+        "src": "./items/screens/029.png",
+        "kind": "screen",
+        "w": 562,
+        "h": 474,
+        "x0": 0,
+        "y0": 8,
+        "bw": 562,
+        "bh": 466,
+        "lum": 54.2
+      },
+      {
+        "src": "./items/screens/030.png",
+        "kind": "screen",
+        "w": 532,
+        "h": 492,
+        "x0": 8,
+        "y0": 8,
+        "bw": 516,
+        "bh": 484,
+        "lum": 40.4
+      },
+      {
+        "src": "./items/screens/031.png",
+        "kind": "screen",
+        "w": 1209,
+        "h": 972,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1209,
+        "bh": 972,
+        "lum": 107.7
+      },
+      {
+        "src": "./items/screens/032.png",
+        "kind": "screen",
+        "w": 1181,
+        "h": 983,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1181,
+        "bh": 983,
+        "lum": 110.0
+      },
+      {
+        "src": "./items/screens/033.png",
+        "kind": "screen",
+        "w": 1008,
+        "h": 767,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1008,
+        "bh": 767,
+        "lum": 122.8
+      },
+      {
+        "src": "./items/screens/034.png",
+        "kind": "screen",
+        "w": 1066,
+        "h": 778,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1066,
+        "bh": 778,
+        "lum": 127.5
+      },
+      {
+        "src": "./items/screens/035.png",
+        "kind": "screen",
+        "w": 922,
+        "h": 719,
+        "x0": 8,
+        "y0": 8,
+        "bw": 906,
+        "bh": 703,
+        "lum": 83.2
+      },
+      {
+        "src": "./items/screens/036.png",
+        "kind": "screen",
+        "w": 1165,
+        "h": 708,
+        "x0": 8,
+        "y0": 8,
+        "bw": 1149,
+        "bh": 692,
+        "lum": 87.3
+      },
+      {
+        "src": "./items/screens/037.png",
+        "kind": "screen",
+        "w": 1128,
+        "h": 600,
+        "x0": 8,
+        "y0": 8,
+        "bw": 1112,
+        "bh": 584,
+        "lum": 67.0
+      },
+      {
+        "src": "./items/screens/038.png",
+        "kind": "screen",
+        "w": 1293,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1285,
+        "bh": 1080,
+        "lum": 46.6
+      },
+      {
+        "src": "./items/screens/039.png",
+        "kind": "screen",
+        "w": 895,
+        "h": 884,
+        "x0": 8,
+        "y0": 8,
+        "bw": 879,
+        "bh": 876,
+        "lum": 36.2
+      },
+      {
+        "src": "./items/screens/040.png",
+        "kind": "screen",
+        "w": 867,
+        "h": 1440,
+        "x0": 8,
+        "y0": 0,
+        "bw": 851,
+        "bh": 1440,
+        "lum": 131.9
+      },
+      {
+        "src": "./items/screens/041.png",
+        "kind": "screen",
+        "w": 675,
+        "h": 606,
+        "x0": 8,
+        "y0": 8,
+        "bw": 659,
+        "bh": 590,
+        "lum": 91.2
+      },
+      {
+        "src": "./items/screens/042.png",
+        "kind": "screen",
+        "w": 1438,
+        "h": 667,
+        "x0": 0,
+        "y0": 8,
+        "bw": 1438,
+        "bh": 659,
+        "lum": 98.2
+      },
+      {
+        "src": "./items/screens/043.png",
+        "kind": "screen",
+        "w": 701,
+        "h": 1202,
+        "x0": 8,
+        "y0": 8,
+        "bw": 685,
+        "bh": 1186,
+        "lum": 100.6
+      },
+      {
+        "src": "./items/screens/044.png",
+        "kind": "screen",
+        "w": 1312,
+        "h": 889,
+        "x0": 0,
+        "y0": 8,
+        "bw": 1304,
+        "bh": 873,
+        "lum": 74.7
+      },
+      {
+        "src": "./items/screens/045.png",
+        "kind": "screen",
+        "w": 732,
+        "h": 406,
+        "x0": 6,
+        "y0": 6,
+        "bw": 720,
+        "bh": 395,
+        "lum": 22.8
+      },
+      {
+        "src": "./items/screens/046.png",
+        "kind": "screen",
+        "w": 1080,
+        "h": 797,
+        "x0": 0,
+        "y0": 8,
+        "bw": 1080,
+        "bh": 787,
+        "lum": 73.8
+      }
+    ],
+    "roadTextures": [
+      {
+        "src": "./items/refs/马路纹理/01.webp",
+        "kind": "asphalt",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.289
+      },
+      {
+        "src": "./items/refs/马路纹理/02.webp",
+        "kind": "asphalt_lanes",
+        "w": 640,
+        "h": 1242,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1155,
+        "lum": 0.271
+      },
+      {
+        "src": "./items/refs/马路纹理/03.webp",
+        "kind": "asphalt_puddle",
+        "w": 640,
+        "h": 835,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 777,
+        "lum": 0.371
+      },
+      {
+        "src": "./items/refs/马路纹理/05.webp",
+        "kind": "asphalt_cracks",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 239,
+        "bw": 640,
+        "bh": 554,
+        "lum": 0.63
+      },
+      {
+        "src": "./items/refs/马路纹理/06.webp",
+        "kind": "asphalt_lanes",
+        "w": 640,
+        "h": 1242,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1155,
+        "lum": 0.271
+      },
+      {
+        "src": "./items/refs/马路纹理/07.webp",
+        "kind": "asphalt",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.289
+      },
+      {
+        "src": "./items/refs/马路纹理/08.webp",
+        "kind": "asphalt_puddle",
+        "w": 640,
+        "h": 835,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 777,
+        "lum": 0.371
+      },
+      {
+        "src": "./items/refs/马路纹理/09.webp",
+        "kind": "asphalt_multilane",
+        "w": 640,
+        "h": 640,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 461,
+        "lum": 0.314
+      },
+      {
+        "src": "./items/refs/马路纹理/10.webp",
+        "kind": "asphalt_raw",
+        "w": 640,
+        "h": 1136,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1045,
+        "lum": 0.315
+      },
+      {
+        "src": "./items/refs/马路/01.png",
+        "kind": "road_crosswalk",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 375,
+        "bw": 640,
+        "bh": 427,
+        "lum": 0.563
+      },
+      {
+        "src": "./items/refs/马路/02.png",
+        "kind": "cobblestone",
+        "w": 640,
+        "h": 1138,
+        "x0": 0,
+        "y0": 0,
+        "bw": 550,
+        "bh": 967,
+        "lum": 0.58
+      },
+      {
+        "src": "./items/streets/001.png",
+        "kind": "zebra_photo",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 1066,
+        "bw": 1080,
+        "bh": 374,
+        "lum": 0.491
+      },
+      {
+        "src": "./items/refs/建筑纹理/08.webp",
+        "kind": "stone_pave",
+        "w": 640,
+        "h": 360,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 338,
+        "lum": 0.427
+      },
+      {
+        "src": "./items/refs/建筑纹理/09.webp",
+        "kind": "sandstone_pave",
+        "w": 512,
+        "h": 512,
+        "x0": 0,
+        "y0": 0,
+        "bw": 512,
+        "bh": 481,
+        "lum": 0.428
+      },
+      {
+        "src": "./items/refs/建筑纹理/10.webp",
+        "kind": "moss_cobble",
+        "w": 640,
+        "h": 360,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 360,
+        "lum": 0.528
+      }
+    ],
+    "concreteTextures": [
+      {
+        "src": "./items/refs/水泥纹理/01.png",
+        "kind": "concrete",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 17,
+        "bw": 640,
+        "bh": 785,
+        "lum": 0.437
+      },
+      {
+        "src": "./items/refs/水泥纹理/02.webp",
+        "kind": "concrete",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 793,
+        "lum": 0.596
+      },
+      {
+        "src": "./items/refs/水泥纹理/03.webp",
+        "kind": "concrete",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.616
+      },
+      {
+        "src": "./items/refs/水泥纹理/04.png",
+        "kind": "concrete",
+        "w": 640,
+        "h": 826,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 727,
+        "lum": 0.634
+      },
+      {
+        "src": "./items/refs/水泥纹理/06.webp",
+        "kind": "concrete",
+        "w": 640,
+        "h": 854,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 803,
+        "lum": 0.544
+      },
+      {
+        "src": "./items/refs/水泥纹理/07.png",
+        "kind": "concrete",
+        "w": 640,
+        "h": 427,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 427,
+        "lum": 0.752
+      },
+      {
+        "src": "./items/refs/水泥纹理/08.webp",
+        "kind": "concrete",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.616
+      },
+      {
+        "src": "./items/refs/水泥纹理/09.webp",
+        "kind": "concrete",
+        "w": 640,
+        "h": 640,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 602,
+        "lum": 0.468
+      }
+    ],
+    "brickTextures": [
+      {
+        "src": "./items/refs/红砖纹理/01.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 912,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 857,
+        "lum": 0.508
+      },
+      {
+        "src": "./items/refs/红砖纹理/03.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 935,
+        "x0": 0,
+        "y0": 234,
+        "bw": 640,
+        "bh": 701,
+        "lum": 0.408
+      },
+      {
+        "src": "./items/refs/红砖纹理/04.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 359,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 233,
+        "lum": 0.345
+      },
+      {
+        "src": "./items/refs/红砖纹理/05.png",
+        "kind": "brick",
+        "w": 640,
+        "h": 799,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 799,
+        "lum": 0.586
+      },
+      {
+        "src": "./items/refs/红砖纹理/06.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 640,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 602,
+        "lum": 0.381
+      },
+      {
+        "src": "./items/refs/红砖纹理/07.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.403
+      },
+      {
+        "src": "./items/refs/红砖纹理/08.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.468
+      },
+      {
+        "src": "./items/refs/红砖纹理/09.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 640,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 602,
+        "lum": 0.381
+      },
+      {
+        "src": "./items/refs/红砖纹理/10.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 960,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 902,
+        "lum": 0.417
+      }
+    ],
+    "archTextures": [
+      {
+        "src": "./items/refs/建筑纹理/01.webp",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 793,
+        "lum": 0.51
+      },
+      {
+        "src": "./items/refs/建筑纹理/02.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.411
+      },
+      {
+        "src": "./items/refs/建筑纹理/03.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.487
+      },
+      {
+        "src": "./items/refs/建筑纹理/04.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.627
+      },
+      {
+        "src": "./items/refs/建筑纹理/05.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.549
+      },
+      {
+        "src": "./items/refs/建筑纹理/06.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 800,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 800,
+        "lum": 0.393
+      },
+      {
+        "src": "./items/refs/建筑纹理/07.webp",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.595
+      },
+      {
+        "src": "./items/refs/建筑纹理/08.webp",
+        "kind": "arch",
+        "w": 640,
+        "h": 360,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 338,
+        "lum": 0.427
+      },
+      {
+        "src": "./items/refs/建筑纹理/09.webp",
+        "kind": "arch",
+        "w": 512,
+        "h": 512,
+        "x0": 0,
+        "y0": 0,
+        "bw": 512,
+        "bh": 481,
+        "lum": 0.428
+      },
+      {
+        "src": "./items/refs/建筑纹理/10.webp",
+        "kind": "arch",
+        "w": 640,
+        "h": 360,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 360,
+        "lum": 0.528
+      }
+    ],
+    "euroFacades": [
+      {
+        "src": "./items/refs/街景/01.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.474
+      },
+      {
+        "src": "./items/refs/街景/02.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.689
+      },
+      {
+        "src": "./items/refs/街景/04.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 1068,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1068,
+        "lum": 0.308
+      },
+      {
+        "src": "./items/refs/街景/06.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.378
+      },
+      {
+        "src": "./items/refs/街景/07.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.44
+      },
+      {
+        "src": "./items/refs/街景/08.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 960,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 960,
+        "lum": 0.341
+      },
+      {
+        "src": "./items/refs/街景/09.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.481
+      },
+      {
+        "src": "./items/refs/街景/10.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 849,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 849,
+        "lum": 0.392
+      },
+      {
+        "src": "./items/refs/房子/02.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 625,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 500,
+        "lum": 0.575
+      },
+      {
+        "src": "./items/refs/房子/03.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.431
+      },
+      {
+        "src": "./items/refs/房子/05.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 427,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 427,
+        "lum": 0.516
+      },
+      {
+        "src": "./items/refs/房子/06.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.474
+      },
+      {
+        "src": "./items/refs/房子/08.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.451
+      },
+      {
+        "src": "./items/refs/房子/09.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 793,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 793,
+        "lum": 0.392
+      },
+      {
+        "src": "./items/refs/房子/10.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.407
+      },
+      {
+        "src": "./items/refs/马路/03.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.358
+      },
+      {
+        "src": "./items/refs/马路/07.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.506
+      }
+    ],
+    "constructivist": [
+      {
+        "src": "./items/refs/苏联美学设计/01.webp",
+        "kind": "poster",
+        "w": 640,
+        "h": 1391,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1308,
+        "lum": 0.284
+      },
+      {
+        "src": "./items/refs/苏联美学设计/02.webp",
+        "kind": "poster",
+        "w": 640,
+        "h": 1174,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1104,
+        "lum": 0.512
+      },
+      {
+        "src": "./items/refs/苏联美学设计/03.webp",
+        "kind": "poster",
+        "w": 640,
+        "h": 977,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 918,
+        "lum": 0.527
+      },
+      {
+        "src": "./items/refs/郊眠寺/01.webp",
+        "kind": "poster",
+        "w": 1440,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1440,
+        "bh": 1015,
+        "lum": 0.143
+      },
+      {
+        "src": "./items/refs/郊眠寺/02.webp",
+        "kind": "poster",
+        "w": 1080,
+        "h": 1443,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1356,
+        "lum": 0.045
+      },
+      {
+        "src": "./items/refs/郊眠寺/03.webp",
+        "kind": "poster",
+        "w": 640,
+        "h": 1388,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1305,
+        "lum": 0.181
+      }
+    ],
+    "surrealRefs": [
+      {
+        "src": "./items/refs/火烈鸟/01.webp",
+        "kind": "flamingo",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.505
+      },
+      {
+        "src": "./items/refs/火烈鸟/02.webp",
+        "kind": "flamingo",
+        "w": 640,
+        "h": 1138,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1070,
+        "lum": 0.354
+      },
+      {
+        "src": "./items/refs/火烈鸟/03.webp",
+        "kind": "flamingo",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.321
+      },
+      {
+        "src": "./items/refs/鲸鱼/01.webp",
+        "kind": "whale",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.589
+      },
+      {
+        "src": "./items/refs/鲸鱼/02.webp",
+        "kind": "whale",
+        "w": 640,
+        "h": 480,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 451,
+        "lum": 0.509
+      },
+      {
+        "src": "./items/refs/鲨鱼/01.webp",
+        "kind": "shark",
+        "w": 640,
+        "h": 1138,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1070,
+        "lum": 0.264
+      },
+      {
+        "src": "./items/refs/鲨鱼/02.webp",
+        "kind": "shark",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.483
+      },
+      {
+        "src": "./items/refs/鲨鱼/03.webp",
+        "kind": "shark",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.422
+      },
+      {
+        "src": "./items/refs/猫/01.webp",
+        "kind": "cat",
+        "w": 640,
+        "h": 863,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 811,
+        "lum": 0.577
+      },
+      {
+        "src": "./items/refs/猫/02.webp",
+        "kind": "cat",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.59
+      },
+      {
+        "src": "./items/refs/猫/03.webp",
+        "kind": "cat",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.57
+      },
+      {
+        "src": "./items/refs/啤酒/01.webp",
+        "kind": "beer",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1354,
+        "lum": 0.506
+      },
+      {
+        "src": "./items/refs/啤酒/02.webp",
+        "kind": "beer",
+        "w": 1080,
+        "h": 2097,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1971,
+        "lum": 0.588
+      },
+      {
+        "src": "./items/refs/啤酒/03.webp",
+        "kind": "beer",
+        "w": 640,
+        "h": 480,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 451,
+        "lum": 0.636
+      },
+      {
+        "src": "./items/refs/夜来香/01.webp",
+        "kind": "botanical",
+        "w": 750,
+        "h": 1000,
+        "x0": 0,
+        "y0": 0,
+        "bw": 750,
+        "bh": 940,
+        "lum": 0.105
+      },
+      {
+        "src": "./items/refs/夜来香/03.webp",
+        "kind": "botanical",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.19
+      },
+      {
+        "src": "./items/refs/羽毛球/01.webp",
+        "kind": "badminton",
+        "w": 640,
+        "h": 1138,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1070,
+        "lum": 0.356
+      },
+      {
+        "src": "./items/refs/羽毛球/02.webp",
+        "kind": "badminton",
+        "w": 640,
+        "h": 854,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 803,
+        "lum": 0.38
+      },
+      {
+        "src": "./items/refs/金属锁链/01.webp",
+        "kind": "chain",
+        "w": 1080,
+        "h": 6096,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 5730,
+        "lum": 0.816
+      },
+      {
+        "src": "./items/refs/金属锁链/02.webp",
+        "kind": "chain",
+        "w": 750,
+        "h": 1000,
+        "x0": 0,
+        "y0": 0,
+        "bw": 750,
+        "bh": 940,
+        "lum": 0.757
+      },
+      {
+        "src": "./items/refs/我的世界/03.webp",
+        "kind": "pixelworld",
+        "w": 1080,
+        "h": 2020,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1899,
+        "lum": 0.427
+      },
+      {
+        "src": "./items/refs/洋葱/03.webp",
+        "kind": "onion",
+        "w": 640,
+        "h": 1067,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 1003,
+        "lum": 0.721
+      },
+      {
+        "src": "./items/refs/安徽板面/02.webp",
+        "kind": "food",
+        "w": 1440,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1440,
+        "bh": 1015,
+        "lum": 0.365
+      },
+      {
+        "src": "./items/refs/安徽板面/03.webp",
+        "kind": "food",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1354,
+        "lum": 0.52
+      }
+    ],
+    "buildingsCool": [
+      {
+        "src": "./items/buildings/003.png",
+        "kind": "building",
+        "w": 1024,
+        "h": 1146,
+        "x0": 12,
+        "y0": 12,
+        "bw": 1012,
+        "bh": 1134,
+        "lum": 29.2
+      },
+      {
+        "src": "./items/buildings/005.png",
+        "kind": "building",
+        "w": 645,
+        "h": 1307,
+        "x0": 12,
+        "y0": 12,
+        "bw": 621,
+        "bh": 1295,
+        "lum": 66.9
+      },
+      {
+        "src": "./items/buildings/007.png",
+        "kind": "building",
+        "w": 1329,
+        "h": 1078,
+        "x0": 12,
+        "y0": 12,
+        "bw": 1305,
+        "bh": 1066,
+        "lum": 59.4
+      },
+      {
+        "src": "./items/buildings/008.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1440,
+        "lum": 34.8
+      },
+      {
+        "src": "./items/buildings/010.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1371,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1080,
+        "bh": 1359,
+        "lum": 52.2
+      },
+      {
+        "src": "./items/buildings/011.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1373,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1080,
+        "bh": 1361,
+        "lum": 67.7
+      },
+      {
+        "src": "./items/buildings/013.png",
+        "kind": "building",
+        "w": 903,
+        "h": 870,
+        "x0": 12,
+        "y0": 12,
+        "bw": 879,
+        "bh": 846,
+        "lum": 72.3
+      },
+      {
+        "src": "./items/buildings/018.png",
+        "kind": "building",
+        "w": 390,
+        "h": 779,
+        "x0": 12,
+        "y0": 12,
+        "bw": 366,
+        "bh": 767,
+        "lum": 63.2
+      },
+      {
+        "src": "./items/buildings/021.png",
+        "kind": "building",
+        "w": 517,
+        "h": 472,
+        "x0": 12,
+        "y0": 12,
+        "bw": 493,
+        "bh": 448,
+        "lum": 71.8
+      },
+      {
+        "src": "./items/buildings/022.png",
+        "kind": "building",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 3,
+        "bw": 640,
+        "bh": 850,
+        "lum": 139.3
+      },
+      {
+        "src": "./items/buildings/023.png",
+        "kind": "building",
+        "w": 465,
+        "h": 853,
+        "x0": 0,
+        "y0": 9,
+        "bw": 453,
+        "bh": 844,
+        "lum": 35.2
+      },
+      {
+        "src": "./items/buildings/025.png",
+        "kind": "building",
+        "w": 480,
+        "h": 761,
+        "x0": 12,
+        "y0": 12,
+        "bw": 468,
+        "bh": 737,
+        "lum": 82.2
+      },
+      {
+        "src": "./items/buildings/026.png",
+        "kind": "building",
+        "w": 640,
+        "h": 480,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 480,
+        "lum": 72.7
+      },
+      {
+        "src": "./items/buildings/028.png",
+        "kind": "building",
+        "w": 274,
+        "h": 490,
+        "x0": 12,
+        "y0": 12,
+        "bw": 250,
+        "bh": 466,
+        "lum": 151.3
+      },
+      {
+        "src": "./items/buildings/029.png",
+        "kind": "building",
+        "w": 544,
+        "h": 761,
+        "x0": 12,
+        "y0": 12,
+        "bw": 520,
+        "bh": 737,
+        "lum": 68.5
+      },
+      {
+        "src": "./items/buildings/033.png",
+        "kind": "building",
+        "w": 787,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 787,
+        "bh": 1400,
+        "lum": 84.1
+      },
+      {
+        "src": "./items/buildings/034.png",
+        "kind": "building",
+        "w": 1400,
+        "h": 788,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 788,
+        "lum": 86.8
+      },
+      {
+        "src": "./items/buildings/035.png",
+        "kind": "building",
+        "w": 1400,
+        "h": 788,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 788,
+        "lum": 134.7
+      },
+      {
+        "src": "./items/buildings/036.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 110.2
+      },
+      {
+        "src": "./items/buildings/037.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 91.4
+      },
+      {
+        "src": "./items/buildings/038.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 92.6
+      },
+      {
+        "src": "./items/buildings/040.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 101.0
+      }
+    ],
+    "buildingsWarm": [
+      {
+        "src": "./items/buildings/039.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 123.9
+      },
+      {
+        "src": "./items/buildings/041.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 86.5
+      },
+      {
+        "src": "./items/buildings/042.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 107.1
+      },
+      {
+        "src": "./items/buildings/043.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 112.5
+      },
+      {
+        "src": "./items/buildings/044.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 129.8
+      },
+      {
+        "src": "./items/buildings/045.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 143.5
+      },
+      {
+        "src": "./items/buildings/046.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 155.6
+      },
+      {
+        "src": "./items/buildings/047.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 126.4
+      },
+      {
+        "src": "./items/buildings/048.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 134.1
+      },
+      {
+        "src": "./items/buildings/049.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 137.7
+      },
+      {
+        "src": "./items/buildings/050.png",
+        "kind": "building",
+        "w": 1259,
+        "h": 839,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1259,
+        "bh": 839,
+        "lum": 126.2
+      },
+      {
+        "src": "./items/buildings/051.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1111,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1111,
+        "lum": 90.2
+      },
+      {
+        "src": "./items/buildings/052.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1043,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1043,
+        "lum": 105.3
+      }
+    ],
+    "signalsClean": [
+      {
+        "src": "./items/signals/001.png",
+        "kind": "signal",
+        "w": 357,
+        "h": 683,
+        "x0": 0,
+        "y0": 5,
+        "bw": 352,
+        "bh": 678,
+        "lum": 91.0
+      },
+      {
+        "src": "./items/signals/002.png",
+        "kind": "signal",
+        "w": 278,
+        "h": 682,
+        "x0": 5,
+        "y0": 5,
+        "bw": 268,
+        "bh": 672,
+        "lum": 79.6
+      },
+      {
+        "src": "./items/signals/003.png",
+        "kind": "signal",
+        "w": 360,
+        "h": 504,
+        "x0": 5,
+        "y0": 5,
+        "bw": 350,
+        "bh": 494,
+        "lum": 92.5
+      },
+      {
+        "src": "./items/signals/004.png",
+        "kind": "signal",
+        "w": 237,
+        "h": 686,
+        "x0": 5,
+        "y0": 5,
+        "bw": 227,
+        "bh": 681,
+        "lum": 66.1
+      },
+      {
+        "src": "./items/signals/005.png",
+        "kind": "signal",
+        "w": 295,
+        "h": 448,
+        "x0": 5,
+        "y0": 5,
+        "bw": 285,
+        "bh": 443,
+        "lum": 151.3
+      },
+      {
+        "src": "./items/signals/006.png",
+        "kind": "signal",
+        "w": 230,
+        "h": 468,
+        "x0": 5,
+        "y0": 5,
+        "bw": 220,
+        "bh": 458,
+        "lum": 114.2
+      },
+      {
+        "src": "./items/signals/007.png",
+        "kind": "signal",
+        "w": 196,
+        "h": 471,
+        "x0": 5,
+        "y0": 3,
+        "bw": 186,
+        "bh": 463,
+        "lum": 99.7
+      },
+      {
+        "src": "./items/signals/008.png",
+        "kind": "signal",
+        "w": 592,
+        "h": 1051,
+        "x0": 5,
+        "y0": 5,
+        "bw": 587,
+        "bh": 1041,
+        "lum": 142.9
+      },
+      {
+        "src": "./items/signals/009.png",
+        "kind": "signal",
+        "w": 446,
+        "h": 1398,
+        "x0": 6,
+        "y0": 3,
+        "bw": 434,
+        "bh": 1389,
+        "lum": 81.8
+      },
+      {
+        "src": "./items/signals/010.png",
+        "kind": "signal",
+        "w": 199,
+        "h": 500,
+        "x0": 0,
+        "y0": 0,
+        "bw": 199,
+        "bh": 500,
+        "lum": 71.4
+      },
+      {
+        "src": "./items/signals/011.png",
+        "kind": "signal",
+        "w": 496,
+        "h": 1329,
+        "x0": 6,
+        "y0": 0,
+        "bw": 490,
+        "bh": 1323,
+        "lum": 127.7
+      },
+      {
+        "src": "./items/signals/012.png",
+        "kind": "signal",
+        "w": 406,
+        "h": 1183,
+        "x0": 5,
+        "y0": 5,
+        "bw": 396,
+        "bh": 1178,
+        "lum": 61.9
+      },
+      {
+        "src": "./items/signals/015.png",
+        "kind": "signal",
+        "w": 527,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 527,
+        "bh": 1400,
+        "lum": 104.6
+      },
+      {
+        "src": "./items/signals/016.png",
+        "kind": "signal",
+        "w": 975,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 975,
+        "bh": 1400,
+        "lum": 90.6
+      },
+      {
+        "src": "./items/signals/017.png",
+        "kind": "signal",
+        "w": 485,
+        "h": 1332,
+        "x0": 5,
+        "y0": 5,
+        "bw": 475,
+        "bh": 1327,
+        "lum": 103.1
+      },
+      {
+        "src": "./items/signals/018.png",
+        "kind": "signal",
+        "w": 480,
+        "h": 796,
+        "x0": 6,
+        "y0": 6,
+        "bw": 468,
+        "bh": 790,
+        "lum": 74.7
+      },
+      {
+        "src": "./items/signals/020.png",
+        "kind": "signal",
+        "w": 287,
+        "h": 790,
+        "x0": 6,
+        "y0": 6,
+        "bw": 275,
+        "bh": 778,
+        "lum": 143.8
+      }
+    ],
+    "signsClean": [
+      {
+        "src": "./items/signs/001.png",
+        "kind": "sign",
+        "w": 426,
+        "h": 1249,
+        "x0": 12,
+        "y0": 12,
+        "bw": 402,
+        "bh": 1225,
+        "lum": 76.9
+      },
+      {
+        "src": "./items/signs/002.png",
+        "kind": "sign",
+        "w": 1358,
+        "h": 220,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1346,
+        "bh": 196,
+        "lum": 171.6
+      },
+      {
+        "src": "./items/signs/003.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1406,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1394,
+        "lum": 40.1
+      },
+      {
+        "src": "./items/signs/004.png",
+        "kind": "sign",
+        "w": 1440,
+        "h": 549,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1440,
+        "bh": 525,
+        "lum": 154.1
+      },
+      {
+        "src": "./items/signs/005.png",
+        "kind": "sign",
+        "w": 359,
+        "h": 356,
+        "x0": 12,
+        "y0": 12,
+        "bw": 335,
+        "bh": 332,
+        "lum": 113.4
+      },
+      {
+        "src": "./items/signs/006.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1069,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1057,
+        "lum": 108.5
+      },
+      {
+        "src": "./items/signs/007.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1440,
+        "lum": 68.4
+      },
+      {
+        "src": "./items/signs/008.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1436,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1080,
+        "bh": 1424,
+        "lum": 75.9
+      },
+      {
+        "src": "./items/signs/009.png",
+        "kind": "sign",
+        "w": 941,
+        "h": 1185,
+        "x0": 0,
+        "y0": 12,
+        "bw": 929,
+        "bh": 1161,
+        "lum": 85.8
+      },
+      {
+        "src": "./items/signs/010.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1440,
+        "lum": 51.0
+      },
+      {
+        "src": "./items/signs/011.png",
+        "kind": "sign",
+        "w": 510,
+        "h": 487,
+        "x0": 12,
+        "y0": 12,
+        "bw": 486,
+        "bh": 463,
+        "lum": 105.5
+      },
+      {
+        "src": "./items/signs/012.png",
+        "kind": "sign",
+        "w": 923,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 911,
+        "bh": 1440,
+        "lum": 75.1
+      },
+      {
+        "src": "./items/signs/014.png",
+        "kind": "sign",
+        "w": 458,
+        "h": 783,
+        "x0": 12,
+        "y0": 12,
+        "bw": 434,
+        "bh": 759,
+        "lum": 128.4
+      },
+      {
+        "src": "./items/signs/015.png",
+        "kind": "sign",
+        "w": 553,
+        "h": 633,
+        "x0": 12,
+        "y0": 12,
+        "bw": 529,
+        "bh": 609,
+        "lum": 140.0
+      },
+      {
+        "src": "./items/signs/016.png",
+        "kind": "sign",
+        "w": 766,
+        "h": 1348,
+        "x0": 12,
+        "y0": 0,
+        "bw": 742,
+        "bh": 1336,
+        "lum": 162.4
+      },
+      {
+        "src": "./items/signs/017.png",
+        "kind": "sign",
+        "w": 1038,
+        "h": 530,
+        "x0": 12,
+        "y0": 12,
+        "bw": 1020,
+        "bh": 506,
+        "lum": 100.3
+      },
+      {
+        "src": "./items/signs/018.png",
+        "kind": "sign",
+        "w": 999,
+        "h": 1349,
+        "x0": 12,
+        "y0": 0,
+        "bw": 975,
+        "bh": 1337,
+        "lum": 104.2
+      },
+      {
+        "src": "./items/signs/019.png",
+        "kind": "sign",
+        "w": 1055,
+        "h": 1440,
+        "x0": 12,
+        "y0": 0,
+        "bw": 1043,
+        "bh": 1440,
+        "lum": 108.1
+      },
+      {
+        "src": "./items/signs/020.png",
+        "kind": "sign",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1440,
+        "lum": 86.6
+      },
+      {
+        "src": "./items/signs/021.png",
+        "kind": "sign",
+        "w": 1006,
+        "h": 922,
+        "x0": 12,
+        "y0": 12,
+        "bw": 982,
+        "bh": 898,
+        "lum": 64.2
+      },
+      {
+        "src": "./items/signs/022.png",
+        "kind": "sign",
+        "w": 838,
+        "h": 1336,
+        "x0": 12,
+        "y0": 0,
+        "bw": 814,
+        "bh": 1324,
+        "lum": 106.3
+      },
+      {
+        "src": "./items/signs/023.png",
+        "kind": "sign",
+        "w": 263,
+        "h": 748,
+        "x0": 12,
+        "y0": 12,
+        "bw": 239,
+        "bh": 724,
+        "lum": 78.6
+      },
+      {
+        "src": "./items/signs/024.png",
+        "kind": "sign",
+        "w": 618,
+        "h": 551,
+        "x0": 12,
+        "y0": 12,
+        "bw": 594,
+        "bh": 527,
+        "lum": 210.6
+      },
+      {
+        "src": "./items/signs/025.png",
+        "kind": "sign",
+        "w": 563,
+        "h": 709,
+        "x0": 0,
+        "y0": 12,
+        "bw": 551,
+        "bh": 685,
+        "lum": 84.4
+      },
+      {
+        "src": "./items/signs/027.png",
+        "kind": "sign",
+        "w": 381,
+        "h": 630,
+        "x0": 12,
+        "y0": 12,
+        "bw": 357,
+        "bh": 606,
+        "lum": 149.3
+      },
+      {
+        "src": "./items/signs/028.png",
+        "kind": "sign",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 65.1
+      },
+      {
+        "src": "./items/signs/029.png",
+        "kind": "sign",
+        "w": 637,
+        "h": 209,
+        "x0": 12,
+        "y0": 12,
+        "bw": 620,
+        "bh": 185,
+        "lum": 66.8
+      },
+      {
+        "src": "./items/signs/030.png",
+        "kind": "sign",
+        "w": 464,
+        "h": 804,
+        "x0": 12,
+        "y0": 0,
+        "bw": 440,
+        "bh": 792,
+        "lum": 161.9
+      }
+    ],
+    "buildingsClean": [
+      {
+        "src": "./items/buildings/003.png",
+        "kind": "building",
+        "w": 1024,
+        "h": 1146,
+        "x0": 12,
+        "y0": 12,
+        "bw": 1012,
+        "bh": 1134,
+        "lum": 29.2
+      },
+      {
+        "src": "./items/buildings/004.png",
+        "kind": "building",
+        "w": 897,
+        "h": 1181,
+        "x0": 0,
+        "y0": 12,
+        "bw": 885,
+        "bh": 1157,
+        "lum": 50.8
+      },
+      {
+        "src": "./items/buildings/005.png",
+        "kind": "building",
+        "w": 645,
+        "h": 1307,
+        "x0": 12,
+        "y0": 12,
+        "bw": 621,
+        "bh": 1295,
+        "lum": 66.9
+      },
+      {
+        "src": "./items/buildings/007.png",
+        "kind": "building",
+        "w": 1329,
+        "h": 1078,
+        "x0": 12,
+        "y0": 12,
+        "bw": 1305,
+        "bh": 1066,
+        "lum": 59.4
+      },
+      {
+        "src": "./items/buildings/008.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1440,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1440,
+        "lum": 34.8
+      },
+      {
+        "src": "./items/buildings/010.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1371,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1080,
+        "bh": 1359,
+        "lum": 52.2
+      },
+      {
+        "src": "./items/buildings/011.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1373,
+        "x0": 0,
+        "y0": 12,
+        "bw": 1080,
+        "bh": 1361,
+        "lum": 67.7
+      },
+      {
+        "src": "./items/buildings/013.png",
+        "kind": "building",
+        "w": 903,
+        "h": 870,
+        "x0": 12,
+        "y0": 12,
+        "bw": 879,
+        "bh": 846,
+        "lum": 72.3
+      },
+      {
+        "src": "./items/buildings/014.png",
+        "kind": "building",
+        "w": 952,
+        "h": 1108,
+        "x0": 12,
+        "y0": 12,
+        "bw": 940,
+        "bh": 1084,
+        "lum": 41.0
+      },
+      {
+        "src": "./items/buildings/018.png",
+        "kind": "building",
+        "w": 390,
+        "h": 779,
+        "x0": 12,
+        "y0": 12,
+        "bw": 366,
+        "bh": 767,
+        "lum": 63.2
+      },
+      {
+        "src": "./items/buildings/021.png",
+        "kind": "building",
+        "w": 517,
+        "h": 472,
+        "x0": 12,
+        "y0": 12,
+        "bw": 493,
+        "bh": 448,
+        "lum": 71.8
+      },
+      {
+        "src": "./items/buildings/022.png",
+        "kind": "building",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 3,
+        "bw": 640,
+        "bh": 850,
+        "lum": 139.3
+      },
+      {
+        "src": "./items/buildings/023.png",
+        "kind": "building",
+        "w": 465,
+        "h": 853,
+        "x0": 0,
+        "y0": 9,
+        "bw": 453,
+        "bh": 844,
+        "lum": 35.2
+      },
+      {
+        "src": "./items/buildings/025.png",
+        "kind": "building",
+        "w": 480,
+        "h": 761,
+        "x0": 12,
+        "y0": 12,
+        "bw": 468,
+        "bh": 737,
+        "lum": 82.2
+      },
+      {
+        "src": "./items/buildings/026.png",
+        "kind": "building",
+        "w": 640,
+        "h": 480,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 480,
+        "lum": 72.7
+      },
+      {
+        "src": "./items/buildings/028.png",
+        "kind": "building",
+        "w": 274,
+        "h": 490,
+        "x0": 12,
+        "y0": 12,
+        "bw": 250,
+        "bh": 466,
+        "lum": 151.3
+      },
+      {
+        "src": "./items/buildings/029.png",
+        "kind": "building",
+        "w": 544,
+        "h": 761,
+        "x0": 12,
+        "y0": 12,
+        "bw": 520,
+        "bh": 737,
+        "lum": 68.5
+      },
+      {
+        "src": "./items/buildings/030.png",
+        "kind": "building",
+        "w": 629,
+        "h": 527,
+        "x0": 1,
+        "y0": 12,
+        "bw": 616,
+        "bh": 503,
+        "lum": 49.7
+      },
+      {
+        "src": "./items/buildings/031.png",
+        "kind": "building",
+        "w": 527,
+        "h": 333,
+        "x0": 12,
+        "y0": 12,
+        "bw": 505,
+        "bh": 309,
+        "lum": 79.9
+      },
+      {
+        "src": "./items/buildings/033.png",
+        "kind": "building",
+        "w": 787,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 787,
+        "bh": 1400,
+        "lum": 84.1
+      },
+      {
+        "src": "./items/buildings/034.png",
+        "kind": "building",
+        "w": 1400,
+        "h": 788,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 788,
+        "lum": 86.8
+      },
+      {
+        "src": "./items/buildings/035.png",
+        "kind": "building",
+        "w": 1400,
+        "h": 788,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1400,
+        "bh": 788,
+        "lum": 134.7
+      },
+      {
+        "src": "./items/buildings/036.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 110.2
+      },
+      {
+        "src": "./items/buildings/037.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 91.4
+      },
+      {
+        "src": "./items/buildings/038.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 92.6
+      },
+      {
+        "src": "./items/buildings/039.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 123.9
+      },
+      {
+        "src": "./items/buildings/040.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 101.0
+      },
+      {
+        "src": "./items/buildings/041.png",
+        "kind": "building",
+        "w": 1050,
+        "h": 1400,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1050,
+        "bh": 1400,
+        "lum": 86.5
+      },
+      {
+        "src": "./items/buildings/042.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 107.1
+      },
+      {
+        "src": "./items/buildings/043.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 112.5
+      },
+      {
+        "src": "./items/buildings/044.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 129.8
+      },
+      {
+        "src": "./items/buildings/045.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 143.5
+      },
+      {
+        "src": "./items/buildings/046.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 155.6
+      },
+      {
+        "src": "./items/buildings/047.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 126.4
+      },
+      {
+        "src": "./items/buildings/048.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 134.1
+      },
+      {
+        "src": "./items/buildings/049.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 137.7
+      },
+      {
+        "src": "./items/buildings/050.png",
+        "kind": "building",
+        "w": 1259,
+        "h": 839,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1259,
+        "bh": 839,
+        "lum": 126.2
+      },
+      {
+        "src": "./items/buildings/051.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1111,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1111,
+        "lum": 90.2
+      },
+      {
+        "src": "./items/buildings/052.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1043,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1043,
+        "lum": 105.3
+      }
+    ],
+    "housesLow": [
+      {
+        "src": "./items/buildings/042.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 107.1
+      },
+      {
+        "src": "./items/buildings/043.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 112.5
+      },
+      {
+        "src": "./items/buildings/044.png",
+        "kind": "building",
+        "w": 960,
+        "h": 1280,
+        "x0": 0,
+        "y0": 0,
+        "bw": 960,
+        "bh": 1280,
+        "lum": 129.8
+      },
+      {
+        "src": "./items/buildings/045.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 143.5
+      },
+      {
+        "src": "./items/buildings/046.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 155.6
+      },
+      {
+        "src": "./items/buildings/047.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1080,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1080,
+        "lum": 126.4
+      },
+      {
+        "src": "./items/buildings/048.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 134.1
+      },
+      {
+        "src": "./items/buildings/049.png",
+        "kind": "building",
+        "w": 1080,
+        "h": 1350,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1080,
+        "bh": 1350,
+        "lum": 137.7
+      },
+      {
+        "src": "./items/buildings/050.png",
+        "kind": "building",
+        "w": 1259,
+        "h": 839,
+        "x0": 0,
+        "y0": 0,
+        "bw": 1259,
+        "bh": 839,
+        "lum": 126.2
+      },
+      {
+        "src": "./items/buildings/051.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1111,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1111,
+        "lum": 90.2
+      },
+      {
+        "src": "./items/buildings/052.png",
+        "kind": "building",
+        "w": 736,
+        "h": 1043,
+        "x0": 0,
+        "y0": 0,
+        "bw": 736,
+        "bh": 1043,
+        "lum": 105.3
+      },
+      {
+        "src": "./items/refs/建筑纹理/03.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.487
+      },
+      {
+        "src": "./items/refs/建筑纹理/04.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.627
+      },
+      {
+        "src": "./items/refs/建筑纹理/05.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.549
+      },
+      {
+        "src": "./items/refs/建筑纹理/06.png",
+        "kind": "arch",
+        "w": 640,
+        "h": 800,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 800,
+        "lum": 0.393
+      },
+      {
+        "src": "./items/refs/街景/01.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.474
+      },
+      {
+        "src": "./items/refs/街景/02.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.689
+      },
+      {
+        "src": "./items/refs/街景/06.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.378
+      },
+      {
+        "src": "./items/refs/街景/07.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.44
+      },
+      {
+        "src": "./items/refs/街景/09.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.481
+      },
+      {
+        "src": "./items/refs/房子/02.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 625,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 500,
+        "lum": 0.575
+      },
+      {
+        "src": "./items/refs/房子/03.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.431
+      },
+      {
+        "src": "./items/refs/房子/05.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 427,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 427,
+        "lum": 0.516
+      },
+      {
+        "src": "./items/refs/房子/06.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.474
+      },
+      {
+        "src": "./items/refs/房子/08.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.451
+      },
+      {
+        "src": "./items/refs/房子/09.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 793,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 793,
+        "lum": 0.392
+      },
+      {
+        "src": "./items/refs/房子/10.png",
+        "kind": "euro",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 0.407
+      },
+      {
+        "src": "./items/refs/红砖纹理/05.png",
+        "kind": "brick",
+        "w": 640,
+        "h": 799,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 799,
+        "lum": 0.586
+      },
+      {
+        "src": "./items/refs/红砖纹理/08.webp",
+        "kind": "brick",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 802,
+        "lum": 0.468
+      },
+      {
+        "src": "./items/streets/022.png",
+        "kind": "street",
+        "w": 640,
+        "h": 853,
+        "x0": 0,
+        "y0": 0,
+        "bw": 640,
+        "bh": 853,
+        "lum": 109.6
+      }
+    ],
+    "towerThemes": [
+      {
+        "id": "01_anhui_noodles",
+        "items": [
+          {
+            "src": "./items/refs/安徽板面/03.webp",
+            "theme": "01_anhui_noodles",
+            "w": 1080,
+            "h": 1440,
+            "x0": 43,
+            "y0": 58,
+            "bw": 994,
+            "bh": 1267,
+            "lum": 0.518
+          },
+          {
+            "src": "./items/refs/安徽板面/02.webp",
+            "theme": "01_anhui_noodles",
+            "w": 1440,
+            "h": 1080,
+            "x0": 58,
+            "y0": 65,
+            "bw": 1324,
+            "bh": 929,
+            "lum": 0.37
+          }
+        ]
+      },
+      {
+        "id": "02_metal_chains",
+        "items": [
+          {
+            "src": "./items/refs/金属锁链/02.webp",
+            "theme": "02_metal_chains",
+            "w": 750,
+            "h": 1000,
+            "x0": 15,
+            "y0": 20,
+            "bw": 720,
+            "bh": 960,
+            "lum": 0.745
+          },
+          {
+            "src": "./items/refs/金属锁链/01.webp",
+            "theme": "02_metal_chains",
+            "w": 1080,
+            "h": 6096,
+            "x0": 22,
+            "y0": 122,
+            "bw": 1036,
+            "bh": 5852,
+            "lum": 0.811
+          }
+        ]
+      },
+      {
+        "id": "03_badminton",
+        "items": [
+          {
+            "src": "./items/refs/羽毛球/02.webp",
+            "theme": "03_badminton",
+            "w": 640,
+            "h": 854,
+            "x0": 26,
+            "y0": 120,
+            "bw": 588,
+            "bh": 666,
+            "lum": 0.41
+          },
+          {
+            "src": "./items/refs/羽毛球/01.webp",
+            "theme": "03_badminton",
+            "w": 640,
+            "h": 1138,
+            "x0": 51,
+            "y0": 273,
+            "bw": 538,
+            "bh": 262,
+            "lum": 0.383
+          }
+        ]
+      },
+      {
+        "id": "04_whale",
+        "items": [
+          {
+            "src": "./items/refs/鲸鱼/01.webp",
+            "theme": "04_whale",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.589
+          },
+          {
+            "src": "./items/refs/鲸鱼/02.webp",
+            "theme": "04_whale",
+            "w": 640,
+            "h": 480,
+            "x0": 13,
+            "y0": 19,
+            "bw": 614,
+            "bh": 423,
+            "lum": 0.51
+          }
+        ]
+      },
+      {
+        "id": "05_jasmine",
+        "items": [
+          {
+            "src": "./items/refs/夜来香/03.webp",
+            "theme": "05_jasmine",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 290,
+            "bw": 614,
+            "bh": 520,
+            "lum": 0.156
+          },
+          {
+            "src": "./items/refs/夜来香/01.webp",
+            "theme": "05_jasmine",
+            "w": 750,
+            "h": 1000,
+            "x0": 30,
+            "y0": 160,
+            "bw": 225,
+            "bh": 560,
+            "lum": 0.17
+          }
+        ]
+      },
+      {
+        "id": "06_onion",
+        "items": [
+          {
+            "src": "./items/refs/洋葱/03.webp",
+            "theme": "06_onion",
+            "w": 640,
+            "h": 1067,
+            "x0": 13,
+            "y0": 21,
+            "bw": 614,
+            "bh": 982,
+            "lum": 0.717
+          },
+          {
+            "src": "./items/refs/洋葱/01.webp",
+            "theme": "06_onion",
+            "w": 640,
+            "h": 639,
+            "x0": 19,
+            "y0": 141,
+            "bw": 602,
+            "bh": 434,
+            "lum": 0.558
+          },
+          {
+            "src": "./items/refs/洋葱/02.webp",
+            "theme": "06_onion",
+            "w": 640,
+            "h": 853,
+            "x0": 19,
+            "y0": 239,
+            "bw": 602,
+            "bh": 512,
+            "lum": 0.519
+          }
+        ]
+      },
+      {
+        "id": "07_shark",
+        "items": [
+          {
+            "src": "./items/refs/鲨鱼/02.webp",
+            "theme": "07_shark",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.478
+          },
+          {
+            "src": "./items/refs/鲨鱼/01.webp",
+            "theme": "07_shark",
+            "w": 640,
+            "h": 1138,
+            "x0": 13,
+            "y0": 46,
+            "bw": 614,
+            "bh": 1001,
+            "lum": 0.27
+          },
+          {
+            "src": "./items/refs/鲨鱼/03.webp",
+            "theme": "07_shark",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.415
+          }
+        ]
+      },
+      {
+        "id": "08_cat",
+        "items": [
+          {
+            "src": "./items/refs/猫/01.webp",
+            "theme": "08_cat",
+            "w": 640,
+            "h": 863,
+            "x0": 13,
+            "y0": 35,
+            "bw": 614,
+            "bh": 759,
+            "lum": 0.594
+          },
+          {
+            "src": "./items/refs/猫/03.webp",
+            "theme": "08_cat",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.573
+          },
+          {
+            "src": "./items/refs/猫/02.webp",
+            "theme": "08_cat",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.589
+          }
+        ]
+      },
+      {
+        "id": "09_minecraft",
+        "items": [
+          {
+            "src": "./items/refs/我的世界/01.webp",
+            "theme": "09_minecraft",
+            "w": 1296,
+            "h": 1080,
+            "x0": 26,
+            "y0": 22,
+            "bw": 1244,
+            "bh": 982,
+            "lum": 0.426
+          },
+          {
+            "src": "./items/refs/我的世界/03.webp",
+            "theme": "09_minecraft",
+            "w": 1080,
+            "h": 2020,
+            "x0": 43,
+            "y0": 848,
+            "bw": 994,
+            "bh": 505,
+            "lum": 0.294
+          }
+        ]
+      },
+      {
+        "id": "10_flamingo",
+        "items": [
+          {
+            "src": "./items/refs/火烈鸟/01.webp",
+            "theme": "10_flamingo",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.507
+          },
+          {
+            "src": "./items/refs/火烈鸟/02.webp",
+            "theme": "10_flamingo",
+            "w": 640,
+            "h": 1138,
+            "x0": 13,
+            "y0": 46,
+            "bw": 614,
+            "bh": 1001,
+            "lum": 0.354
+          },
+          {
+            "src": "./items/refs/火烈鸟/03.webp",
+            "theme": "10_flamingo",
+            "w": 640,
+            "h": 853,
+            "x0": 13,
+            "y0": 34,
+            "bw": 614,
+            "bh": 751,
+            "lum": 0.328
+          }
+        ]
+      },
+      {
+        "id": "11_beer",
+        "items": [
+          {
+            "src": "./items/refs/啤酒/01.webp",
+            "theme": "11_beer",
+            "w": 1080,
+            "h": 1440,
+            "x0": 86,
+            "y0": 86,
+            "bw": 908,
+            "bh": 1239,
+            "lum": 0.532
+          },
+          {
+            "src": "./items/refs/啤酒/03.webp",
+            "theme": "11_beer",
+            "w": 640,
+            "h": 480,
+            "x0": 26,
+            "y0": 77,
+            "bw": 332,
+            "bh": 345,
+            "lum": 0.61
+          }
+        ]
+      },
+      {
+        "id": "12_soviet",
+        "items": [
+          {
+            "src": "./items/refs/苏联美学设计/01.webp",
+            "theme": "12_soviet",
+            "w": 640,
+            "h": 1391,
+            "x0": 26,
+            "y0": 696,
+            "bw": 588,
+            "bh": 417,
+            "lum": 0.33
+          },
+          {
+            "src": "./items/refs/苏联美学设计/02.webp",
+            "theme": "12_soviet",
+            "w": 640,
+            "h": 1174,
+            "x0": 77,
+            "y0": 164,
+            "bw": 486,
+            "bh": 634,
+            "lum": 0.447
+          }
+        ]
+      },
+      {
+        "id": "13_jiaomian_temple",
+        "items": [
+          {
+            "src": "./items/refs/郊眠寺/02.webp",
+            "theme": "13_jiaomian_temple",
+            "w": 1080,
+            "h": 1443,
+            "x0": 151,
+            "y0": 635,
+            "bw": 778,
+            "bh": 592,
+            "lum": 0.085
+          },
+          {
+            "src": "./items/refs/郊眠寺/01.webp",
+            "theme": "13_jiaomian_temple",
+            "w": 1440,
+            "h": 1080,
+            "x0": 58,
+            "y0": 43,
+            "bw": 1324,
+            "bh": 454,
+            "lum": 0.145
+          }
+        ]
       }
     ]
   },
@@ -1693,5 +6425,97 @@
       "cx": 0.47473,
       "cy": 0.39619
     }
+  },
+  "kicks3d": [
+    0.0,
+    2.376,
+    4.746,
+    7.126,
+    9.496,
+    11.876,
+    16.786,
+    17.396,
+    17.966,
+    18.586,
+    19.006,
+    19.456,
+    19.896,
+    20.486,
+    21.376,
+    21.826,
+    22.276,
+    22.866,
+    23.756,
+    24.206,
+    24.646,
+    25.236,
+    26.136,
+    26.576,
+    27.026,
+    27.616,
+    28.506,
+    28.956,
+    29.396,
+    29.996,
+    30.886,
+    31.336,
+    31.776,
+    32.366,
+    33.256,
+    33.706,
+    34.156,
+    34.746,
+    35.636,
+    36.086,
+    36.976,
+    37.596,
+    38.016,
+    38.466,
+    38.906,
+    39.496,
+    40.386,
+    40.836,
+    41.286,
+    41.876,
+    42.766,
+    43.216,
+    43.656,
+    44.246,
+    45.136,
+    45.586,
+    46.036,
+    46.626,
+    47.516,
+    47.966,
+    48.406,
+    48.996,
+    49.896,
+    50.346,
+    50.786,
+    51.376,
+    52.266,
+    52.716,
+    53.166,
+    53.756,
+    54.806,
+    55.416,
+    55.986,
+    56.606
+  ],
+  "cues3d": {
+    "echoStartAge": 9.505,
+    "reverbStartAge": 14.257,
+    "invertStartAge": 15.15,
+    "invertEndAge": 16.55,
+    "shockKicks": [
+      16.786,
+      17.396,
+      17.966,
+      18.586
+    ],
+    "micCheckAge": 19.01,
+    "towerStartAge": 21.386,
+    "towerFinishAge": 53.95,
+    "next1234Age": 54.64
   }
 }
