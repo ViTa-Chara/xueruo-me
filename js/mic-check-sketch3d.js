@@ -112,19 +112,19 @@
     return t * t * (3 - 2 * t);
   }
 
-  // Silky C1 asymmetric elastic curve:
-  //   - Fast, smooth launch out (0 -> tPeak ≈ 0.145s / speed)
-  //   - Slow, liquid elastic return (~10x slower, ~1.45s decay with one gentle -7.7% cushion)
+  // Silky C1 asymmetric elastic curve locked tightly to 01_vocals.wav leading onsets:
+  //   - Fast, snappy smooth launch out (0 -> tPeak ≈ 0.095s / speed) so ears & eyes lock in sync
+  //   - Slow, liquid elastic return (~10x slower, ~0.96s decay with one gentle -7.7% cushion)
   function evalElasticFastOutSlowReturn(dt, speed) {
     if (dt <= 0) return 0;
     const sp = clamp(speed || 1, 0.5, 2.0);
-    const tPeak = 0.145 / sp;
+    const tPeak = 0.095 / sp;
     if (dt <= tPeak) {
       const u = dt / tPeak;
       const s = u * u * (3 - 2 * u);
-      return Math.pow(s, 0.58);
+      return Math.pow(s, 0.56);
     }
-    const tRet = 1.45 / Math.sqrt(sp);
+    const tRet = 0.96 / Math.sqrt(sp);
     const r = (dt - tPeak) / tRet;
     if (r >= 2.6) return 0;
     const damp = 2.35;
@@ -288,8 +288,8 @@
       for (let i = 0; i < stereoCues.length; i++) {
         const ev = stereoCues[i];
         if (ev.t > age) break;
-        // Full slow elastic return window (~4.55s worst case for speed=0.76 + lag=0.045s)
-        if (age <= ev.t + 4.75) {
+        // Full slow elastic return window (~2.95s worst case for speed=0.82 + lag=0.022s)
+        if (age <= ev.t + 3.25) {
           activeStereoCues.push(ev);
         }
       }
@@ -349,8 +349,8 @@
       // Center third glides horizontally toward the vertical center axis (x = 0) on Mic Check cues only
       let centerShift = 0;
       if (centerW > 1e-4 && Math.abs(cSum) > 1e-4) {
-        const pullFrac = Math.tanh(cSum * 0.90) * 0.42 * gain * centerW;
-        centerShift = clamp(-sx * pullFrac, -5.2, 5.2);
+        const pullFrac = Math.tanh(cSum * 0.90) * 0.48 * gain * centerW;
+        centerShift = clamp(-sx * pullFrac, -5.5, 5.5);
       }
 
       const totalRightShift = leftShift + rightShift + centerShift;
@@ -602,9 +602,9 @@
         arenaId: o.arenaId || null,
         isKnockout,
         stereo: {
-          speed: lerp(0.76, 1.32, stereoRng()),
-          amp: lerp(0.78, 1.32, stereoRng()),
-          lag: stereoRng() * 0.045,
+          speed: lerp(0.82, 1.28, stereoRng()),
+          amp: lerp(0.80, 1.32, stereoRng()),
+          lag: stereoRng() * 0.022,
           roleGain: o.isOrbiter ? 1.22 : (o.isOpeningCard ? 0.85 : 1.0),
         },
         queued: false,
@@ -2039,17 +2039,17 @@
       // 4. 3-Vertical-Thirds Elastic Stereo Response Verification ('L', 'R', 'C')
       // 4A. Asymmetric elastic curve profile ("去得快，回来的慢")
       const curveProfile = {
-        at0_05s: Number(evalElasticFastOutSlowReturn(0.05, 1.0).toFixed(4)),
-        at0_145s_peak: Number(evalElasticFastOutSlowReturn(0.145, 1.0).toFixed(4)),
-        at0_55s_returning: Number(evalElasticFastOutSlowReturn(0.55, 1.0).toFixed(4)),
-        at1_00s_returning: Number(evalElasticFastOutSlowReturn(1.00, 1.0).toFixed(4)),
-        at1_72s_cushion: Number(evalElasticFastOutSlowReturn(1.72, 1.0).toFixed(4)),
-        at3_95s_settled: Number(evalElasticFastOutSlowReturn(3.95, 1.0).toFixed(4)),
+        at0_035s: Number(evalElasticFastOutSlowReturn(0.035, 1.0).toFixed(4)),
+        at0_095s_peak: Number(evalElasticFastOutSlowReturn(0.095, 1.0).toFixed(4)),
+        at0_38s_returning: Number(evalElasticFastOutSlowReturn(0.38, 1.0).toFixed(4)),
+        at0_72s_returning: Number(evalElasticFastOutSlowReturn(0.72, 1.0).toFixed(4)),
+        at1_14s_cushion: Number(evalElasticFastOutSlowReturn(1.14, 1.0).toFixed(4)),
+        at2_65s_settled: Number(evalElasticFastOutSlowReturn(2.65, 1.0).toFixed(4)),
       };
 
       // 4B. Strict single-cue 3-thirds isolation audit (ensuring ZERO cross-third bleeding)
       const measureIsolatedThirds = (dir, testAge) => {
-        const cueT = testAge - 0.16;
+        const cueT = testAge - 0.105;
         const cp = updateCamera(testAge);
         const tanHalf = Math.tan(deg(cp.fov * 0.5));
         const zones = {
@@ -2140,8 +2140,8 @@
       const measureRealCue = (dir) => {
         const ev = pickRealCue(dir);
         if (!ev) return null;
-        const tPeak = ev.t + 0.16;
-        const tSlow = ev.t + 0.85;
+        const tPeak = ev.t + 0.105;
+        const tSlow = ev.t + 0.55;
         const sampleZoneShift = (tSample) => {
           const cp = updateCamera(tSample);
           const tanHalf = Math.tan(deg(cp.fov * 0.5));

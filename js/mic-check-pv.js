@@ -28,7 +28,7 @@
   function loadPvData() {
     if (pvDataCache) return Promise.resolve(pvDataCache);
     if (pvDataPromise) return pvDataPromise;
-    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json?v=20261126x', 3)
+    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json?v=20261126y', 3)
       .then((d) => {
         pvDataCache = d;
         return d;
