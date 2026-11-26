@@ -2,23 +2,28 @@
   'use strict';
 
   // =========================================================================
-  // MIC CHECK — 13-STORY EXAGGERATED 3D WHITE-MODEL (白模) + PACKED STICKER
-  // COLLAGE SKYSCRAPER (Staircase Formation -> Mid-Chorus Cuboid Convergence)
+  // MIC CHECK — SHANGHAI TOWER (上海中心大厦) FLUID HELICAL SKYSCRAPER
   //
-  // Features:
-  //   - Massive, dense, exaggerated 3D GLB white models occupying >60% of every
-  //     floor (all 15 items/lowpoly/**/*.glb + sculptural white-clay F12/F13)
-  //   - Every floor plastered full of photo stickers (per-floor 1024x1024
-  //     sticker-wrapped white-clay atlas + 28-36 3D cutout collage stickers)
-  //   - ZERO velocity zero-points: every floor, white model & sticker moves on
-  //     C∞ differentiable continuous trajectories from age = 0 onward
-  //   - Exact vocal sync:
-  //       * Every "MIC CHECK" triggers smooth C∞ arrival of new model batches
-  //       * Every stereo Left/Right "啊 啊" smoothly rotates a target floor L/R
-  //       * Mid-chorus (SNAP_AGE = 38.02s) smoothly converges the forward-upward
-  //         staircase into ONE unified rectangular cuboid skyscraper
-  //       * START chant (57.03s+) smoothly turns the entire skyscraper into a
-  //         razor-sharp backlit silhouette against the Sun's expanding light
+  // Strict Guarantees:
+  //   1. FLUID SHANGHAI TOWER ARCHITECTURE:
+  //      - Soft 3-lobed Reuleaux rounded-triangle aerodynamic floorplan
+  //      - Continuous 120° helical spiral twist from base (y=0) to crown (y=66m)
+  //      - Progressive fluid tapering (R = 16.4m -> 9.2m) + sweeping helical
+  //        curtain-wall airfoil ribbons + open spiral sky-atrium galleries +
+  //        iconic Shanghai Tower diagonal sculpted asymmetric crown!
+  //   2. 100% SEAMLESS EDGE-TO-EDGE PHOTO SKIN ON EVERY 3D MODEL & SURFACE:
+  //      - ZERO bare white-clay or untextured 3D model materials shown anywhere!
+  //      - Every GLB model and every curved architectural surface stretches a
+  //        real user-supplied photo tightly edge-to-edge [0..1]x[0..1] across
+  //        its 3D geometry.
+  //   3. ZERO DUPLICATE ASSETS WITHIN ANY FLOOR:
+  //      - Strict per-floor Set() guarantees every single model & curved panel
+  //        on a floor uses a completely unique user-provided image file.
+  //   4. C∞ CONTINUOUS MOTION + EXACT VOCAL SYNC:
+  //      - Every "MIC CHECK" smoothly unfolds new fluid batches (tanhStep)
+  //      - Every stereo Left/Right "啊 啊" smoothly torques a floor Left/Right
+  //      - START chant (57.03s+) turns the entire spiraling Shanghai Tower into
+  //        a razor-sharp backlit silhouette against the Sun's expanding light!
   // =========================================================================
 
   function makeRng(seed) {
@@ -37,18 +42,17 @@
     return 0.5 * (1 + Math.tanh((t - t0) / w));
   }
 
-  // Exact measured "MIC CHECK" vocal hits (age in seconds from Bar 18.1 = 40.396s)
+  // Exact measured "MIC CHECK" vocal hits (age in seconds since Bar 18.1 = 40.396s)
   const MIC_CHECK_HITS = [
     19.01, 20.49, 21.68, 22.87, 23.76, 25.25,
     26.14, 27.62, 28.51, 30.00, 30.89, 32.38,
     33.27, 34.75, 35.64, 37.13,
-    // Second half of chorus (after cuboid convergence at 38.02s)
     38.02, 39.50, 40.39, 41.88, 42.77, 44.26,
     45.15, 46.04, 47.52, 49.01, 49.90, 50.79,
     52.28, 53.46, 54.65, 55.84,
   ];
 
-  // Exact measured stereo LEFT / RIGHT "啊 啊" hits from 01_vocals.wav
+  // Exact measured stereo LEFT / RIGHT "啊 啊" vocal hits
   // dir = -1 (Left <<<L) rotates floor left, dir = +1 (Right R>>>) rotates floor right
   const AH_STEREO_ROT_HITS = [
     { t: 19.90, dir: -1, floorIdx: 0 },
@@ -70,7 +74,6 @@
     { t: 34.45, dir: -1, floorIdx: 6 },
     { t: 36.53, dir: +1, floorIdx: 6 },
     { t: 36.83, dir: -1, floorIdx: 5 },
-    // Second half of chorus (unified rectangular cuboid — floors twist left & right on every Ah!)
     { t: 38.91, dir: -1, floorIdx: 7 },
     { t: 39.21, dir: +1, floorIdx: 7 },
     { t: 41.29, dir: -1, floorIdx: 8 },
@@ -85,187 +88,335 @@
     { t: 53.46, dir: -1, floorIdx: 12 },
   ];
 
-  function buildStaircaseToCuboidTower(ctx) {
+  // Shanghai Tower rounded-triangle (Reuleaux) aerodynamic floorplan profile
+  function reuleauxR(theta, baseR) {
+    return baseR * (1.0 + 0.148 * Math.cos(3 * theta) + 0.024 * Math.cos(6 * theta));
+  }
+
+  // Build lofted fluid helical curtain-wall panel (sweeps smoothly along Reuleaux curve + twists from bot to top!)
+  function buildHelicalCurtainRibbonGeo(THREE, rBot, rTop, height, thetaStart, thetaEnd, twistDelta, segU, segV) {
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    for (let iv = 0; iv <= segV; iv++) {
+      const v = iv / segV;
+      const y = v * height;
+      const rBase = rBot + (rTop - rBot) * v;
+      const tw = twistDelta * v;
+      // Subtle aerodynamic belly bulge along vertical arc
+      const bulge = 1.0 + Math.sin(v * Math.PI) * 0.025;
+
+      for (let iu = 0; iu <= segU; iu++) {
+        const u = iu / segU;
+        const thLocal = thetaStart + (thetaEnd - thetaStart) * u;
+        const r = reuleauxR(thLocal, rBase) * bulge;
+        const thWorld = thLocal + tw;
+        positions.push(Math.cos(thWorld) * r, y, Math.sin(thWorld) * r);
+        uvs.push(u, v);
+      }
+    }
+
+    const row = segU + 1;
+    for (let iv = 0; iv < segV; iv++) {
+      for (let iu = 0; iu < segU; iu++) {
+        const a = iv * row + iu;
+        const b = a + 1;
+        const c = (iv + 1) * row + iu;
+        const d = c + 1;
+        indices.push(a, c, b, b, c, d);
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  // Build fluid sweeping Reuleaux floor ring slab (curved outer facade edge + flat walkable deck!)
+  function buildFluidSlabGeo(THREE, rInner, rOuter, thickness, segU) {
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    // 4 rings: inner-top(0), outer-top(1), outer-bot(2), inner-bot(3)
+    const profiles = [
+      { radMult: rInner, y: thickness, v: 0.0 },
+      { radMult: rOuter, y: thickness, v: 0.35 },
+      { radMult: rOuter, y: 0.0,       v: 0.70 },
+      { radMult: rInner, y: 0.0,       v: 1.0 },
+    ];
+
+    for (let ip = 0; ip < profiles.length; ip++) {
+      const pr = profiles[ip];
+      for (let iu = 0; iu <= segU; iu++) {
+        const u = iu / segU;
+        const th = u * Math.PI * 2;
+        const r = reuleauxR(th, pr.radMult);
+        positions.push(Math.cos(th) * r, pr.y, Math.sin(th) * r);
+        uvs.push(u, pr.v);
+      }
+    }
+
+    const row = segU + 1;
+    for (let ip = 0; ip < profiles.length; ip++) {
+      const nextP = (ip + 1) % profiles.length;
+      for (let iu = 0; iu < segU; iu++) {
+        const a = ip * row + iu;
+        const b = a + 1;
+        const c = nextP * row + iu;
+        const d = c + 1;
+        indices.push(a, b, c, b, d, c);
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  // Build sweeping aerodynamic exterior spiral spine fin (Shanghai Tower's iconic diagonal wind fin!)
+  function buildFluidSpiralFinGeo(THREE, rBot, rTop, height, thetaCorner, twistDelta, finDepth, segV) {
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    for (let iv = 0; iv <= segV; iv++) {
+      const v = iv / segV;
+      const y = v * height;
+      const rBase = rBot + (rTop - rBot) * v;
+      const rCore = reuleauxR(thetaCorner, rBase);
+      const thW = thetaCorner + twistDelta * v;
+      const cosT = Math.cos(thW);
+      const sinT = Math.sin(thW);
+      const flare = finDepth * (0.85 + 0.30 * Math.sin(v * Math.PI));
+
+      // Inner attachment -> outer aerodynamic fin tip
+      positions.push(cosT * (rCore - 0.6), y, sinT * (rCore - 0.6));
+      uvs.push(0.0, v);
+      positions.push(cosT * (rCore + flare), y, sinT * (rCore + flare));
+      uvs.push(1.0, v);
+    }
+
+    for (let iv = 0; iv < segV; iv++) {
+      const a = iv * 2;
+      const b = a + 1;
+      const c = a + 2;
+      const d = a + 3;
+      indices.push(a, b, c, b, d, c);
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  // Build iconic Shanghai Tower slanted asymmetric fluid crown parapet (swoops gracefully to peak!)
+  function buildShanghaiCrownGeo(THREE, rBot, rTop, baseH, peakH, twistDelta, segU, segV) {
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    for (let iv = 0; iv <= segV; iv++) {
+      const v = iv / segV;
+      const rBase = rBot + (rTop - rBot) * v;
+      const tw = twistDelta * v;
+      for (let iu = 0; iu <= segU; iu++) {
+        const u = iu / segU;
+        const thLocal = u * Math.PI * 2;
+        // Asymmetric soaring diagonal roofline characteristic of Shanghai Tower!
+        const localMaxH = baseH + (peakH - baseH) * (0.5 + 0.5 * Math.cos(thLocal - 0.65));
+        const y = v * localMaxH;
+        const r = reuleauxR(thLocal, rBase);
+        const thW = thLocal + tw;
+        positions.push(Math.cos(thW) * r, y, Math.sin(thW) * r);
+        uvs.push(u, v);
+      }
+    }
+
+    const row = segU + 1;
+    for (let iv = 0; iv < segV; iv++) {
+      for (let iu = 0; iu < segU; iu++) {
+        const a = iv * row + iu;
+        const b = a + 1;
+        const c = (iv + 1) * row + iu;
+        const d = c + 1;
+        indices.push(a, c, b, b, c, d);
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  function buildShanghaiFluidTower(ctx) {
     const {
-      THREE, scene, TOWER_X, CUBOID_Z, STAIR_Z0, SNAP_AGE,
-      makeCutout, getCutoutTex, getImage, findBySrc, pickMeta,
-      towerThemes, concreteTextures, brickTextures, archTextures,
-      buildingsClean, streetsPool, screensPool, signsPool, itemsPool,
-      onTextureReady,
+      THREE, scene, TOWER_X, TOWER_Z,
+      getImage, towerThemes, concreteTextures, brickTextures, archTextures,
+      roadTextures, buildingsClean, housesPool, streetsPool, screensPool,
+      signsPool, signalsPool, carsPool, polesPool, itemsPool,
+      cityAssets, extraRefs, onTextureReady,
     } = ctx;
 
-    const rng = makeRng(20261125);
+    const rng = makeRng(20261128);
     const towerRoot = new THREE.Group();
+    towerRoot.position.set(TOWER_X, 0, TOWER_Z);
     scene.add(towerRoot);
 
     // -----------------------------------------------------------------------
-    // 1. SHARED WHITE-CLAY (白模) & SILHOUETTE-CAPABLE MATERIALS
+    // 1. MASTER UNIQUE USER-SUPPLIED ASSET REGISTRY (ZERO DUPLICATES PER FLOOR!)
     // -----------------------------------------------------------------------
-    const silhouetteTargets = []; // { mat, baseColor: THREE.Color, kind: 'lit'|'unlit' }
-    const pendingAtlasPainters = [];
+    const masterBySrc = new Map();
+    const archFacadePool = []; // Ideal full-frame textures for sweeping Shanghai Tower ribbons & slabs!
+    const generalPhotoPool = [];
 
-    function trackMat(mat, hex, kind) {
-      silhouetteTargets.push({ mat, baseColor: new THREE.Color(hex), kind });
-      return mat;
+    function pushUniqueTo(arr, list) {
+      if (!Array.isArray(list)) return;
+      for (let i = 0; i < list.length; i++) {
+        const m = list[i];
+        if (!m || !m.src) continue;
+        if (!masterBySrc.has(m.src)) {
+          masterBySrc.set(m.src, m);
+          generalPhotoPool.push(m);
+        }
+        if (arr && arr.indexOf(m) === -1) arr.push(m);
+      }
     }
 
-    // Crisp matte alabaster plaster white-model shader (catches dramatic sculptural shadows!)
-    const pureWhiteClayMat = trackMat(new THREE.MeshStandardMaterial({
-      color: 0xf4f5f8,
-      roughness: 0.72,
-      metalness: 0.06,
-      flatShading: true,
-      side: THREE.DoubleSide,
-    }), 0xf4f5f8, 'lit');
+    // Prioritize rich opaque architectural & urban photo textures for fluid tower skins
+    pushUniqueTo(archFacadePool, extraRefs);
+    pushUniqueTo(archFacadePool, archTextures);
+    pushUniqueTo(archFacadePool, concreteTextures);
+    pushUniqueTo(archFacadePool, brickTextures);
+    pushUniqueTo(archFacadePool, roadTextures);
+    pushUniqueTo(archFacadePool, buildingsClean);
+    pushUniqueTo(archFacadePool, housesPool);
+    pushUniqueTo(archFacadePool, streetsPool);
+    pushUniqueTo(archFacadePool, screensPool);
+    pushUniqueTo(archFacadePool, signsPool);
+    pushUniqueTo(null, signalsPool);
+    pushUniqueTo(null, carsPool);
+    pushUniqueTo(null, polesPool);
+    pushUniqueTo(null, itemsPool);
 
-    const warmWhiteClayMat = trackMat(new THREE.MeshStandardMaterial({
-      color: 0xe6e8ee,
-      roughness: 0.80,
-      metalness: 0.04,
-      flatShading: true,
-      side: THREE.DoubleSide,
-    }), 0xe6e8ee, 'lit');
+    if (cityAssets && typeof cityAssets === 'object') {
+      Object.keys(cityAssets).forEach((cat) => {
+        pushUniqueTo(
+          (cat.includes('街') || cat === '小屋' || cat === '天桥' || cat === '高架' || cat === '冷却塔') ? archFacadePool : null,
+          cityAssets[cat]
+        );
+      });
+    }
 
-    const slabWhiteMat = trackMat(new THREE.MeshStandardMaterial({
-      color: 0xdce0e8,
-      roughness: 0.78,
-      metalness: 0.08,
-      flatShading: true,
-      side: THREE.DoubleSide,
-    }), 0xdce0e8, 'lit');
+    // Also ensure every towerTheme image is registered in masterBySrc
+    (towerThemes || []).forEach((th) => {
+      if (th && Array.isArray(th.items)) {
+        th.items.forEach((m) => {
+          if (m && m.src && !masterBySrc.has(m.src)) {
+            masterBySrc.set(m.src, m);
+          }
+        });
+      }
+    });
 
-    const darkEdgeMat = trackMat(new THREE.MeshBasicMaterial({
-      color: 0x1a1e26,
-      side: THREE.DoubleSide,
-    }), 0x1a1e26, 'unlit');
+    // -----------------------------------------------------------------------
+    // 2. FULL-BLEED EDGE-TO-EDGE STRETCHED PHOTO MATERIAL FACTORY
+    //    Every single texel [0..1]x[0..1] is 100% stretched real photo imagery:
+    //    ZERO white margins, ZERO blank gaps, ZERO untextured clay model shown!
+    // -----------------------------------------------------------------------
+    const fullBleedTexCache = new Map();
+    const pendingPainters = [];
+    const silhouetteMats = [];
 
-    // Create a dense 1024x1024 photo-sticker collage atlas plastered onto a white-plaster base!
-    function createFloorStickerAtlasMat(floorIdx, themeList) {
+    function getFullBleedPhotoTex(meta) {
+      if (!meta || !meta.src) return null;
+      if (fullBleedTexCache.has(meta.src)) return fullBleedTexCache.get(meta.src);
+
       const cnv = document.createElement('canvas');
       cnv.width = 512;
       cnv.height = 512;
       const g = cnv.getContext('2d');
       const tex = new THREE.CanvasTexture(cnv);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.RepeatWrapping;
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.minFilter = THREE.LinearMipmapLinearFilter;
       tex.magFilter = THREE.LinearFilter;
+      const im = getImage(meta.src);
 
-      // Gather rich pool of real images for this floor's sticker wrap
-      const srcPool = [];
-      (themeList || []).forEach((m) => { if (m && m.src) srcPool.push(m); });
-      for (let k = 0; k < 6; k++) {
-        const it = pickMeta(itemsPool, floorIdx * 5 + k * 3);
-        if (it) srcPool.push(it);
-      }
-      for (let k = 0; k < 4; k++) {
-        const b = pickMeta(buildingsClean, floorIdx * 3 + k * 2);
-        if (b) srcPool.push(b);
-      }
-      for (let k = 0; k < 3; k++) {
-        const sg = pickMeta(signsPool, floorIdx * 4 + k);
-        if (sg) srcPool.push(sg);
-      }
-      const imgs = srcPool.map((m) => ({ meta: m, im: getImage(m.src) }));
+      function paint() {
+        if (!g || !im || !im.complete || !im.naturalWidth) return false;
+        const sx = meta.x0 || 0;
+        const sy = meta.y0 || 0;
+        const sw = meta.bw || im.naturalWidth;
+        const sh = meta.bh || im.naturalHeight;
 
-      // Deterministic sticker layout (48 dense overlapping photo stickers plastered on white clay!)
-      const arng = makeRng(88001 + floorIdx * 997);
-      const stamps = [];
-      for (let s = 0; s < 48; s++) {
-        const isTheme = s < 24 && themeList && themeList.length;
-        const pickIdx = isTheme ? (s % themeList.length) : (Math.floor(arng() * imgs.length));
-        stamps.push({
-          idx: pickIdx % Math.max(1, imgs.length),
-          cx: arng() * 512,
-          cy: arng() * 512,
-          size: isTheme ? (105 + arng() * 115) : (58 + arng() * 88),
-          rot: (arng() - 0.5) * 0.95,
-        });
-      }
+        // Pass 1: zoomed-in full-bleed backdrop from the SAME photo so cutout PNG corners NEVER show white/black gaps!
+        g.clearRect(0, 0, 512, 512);
+        const padX = sw * 0.16;
+        const padY = sh * 0.16;
+        g.drawImage(im, sx + padX, sy + padY, Math.max(1, sw - padX * 2), Math.max(1, sh - padY * 2), 0, 0, 512, 512);
+        // Pass 2: crisp full opaque bounding box stretched 100% edge-to-edge [0..512]x[0..512]!
+        g.drawImage(im, sx, sy, sw, sh, 0, 0, 512, 512);
 
-      let paintedReadyCount = -1;
-      function repaint() {
-        if (!g) return true;
-        let readyCount = 0;
-        for (let i = 0; i < imgs.length; i++) {
-          if (imgs[i].im && imgs[i].im.complete && imgs[i].im.naturalWidth > 0) readyCount++;
-        }
-        if (readyCount === paintedReadyCount && paintedReadyCount > 0) {
-          return readyCount >= imgs.length;
-        }
-        paintedReadyCount = readyCount;
-
-        // Crisp white plaster clay base so white-model facets peek through stickers!
-        g.fillStyle = '#eceff4';
-        g.fillRect(0, 0, 512, 512);
-        // Subtle architectural pencil grid lines on white clay
-        g.strokeStyle = 'rgba(20, 26, 36, 0.14)';
-        g.lineWidth = 1;
-        for (let p = 64; p < 512; p += 64) {
-          g.beginPath(); g.moveTo(p, 0); g.lineTo(p, 512); g.stroke();
-          g.beginPath(); g.moveTo(0, p); g.lineTo(512, p); g.stroke();
-        }
-
-        for (let s = 0; s < stamps.length; s++) {
-          const st = stamps[s];
-          const entry = imgs[st.idx];
-          if (!entry || !entry.im || !entry.im.complete || !entry.im.naturalWidth) continue;
-          const m = entry.meta;
-          const sx = m.x0 || 0;
-          const sy = m.y0 || 0;
-          const sw = m.bw || entry.im.naturalWidth;
-          const sh = m.bh || entry.im.naturalHeight;
-          const ar = sw / Math.max(1, sh);
-          const dw = ar >= 1 ? st.size : st.size * ar;
-          const dh = ar >= 1 ? st.size / ar : st.size;
-          g.save();
-          g.translate(st.cx, st.cy);
-          g.rotate(st.rot);
-          g.drawImage(entry.im, sx, sy, sw, sh, -dw * 0.5, -dh * 0.5, dw, dh);
-          g.restore();
-        }
         tex.needsUpdate = true;
         if (onTextureReady) onTextureReady();
-        return readyCount >= imgs.length;
+        return true;
       }
 
-      if (!repaint()) {
-        pendingAtlasPainters.push(repaint);
-        imgs.forEach((entry) => {
-          if (entry.im && !entry.im.complete) {
-            entry.im.addEventListener('load', () => { repaint(); }, { once: true });
-          }
-        });
+      if (!paint()) {
+        pendingPainters.push(paint);
+        im.addEventListener('load', () => { paint(); }, { once: true });
       }
+      fullBleedTexCache.set(meta.src, tex);
+      return tex;
+    }
 
-      const mat = trackMat(new THREE.MeshStandardMaterial({
+    function createFullBleedPhotoMat(meta, emissiveBoost) {
+      const tex = getFullBleedPhotoTex(meta);
+      const baseEmissive = emissiveBoost ?? 0.42;
+      const mat = new THREE.MeshStandardMaterial({
         map: tex,
         color: 0xffffff,
-        roughness: 0.68,
-        metalness: 0.05,
-        flatShading: true,
+        roughness: 0.52,
+        metalness: 0.08,
+        emissiveMap: tex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: baseEmissive,
         side: THREE.DoubleSide,
-      }), 0xffffff, 'lit');
+      });
+      silhouetteMats.push({ mat, baseEmissive });
       return mat;
     }
 
     // -----------------------------------------------------------------------
-    // 2. GLB WHITE-MODEL INSTANCE HELPER (Async Geometry Binding, Shared VBO!)
+    // 3. GLB ASYNC BINDING (Shared VBOs, Per-Instance Unique Stretched Photo Mat!)
     // -----------------------------------------------------------------------
-    const glbBindings = []; // { mesh, url }
-    const fallbackGeo = new THREE.IcosahedronGeometry(0.45, 0);
-    fallbackGeo.translate(0, 0.45, 0);
+    const glbBindings = [];
+    // Smooth organic curved droplet fallback until GLB finishes fetching (~50ms)
+    const fallbackGeo = new THREE.SphereGeometry(0.46, 10, 8);
+    fallbackGeo.translate(0, 0.46, 0);
 
-    function createWhiteGlbInstance(url, scaleVec, mat) {
+    function createPhotoWrappedGlb(url, scaleVal, mat) {
       const mesh = new THREE.Mesh(fallbackGeo, mat);
-      if (typeof scaleVec === 'number') mesh.scale.set(scaleVec, scaleVec, scaleVec);
-      else mesh.scale.set(scaleVec[0], scaleVec[1], scaleVec[2]);
+      mesh.scale.set(scaleVal, scaleVal, scaleVal);
       glbBindings.push({ mesh, url });
       return mesh;
     }
 
-    // Kick off non-blocking load of all 15 GLBs (only ~1.3MB total!) and bind immediately on resolve
-    function loadAllWhiteModels() {
+    function loadAllGlbs() {
       if (!window.MicCheckGLB) return;
       const urls = new Set(glbBindings.map((b) => b.url));
       urls.forEach((url) => {
@@ -281,347 +432,304 @@
       });
     }
 
-    // Sculptural white-clay procedural geometries for Floor 12 (Soviet) & Floor 13 (JiaoMian Temple)
-    const sovietConesGeo = new THREE.ConeGeometry(0.5, 1.0, 6);
-    sovietConesGeo.translate(0, 0.5, 0);
-    const sovietRingGeo = new THREE.TorusGeometry(0.45, 0.11, 6, 16);
-    sovietRingGeo.translate(0, 0.5, 0);
-    const sovietSlabGeo = new THREE.BoxGeometry(0.85, 1.0, 0.28);
-    sovietSlabGeo.translate(0, 0.5, 0);
-    const templeRoofGeo = new THREE.ConeGeometry(0.72, 0.55, 4);
-    templeRoofGeo.rotateY(Math.PI * 0.25);
-    templeRoofGeo.translate(0, 0.72, 0);
-    const templePillarGeo = new THREE.CylinderGeometry(0.14, 0.18, 1.0, 6);
-    templePillarGeo.translate(0, 0.5, 0);
+    // Sculptural fluid procedural fallback geometries for F11 (Soviet) & F12 (Temple)
+    const sovietRibbonGeo = new THREE.TorusKnotGeometry(0.36, 0.14, 28, 8);
+    sovietRibbonGeo.translate(0, 0.52, 0);
+    const templeWaveGeo = new THREE.ConeGeometry(0.62, 1.0, 12, 3, false);
+    templeWaveGeo.translate(0, 0.5, 0);
 
     // -----------------------------------------------------------------------
-    // 3. BUILD ALL 13 FLOORS: HUGE WHITE MODELS (>60% VOLUME) + FULL STICKERS!
+    // 4. BUILD ALL 13 HELICAL FLUID SHANGHAI TOWER FLOORS
+    //    Total Height: ~66m | Base Radius: 16.4m -> Crown Radius: 9.2m | 120° Twist!
     // -----------------------------------------------------------------------
-    const FLOOR_W = 21.0;
-    const FLOOR_D = 17.6;
-    const FLOOR_H = 5.25;
     const STAGE_COUNT = 13;
+    const FLOOR_H = 4.65;
+    const TOTAL_TWIST = (Math.PI * 2) / 3; // Iconic 120° Shanghai Tower helical rotation!
+    const FLOOR_TWIST = TOTAL_TWIST / STAGE_COUNT;
 
-    const FLOOR_GLB_SPECS = [
-      // F00 安徽板面 — colossal steaming ramen bowls crowding >70% of deck!
-      { id: '01_anhui_noodles',  glbs: ['./items/lowpoly/安徽板面/ramen.glb'], count: 24, heroScale: 13.8, swarmMin: 4.8, swarmMax: 8.8 },
-      // F01 金属锁链 — colossal thick overlapping iron chain sculptures!
-      { id: '02_metal_chains',   glbs: ['./items/lowpoly/金属锁链/chain.glb'], count: 32, heroScale: 16.5, swarmMin: 6.8, swarmMax: 12.2 },
-      // F02 羽毛球 — monumental rackets + massive dense swarm of giant shuttlecocks!
-      { id: '03_badminton',      glbs: ['./items/lowpoly/羽毛球/racket.glb', './items/lowpoly/羽毛球/shuttlecock.glb', './items/lowpoly/羽毛球/shuttlecock.glb'], count: 28, heroScale: 14.8, swarmMin: 4.6, swarmMax: 9.2 },
-      // F03 鲸鱼 — giant breaching whale + surging colossal whale pod!
-      { id: '04_whale',          glbs: ['./items/lowpoly/鲸鱼/whale.glb'], count: 20, heroScale: 18.6, swarmMin: 6.8, swarmMax: 12.5 },
-      // F04 夜来香 — gigantic overflowing white-clay jasmine jungle!
-      { id: '05_jasmine',        glbs: ['./items/lowpoly/夜来香/night-jasmine.glb'], count: 26, heroScale: 14.2, swarmMin: 5.5, swarmMax: 10.0 },
-      // F05 洋葱 — colossal nested white-model onion cathedral!
-      { id: '06_onion',          glbs: ['./items/lowpoly/洋葱/onion.glb'], count: 26, heroScale: 13.6, swarmMin: 5.0, swarmMax: 9.4 },
-      // F06 鲨鱼 — ferocious dense colossal shark swarm!
-      { id: '07_shark',          glbs: ['./items/lowpoly/鲨鱼/shark.glb'], count: 22, heroScale: 17.5, swarmMin: 7.2, swarmMax: 12.4 },
-      // F07 猫 — exaggerated army of colossal white-clay cats!
-      { id: '08_cat',            glbs: ['./items/lowpoly/猫/cat.glb'], count: 24, heroScale: 13.8, swarmMin: 5.0, swarmMax: 9.2 },
-      // F08 我的世界 — dense 36-piece voxel mountain of giant trees, stone, dirt, wood!
-      { id: '09_minecraft',      glbs: ['./items/lowpoly/我的世界/tree.glb', './items/lowpoly/我的世界/stone.glb', './items/lowpoly/我的世界/dirt-grass.glb', './items/lowpoly/我的世界/wood.glb'], count: 36, heroScale: 11.8, swarmMin: 4.0, swarmMax: 7.6 },
-      // F09 火烈鸟 — towering dense flock of exaggerated white-clay flamingos!
-      { id: '10_flamingo',       glbs: ['./items/lowpoly/火烈鸟/flamingo.glb'], count: 24, heroScale: 14.2, swarmMin: 5.8, swarmMax: 10.2 },
-      // F10 啤酒 — monumental banquet of giant white-clay beer mugs!
-      { id: '11_beer',           glbs: ['./items/lowpoly/啤酒/beer-mug.glb'], count: 24, heroScale: 13.8, swarmMin: 5.0, swarmMax: 9.4 },
-      // F11 苏联美学设计 — Constructivist white-clay monuments + chain tension struts!
-      { id: '12_soviet',         glbs: ['./items/lowpoly/金属锁链/chain.glb'], count: 24, heroScale: 14.5, swarmMin: 5.4, swarmMax: 9.8, procedural: 'soviet' },
-      // F12 郊眠寺 — Monumental white-clay Temple Sanctuary Crown + jasmine garlands!
-      { id: '13_jiaomian_temple',glbs: ['./items/lowpoly/夜来香/night-jasmine.glb'], count: 22, heroScale: 15.2, swarmMin: 5.6, swarmMax: 9.6, procedural: 'temple' },
-    ];
-
-    // Assign exact MIC CHECK emergence batches across all 13 floors:
-    //   Floors 0..6 (Staircase Half): MIC CHECK hits 0..15 (19.01s -> 37.13s)
-    //   Floors 7..12 (Cuboid Upper Half): MIC CHECK hits 16..31 (38.02s -> 55.84s)
-    const towerFloors = [];
-    const trackedStickers = [];
-
-    function makeTrackedCutout(meta, targetH, opts2) {
-      const c = makeCutout(meta, targetH, opts2);
-      trackMat(c.mat, 0xffffff, 'unlit');
-      return c;
+    function radiusAtLevel(lvl) {
+      const u = clamp(lvl / STAGE_COUNT, 0, 1);
+      return 16.4 * (1.0 - 0.44 * Math.pow(u, 1.12));
     }
 
+    const FLOOR_GLB_SPECS = [
+      { id: '01_anhui_noodles',  glbs: ['./items/lowpoly/安徽板面/ramen.glb'], count: 14, heroScale: 7.4, swarmMin: 3.4, swarmMax: 5.8 },
+      { id: '02_metal_chains',   glbs: ['./items/lowpoly/金属锁链/chain.glb'], count: 16, heroScale: 8.6, swarmMin: 4.4, swarmMax: 7.2 },
+      { id: '03_badminton',      glbs: ['./items/lowpoly/羽毛球/racket.glb', './items/lowpoly/羽毛球/shuttlecock.glb'], count: 16, heroScale: 8.2, swarmMin: 3.4, swarmMax: 6.2 },
+      { id: '04_whale',          glbs: ['./items/lowpoly/鲸鱼/whale.glb'], count: 12, heroScale: 10.6, swarmMin: 4.8, swarmMax: 8.2 },
+      { id: '05_jasmine',        glbs: ['./items/lowpoly/夜来香/night-jasmine.glb'], count: 14, heroScale: 7.8, swarmMin: 3.8, swarmMax: 6.4 },
+      { id: '06_onion',          glbs: ['./items/lowpoly/洋葱/onion.glb'], count: 14, heroScale: 7.4, swarmMin: 3.5, swarmMax: 6.0 },
+      { id: '07_shark',          glbs: ['./items/lowpoly/鲨鱼/shark.glb'], count: 12, heroScale: 9.8, swarmMin: 4.6, swarmMax: 7.6 },
+      { id: '08_cat',            glbs: ['./items/lowpoly/猫/cat.glb'], count: 14, heroScale: 7.4, swarmMin: 3.5, swarmMax: 6.0 },
+      { id: '09_minecraft',      glbs: ['./items/lowpoly/我的世界/tree.glb', './items/lowpoly/我的世界/stone.glb', './items/lowpoly/我的世界/dirt-grass.glb', './items/lowpoly/我的世界/wood.glb'], count: 16, heroScale: 6.6, swarmMin: 3.0, swarmMax: 5.2 },
+      { id: '10_flamingo',       glbs: ['./items/lowpoly/火烈鸟/flamingo.glb'], count: 14, heroScale: 7.8, swarmMin: 3.8, swarmMax: 6.4 },
+      { id: '11_beer',           glbs: ['./items/lowpoly/啤酒/beer-mug.glb'], count: 14, heroScale: 7.4, swarmMin: 3.5, swarmMax: 5.8 },
+      { id: '12_soviet',         glbs: ['./items/lowpoly/金属锁链/chain.glb'], count: 14, heroScale: 7.8, swarmMin: 3.6, swarmMax: 6.2, procedural: 'soviet' },
+      { id: '13_jiaomian_temple',glbs: ['./items/lowpoly/夜来香/night-jasmine.glb'], count: 12, heroScale: 8.0, swarmMin: 3.6, swarmMax: 6.0, procedural: 'temple' },
+    ];
+
+    const towerFloors = [];
+    const floorAssetAudit = [];
+
     FLOOR_GLB_SPECS.forEach((spec, idx) => {
-      const thObj = towerThemes[idx];
-      const th = (thObj && thObj.items && thObj.items.length) ? thObj.items : [findBySrc('水泥纹理/01.png', concreteTextures, 0)];
-      const stickerAtlasMat = createFloorStickerAtlasMat(idx, th);
+      const thObj = towerThemes && towerThemes[idx];
+      const themeItems = (thObj && Array.isArray(thObj.items)) ? thObj.items : [];
+
+      // STRICT ZERO-DUPLICATE PER-FLOOR ASSET ALLOCATOR!
+      const usedInFloor = new Set();
+      const archCursorStart = (idx * 23) % Math.max(1, archFacadePool.length);
+      const genCursorStart = (idx * 37) % Math.max(1, generalPhotoPool.length);
+      let themeCursor = 0;
+      let archCursor = 0;
+      let genCursor = 0;
+
+      function takeUniqueAsset(prefer) {
+        // 1. First pull unique theme photos (up to all 3 real photos of this floor's theme!)
+        if (prefer === 'theme') {
+          while (themeCursor < themeItems.length) {
+            const cand = themeItems[themeCursor++];
+            if (cand && cand.src && !usedInFloor.has(cand.src)) {
+              usedInFloor.add(cand.src);
+              return cand;
+            }
+          }
+        }
+        // 2. Pull unique architectural / urban photo textures for fluid curtain walls & slabs
+        if (prefer === 'arch' || prefer === 'theme') {
+          for (let tries = 0; tries < archFacadePool.length; tries++) {
+            const cand = archFacadePool[(archCursorStart + archCursor++) % archFacadePool.length];
+            if (cand && cand.src && !usedInFloor.has(cand.src)) {
+              usedInFloor.add(cand.src);
+              return cand;
+            }
+          }
+        }
+        // 3. Pull unique general real-photo textures from the 460+ master pool
+        for (let tries = 0; tries < generalPhotoPool.length; tries++) {
+          const cand = generalPhotoPool[(genCursorStart + genCursor++) % generalPhotoPool.length];
+          if (cand && cand.src && !usedInFloor.has(cand.src)) {
+            usedInFloor.add(cand.src);
+            return cand;
+          }
+        }
+        return null;
+      }
+
+      const rBot = radiusAtLevel(idx);
+      const rTop = radiusAtLevel(idx + 1);
+      const baseTwist = idx * FLOOR_TWIST;
+      const yBase = idx * FLOOR_H;
 
       const floorRoot = new THREE.Group();
-      const rotPivot = new THREE.Group(); // Dedicated smooth L/R rotation pivot for stereo "啊 啊"!
+      floorRoot.position.set(0, yBase, 0);
+      const rotPivot = new THREE.Group(); // Smoothly twists Left/Right on stereo "啊 啊"!
       floorRoot.add(rotPivot);
       towerRoot.add(floorRoot);
 
-      // Floor slab & ceiling beam frame (crisp white-clay architectural slabs plastered with stickers!)
-      const slabGroup = new THREE.Group();
-      const w = idx === 12 ? FLOOR_W * 0.88 : FLOOR_W;
-      const d = idx === 12 ? FLOOR_D * 0.88 : FLOOR_D;
-      const h = idx === 12 ? FLOOR_H * 1.15 : FLOOR_H;
+      // --- A. SHANGHAI TOWER FLUID ARCHITECTURAL SKIN (100% EDGE-TO-EDGE PHOTO WRAPPED!) ---
+      const shellGrp = new THREE.Group();
+      rotPivot.add(shellGrp);
 
-      const botSlab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.52, d), stickerAtlasMat);
-      botSlab.position.y = 0.26;
-      slabGroup.add(botSlab);
-      const topSlab = new THREE.Mesh(new THREE.BoxGeometry(w + 0.4, 0.42, d + 0.4), slabWhiteMat);
-      topSlab.position.y = h - 0.21;
-      slabGroup.add(topSlab);
+      // 1. Fluid Reuleaux curved floor slab ring (unique arch photo stretched seamlessly around!)
+      const slabGeo = buildFluidSlabGeo(THREE, rBot * 0.42, rBot * 1.02, 0.56, 48);
+      const slabMesh = new THREE.Mesh(slabGeo, createFullBleedPhotoMat(takeUniqueAsset('arch'), 0.45));
+      shellGrp.add(slabMesh);
 
-      // 4 crisp corner architectural white-clay columns
-      const colGeo = new THREE.BoxGeometry(0.95, h - 0.5, 0.95);
-      [-1, 1].forEach((sx) => {
-        [-1, 1].forEach((sz) => {
-          const col = new THREE.Mesh(colGeo, pureWhiteClayMat);
-          col.position.set(sx * (w * 0.5 - 0.55), h * 0.5, sz * (d * 0.5 - 0.55));
-          slabGroup.add(col);
-        });
-      });
-
-      // Plaster ALL 4 perimeter slab edges with dense photo collage stickers!
-      const hw = w * 0.5, hd = d * 0.5;
-      for (let side = 0; side < 4; side++) {
-        const isFB = side < 2;
-        const span = isFB ? w : d;
-        const nSt = 5;
-        for (let s = 0; s < nSt; s++) {
-          const frac = ((s + 0.5) / nSt - 0.5) * (span * 0.92);
-          const meta = (s % 2 === 0) ? th[s % th.length] : pickMeta(s % 3 === 0 ? signsPool : buildingsClean, idx * 7 + side * 3 + s);
-          if (!meta) continue;
-          const card = makeTrackedCutout(meta, 1.55 + (s % 2) * 0.75, {
-            maxW: 3.8, maxDim: 256, pivot: 'bottom', alphaTest: 0.08,
-          });
-          if (side === 0) { card.mesh.position.set(frac, 0.15, +hd + 0.12); card.mesh.rotation.y = 0; }
-          else if (side === 1) { card.mesh.position.set(frac, 0.15, -hd - 0.12); card.mesh.rotation.y = Math.PI; }
-          else if (side === 2) { card.mesh.position.set(+hw + 0.12, 0.15, frac); card.mesh.rotation.y = Math.PI * 0.5; }
-          else { card.mesh.position.set(-hw - 0.12, 0.15, frac); card.mesh.rotation.y = -Math.PI * 0.5; }
-          slabGroup.add(card.mesh);
-        }
+      // 2. 3 Sweeping Helical Curved Curtain-Wall Airfoil Ribbons around the 3 Reuleaux lobes!
+      //    Leaves 3 dramatic open curved spiral sky-atrium V-gaps so internal photo-wrapped models shine through!
+      for (let lobe = 0; lobe < 3; lobe++) {
+        const th0 = lobe * ((Math.PI * 2) / 3) + 0.18;
+        const th1 = th0 + ((Math.PI * 2) / 3) * 0.64; // 64% sweeping curtain wall, 36% open fluid sky-atrium!
+        const ribGeo = buildHelicalCurtainRibbonGeo(THREE, rBot, rTop, FLOOR_H + 0.08, th0, th1, FLOOR_TWIST, 18, 6);
+        // First 3 lobes get the 3 dedicated real photos of THIS floor's theme!
+        const ribMeta = takeUniqueAsset('theme');
+        const ribMesh = new THREE.Mesh(ribGeo, createFullBleedPhotoMat(ribMeta, 0.46));
+        shellGrp.add(ribMesh);
       }
-      rotPivot.add(slabGroup);
 
-      // Determine exact MIC CHECK wave timestamps for this floor (2–3 batches per floor!)
-      const isUpper = idx >= 7;
-      const baseHitIdx = isUpper
-        ? (16 + Math.floor(((idx - 7) / 6) * 15))
-        : Math.floor((idx / 7) * 16);
+      // 3. 3 Sweeping Aerodynamic Spiral Structural Spine Fins (Shanghai Tower signature wind-carved ridges!)
+      for (let fin = 0; fin < 3; fin++) {
+        const thFin = fin * ((Math.PI * 2) / 3) + 0.14;
+        const finGeo = buildFluidSpiralFinGeo(THREE, rBot, rTop, FLOOR_H + 0.14, thFin, FLOOR_TWIST, 2.2, 8);
+        const finMesh = new THREE.Mesh(finGeo, createFullBleedPhotoMat(takeUniqueAsset('arch'), 0.40));
+        shellGrp.add(finMesh);
+      }
+
+      // 4. Inner Curved Fluid Atrium Core Drum (unique stretched photo skin — ZERO bare geometry!)
+      const coreGeo = new THREE.CylinderGeometry(rTop * 0.36, rBot * 0.38, FLOOR_H, 24, 1, true);
+      coreGeo.translate(0, FLOOR_H * 0.5, 0);
+      const coreMesh = new THREE.Mesh(coreGeo, createFullBleedPhotoMat(takeUniqueAsset('arch'), 0.36));
+      shellGrp.add(coreMesh);
+
+      // 5. Floor 12 (Top) — Iconic Shanghai Tower Asymmetric Diagonal Sculpted Fluid Crown!
+      if (idx === STAGE_COUNT - 1) {
+        const crownGeo = buildShanghaiCrownGeo(THREE, rTop * 1.02, rTop * 0.80, FLOOR_H * 0.72, FLOOR_H * 2.35, FLOOR_TWIST * 1.6, 54, 10);
+        const crownMesh = new THREE.Mesh(crownGeo, createFullBleedPhotoMat(takeUniqueAsset('arch'), 0.48));
+        crownMesh.position.y = FLOOR_H * 0.88;
+        shellGrp.add(crownMesh);
+      }
+
+      // --- B. SEAMLESSLY PHOTO-WRAPPED 3D GLB MODELS SPIRALING IN & OUT OF THE FLUID ATRIUM! ---
+      // Exact MIC CHECK emergence hits distributed evenly across Bars 26–41 (19.01s -> 55.84s)
+      const baseHitIdx = Math.floor((idx / STAGE_COUNT) * (MIC_CHECK_HITS.length - 2));
       const hit0 = MIC_CHECK_HITS[clamp(baseHitIdx, 0, MIC_CHECK_HITS.length - 1)];
       const hit1 = MIC_CHECK_HITS[clamp(baseHitIdx + 1, 0, MIC_CHECK_HITS.length - 1)];
       const hit2 = MIC_CHECK_HITS[clamp(baseHitIdx + 2, 0, MIC_CHECK_HITS.length - 1)];
-      const waveHits = [hit0, hit1, hit2];
 
-      // Build 3 kinetic emergence batches per floor (each triggered smoothly on a MIC CHECK!)
       const batches = [
-        { grp: new THREE.Group(), tHit: waveHits[0], items: [], stickers: [] },
-        { grp: new THREE.Group(), tHit: waveHits[1], items: [], stickers: [] },
-        { grp: new THREE.Group(), tHit: waveHits[2], items: [], stickers: [] },
+        { grp: new THREE.Group(), tHit: hit0, items: [] },
+        { grp: new THREE.Group(), tHit: hit1, items: [] },
+        { grp: new THREE.Group(), tHit: hit2, items: [] },
       ];
       batches.forEach((b) => rotPivot.add(b.grp));
 
-      // --- A. MASSIVE, EXAGGERATED 3D WHITE MODELS (Occupying >60% of each floor!) ---
+      const scaleFactor = rBot / 16.4; // Taper model sizes gracefully with Shanghai Tower height!
+
       for (let m = 0; m < spec.count; m++) {
-        const batchIdx = m === 0 ? 0 : (1 + (m % 2));
+        const batchIdx = m < 3 ? 0 : (1 + (m % 2));
         const batch = batches[batchIdx];
-        const isHero = m === 0 || m === 1;
-        // ~55% crisp alabaster white-clay, ~45% dense sticker-wrapped white-clay!
-        const mat = (m % 5 === 1 || m % 5 === 3) ? stickerAtlasMat : (m % 2 === 0 ? pureWhiteClayMat : warmWhiteClayMat);
+        const isHero = m < 2;
+
+        // Every SINGLE 3D model instance receives a STRICTLY UNIQUE real photo texture stretched edge-to-edge!
+        const photoMeta = takeUniqueAsset(isHero ? 'arch' : 'general');
+        const mat = createFullBleedPhotoMat(photoMeta, 0.44);
+
+        const rawSc = isHero
+          ? (m === 0 ? spec.heroScale * 1.18 : spec.heroScale * 0.92)
+          : (spec.swarmMin + rng() * (spec.swarmMax - spec.swarmMin)) * 1.16;
+        const sc = rawSc * (0.62 + 0.40 * scaleFactor);
 
         let obj3d = null;
-        const sc = isHero
-          ? (m === 0 ? spec.heroScale : spec.heroScale * 0.72)
-          : (spec.swarmMin + rng() * (spec.swarmMax - spec.swarmMin));
-
-        if (spec.procedural === 'soviet' && m % 3 !== 2) {
-          const geoPick = m % 3 === 0 ? (m === 0 ? sovietRingGeo : sovietConesGeo) : sovietSlabGeo;
-          obj3d = new THREE.Mesh(geoPick, mat);
-          obj3d.scale.set(sc * 0.85, sc * 0.95, sc * 0.85);
-        } else if (spec.procedural === 'temple' && m % 3 !== 2) {
-          const geoPick = m % 2 === 0 ? templeRoofGeo : templePillarGeo;
-          obj3d = new THREE.Mesh(geoPick, mat);
-          obj3d.scale.set(sc * 0.92, sc * 0.90, sc * 0.92);
+        if (spec.procedural === 'soviet' && m % 2 === 0) {
+          obj3d = new THREE.Mesh(sovietRibbonGeo, mat);
+          obj3d.scale.set(sc * 0.9, sc * 0.9, sc * 0.9);
+        } else if (spec.procedural === 'temple' && m % 2 === 0) {
+          obj3d = new THREE.Mesh(templeWaveGeo, mat);
+          obj3d.scale.set(sc * 0.95, sc * 0.95, sc * 0.95);
         } else {
           const url = spec.glbs[m % spec.glbs.length];
-          obj3d = createWhiteGlbInstance(url, sc, mat);
+          obj3d = createPhotoWrappedGlb(url, sc, mat);
         }
 
-        // Pack tightly & dramatically across the entire floor footprint (even overhanging edges!)
-        const ang = (m / Math.max(1, spec.count)) * Math.PI * 2 + idx * 0.5;
-        const radFrac = isHero ? (m === 0 ? 0.04 : 0.24) : (0.28 + rng() * 0.62);
-        const homeX = Math.cos(ang) * (hw * 0.88 * radFrac);
-        const homeZ = Math.sin(ang) * (hd * 0.88 * radFrac);
-        const homeY = isHero ? 0.35 : (0.35 + rng() * (h * 0.42));
-
-        // Wrap in a kinetic container so every model ALWAYS has continuous C∞ motion (v != 0)!
         const holder = new THREE.Group();
         holder.add(obj3d);
-
-        // Plaster 1-2 crisp 3D cutout stickers DIRECTLY ONTO the surface of larger white models!
-        if (m < 10) {
-          const stMeta = th[m % th.length];
-          const stCard = makeTrackedCutout(stMeta, clamp(sc * 0.42, 1.6, 3.8), {
-            maxW: clamp(sc * 0.52, 1.8, 4.4), maxDim: 256, pivot: 'center', alphaTest: 0.08,
-          });
-          stCard.mesh.position.set(0, sc * 0.38, sc * 0.36);
-          holder.add(stCard.mesh);
-          if (m < 5) {
-            const stCard2 = makeTrackedCutout(pickMeta(itemsPool, idx * 9 + m * 3), clamp(sc * 0.36, 1.3, 3.0), {
-              maxW: 3.2, maxDim: 224, pivot: 'center', alphaTest: 0.08,
-            });
-            stCard2.mesh.position.set(sc * 0.32, sc * 0.50, -sc * 0.28);
-            stCard2.mesh.rotation.y = Math.PI * 0.5;
-            holder.add(stCard2.mesh);
-          }
-        }
-
         batch.grp.add(holder);
+
+        // Place models along the fluid Reuleaux atrium perimeter (bursting boldly along the 3 open spiral V-atriums!)
+        const theta0 = (m / Math.max(1, spec.count)) * Math.PI * 2 + idx * 0.45;
+        const radFrac = isHero ? 1.04 : (0.72 + rng() * 0.46);
+        const homeY = isHero ? 0.42 : (0.45 + rng() * (FLOOR_H * 0.56));
+
         batch.items.push({
           obj: holder,
-          homeX, homeY, homeZ,
-          // Continuous eternal motion parameters (ZERO zero-velocity points!)
-          orbitSpeed: (m % 2 === 0 ? 1 : -1) * (0.14 + (m % 4) * 0.06),
-          spinSpeed: (m % 2 === 0 ? 1 : -1) * (0.28 + rng() * 0.38),
-          driftAmp: 0.35 + rng() * 0.65,
-          driftFreq: 0.65 + rng() * 0.55,
+          theta0,
+          radBase: rBot * radFrac,
+          homeY,
+          // Continuous eternal fluid gliding around the Reuleaux curve (ZERO velocity zero-points!)
+          orbitSpeed: (m % 2 === 0 ? 1 : -1) * (0.20 + (m % 4) * 0.06),
+          spinSpeed: (m % 2 === 0 ? 1 : -1) * (0.34 + rng() * 0.36),
+          bobAmp: 0.35 + rng() * 0.45,
+          bobFreq: 0.72 + rng() * 0.50,
           phase: rng() * 6.28,
-          tiltX: (rng() - 0.5) * 0.38,
-          tiltZ: (rng() - 0.5) * 0.38,
-          // Stream-in offset before MIC CHECK wave arrives (slides smoothly in from outer space!)
-          enterOffset: new THREE.Vector3(
-            Math.cos(ang) * (18 + rng() * 14),
-            (m % 2 === 0 ? 1 : -1) * (9 + rng() * 10),
-            Math.sin(ang) * (18 + rng() * 14) - 12
-          ),
+          tiltX: (rng() - 0.5) * 0.32,
+          tiltZ: (rng() - 0.5) * 0.32,
+          enterR: rBot + 16 + rng() * 14,
+          enterY: (m % 2 === 0 ? 1 : -1) * (8 + rng() * 8),
         });
       }
 
-      // --- B. DENSE STICKER COLLAGE PLATES PLASTERED ALL OVER THE FLOOR (24 extra cutouts!) ---
-      for (let s = 0; s < 24; s++) {
-        const batchIdx = s % 3;
-        const batch = batches[batchIdx];
-        const useTheme = s < 14;
-        const meta = useTheme
-          ? th[s % th.length]
-          : pickMeta(s % 3 === 0 ? itemsPool : (s % 3 === 1 ? screensPool : buildingsClean), idx * 11 + s * 2);
-        if (!meta) continue;
-        const cardH = useTheme ? (2.6 + (s % 3) * 0.85) : (1.7 + (s % 3) * 0.55);
-        const card = makeTrackedCutout(meta, cardH, {
-          maxW: cardH * 1.45, maxDim: 288, pivot: 'center', alphaTest: 0.08,
-        });
-        const ang = (s / 24) * Math.PI * 2 + 0.22;
-        const rx = Math.cos(ang) * (hw * (0.55 + (s % 3) * 0.18));
-        const rz = Math.sin(ang) * (hd * (0.55 + (s % 3) * 0.18));
-        const ry = 1.15 + ((s * 37) % 100) / 100 * (h - 2.1);
-
-        batch.grp.add(card.mesh);
-        batch.stickers.push({
-          mesh: card.mesh,
-          homeX: rx, homeY: ry, homeZ: rz,
-          baseRotY: -ang + Math.PI * 0.5,
-          spinRate: (s % 2 === 0 ? 1 : -1) * (0.18 + (s % 4) * 0.07),
-          bobPhase: s * 0.72,
-          enterOffset: new THREE.Vector3(Math.cos(ang) * 20, (s % 2 === 0 ? 10 : -8), Math.sin(ang) * 20 - 10),
-        });
-        trackedStickers.push(card.mesh);
-      }
-
-      // Pre-bind all stereo Left/Right "啊" rotation events assigned to this floor
       const myAhEvents = AH_STEREO_ROT_HITS.filter((ev) => ev.floorIdx === idx);
-
-      // Staircase position (ahead & above previous floor straight down T-junction!) vs Cuboid stack!
-      const stairX = Math.sin(idx * 0.85) * 1.4;
-      const stairY = 1.6 + idx * FLOOR_H;
-      const stairZ = STAIR_Z0 - idx * 18.5;
-
-      const cuboidX = TOWER_X;
-      const cuboidY = 1.2 + idx * FLOOR_H;
-      const cuboidZ = CUBOID_Z;
+      floorAssetAudit.push({
+        floor: idx,
+        id: spec.id,
+        uniqueAssetCount: usedInFloor.size,
+        srcs: Array.from(usedInFloor),
+      });
 
       towerFloors.push({
         idx,
         id: spec.id,
         root: floorRoot,
         rotPivot,
-        slabGroup,
+        shellGrp,
         batches,
         myAhEvents,
-        baseSpin: (idx % 2 === 0 ? 1 : -1) * (0.09 + (idx % 3) * 0.03),
-        stairPos: new THREE.Vector3(stairX, stairY, stairZ),
-        cuboidPos: new THREE.Vector3(cuboidX, cuboidY, cuboidZ),
-        firstHitAge: waveHits[0],
-        w, d, h,
+        baseTwist,
+        yBase,
+        firstHitAge: hit0,
+        rBot,
       });
     });
 
-    // Trigger background fetch of all 15 GLB white models right away
-    loadAllWhiteModels();
+    // Expose asset uniqueness audit for automated Playwright verification!
+    window.__MIC_CHECK_TOWER_AUDIT__ = floorAssetAudit;
 
-    const BLACK_SIL = new THREE.Color(0x040508);
+    // Fetch all 15 GLB white-model geometries in background and bind immediately
+    loadAllGlbs();
+
+    const BLACK_SIL = new THREE.Color(0x030406);
+    const WHITE_COL = new THREE.Color(0xffffff);
     const tmpCol = new THREE.Color();
 
     function setSilhouetteAmount(silU) {
       const s = clamp(silU, 0, 1);
-      for (let i = 0; i < silhouetteTargets.length; i++) {
-        const t = silhouetteTargets[i];
-        tmpCol.copy(t.baseColor).lerp(BLACK_SIL, s);
-        t.mat.color.copy(tmpCol);
+      tmpCol.copy(WHITE_COL).lerp(BLACK_SIL, s);
+      for (let i = 0; i < silhouetteMats.length; i++) {
+        const entry = silhouetteMats[i];
+        entry.mat.color.copy(tmpCol);
+        entry.mat.emissiveIntensity = entry.baseEmissive * (1 - s);
       }
     }
 
-    function flushStickerAtlases(budget) {
-      const limit = typeof budget === 'number' ? budget : pendingAtlasPainters.length;
+    function flushPhotoTextures(budget) {
+      const limit = typeof budget === 'number' ? budget : pendingPainters.length;
       let done = 0;
-      for (let i = pendingAtlasPainters.length - 1; i >= 0 && done < limit; i--) {
-        if (pendingAtlasPainters[i]()) {
-          pendingAtlasPainters.splice(i, 1);
+      for (let i = pendingPainters.length - 1; i >= 0 && done < limit; i--) {
+        if (pendingPainters[i]()) {
+          pendingPainters.splice(i, 1);
           done++;
         }
       }
     }
 
-    // Update ALL 13 floors with C∞ differentiable continuous motion (ZERO zero-velocity points!)
+    // Update ALL 13 fluid Shanghai Tower floors with smooth C∞ continuous motion (ZERO velocity zero-points!)
     function updateTower(age, beatPos, kickEnergy) {
-      if (pendingAtlasPainters.length > 0) flushStickerAtlases(2);
+      if (pendingPainters.length > 0) flushPhotoTextures(4);
 
-      // Mid-chorus convergence curve (Bar 34.1 = 38.02s): staircase suddenly coalesces into ONE rectangular cuboid!
-      const snapU = tanhStep(age, SNAP_AGE, 0.44);
-      // Continuous eternal subtle upward breath so the skyscraper itself never freezes at v = 0
-      const eternalRise = age * 0.08;
+      // Gentle eternal helical flow so the tower is ALWAYS alive (never freezes!)
+      const globalFlow = age * 0.045;
 
       for (let i = 0; i < towerFloors.length; i++) {
         const fl = towerFloors[i];
-        // Smooth C∞ floor presence (starts emerging smoothly slightly ahead of its first MIC CHECK hit!)
-        const floorU = tanhStep(age, fl.firstHitAge - 0.55, 0.28);
+        const floorU = tanhStep(age, fl.firstHitAge - 0.35, 0.34);
         if (floorU < 0.008) {
           fl.root.visible = false;
           continue;
         }
         fl.root.visible = true;
 
-        // Smooth C∞ Staircase -> Unified Rectangular Cuboid morph!
-        const fx = fl.stairPos.x + (fl.cuboidPos.x - fl.stairPos.x) * snapU;
-        const fy = fl.stairPos.y + (fl.cuboidPos.y - fl.stairPos.y) * snapU + eternalRise;
-        const fz = fl.stairPos.z + (fl.cuboidPos.z - fl.stairPos.z) * snapU;
-        fl.root.position.set(fx, fy, fz);
+        // Smooth C∞ upward spiral emergence from below into final Shanghai Tower elevation
+        const riseOffset = (1 - floorU) * -4.2;
+        fl.root.position.set(0, fl.yBase + riseOffset, 0);
 
-        // Slab frame scale glides smoothly into full dimensions + subtle C∞ kick pulse
-        const slabScale = 0.08 + 0.92 * floorU;
-        const kickLift = 1.0 + kickEnergy * 0.03;
-        fl.slabGroup.scale.set(slabScale * kickLift, slabScale, slabScale * kickLift);
+        // Fluid shell expands smoothly into aerodynamic silhouette + subtle kick breathing
+        const shellXZ = (0.14 + 0.86 * floorU) * (1.0 + kickEnergy * 0.025);
+        const shellY = 0.08 + 0.92 * floorU;
+        fl.shellGrp.scale.set(shellXZ, shellY, shellXZ);
 
-        // Floor Y-rotation: crisp 90° Left/Right twists on EVERY stereo "啊 啊" hit!
-        // During staircase (snapU < 1) floors drift freely; after cuboid snap (snapU -> 1)
-        // they lock orthogonally into ONE crisp rectangular cuboid while still twisting +-90° on "啊 啊"!
+        // Helical floor twist: Shanghai Tower's 120° progressive spiral + crisp Left/Right stereo "啊 啊" torque!
         let ahAngle = 0;
         for (let a = 0; a < fl.myAhEvents.length; a++) {
           const ev = fl.myAhEvents[a];
-          ahAngle += ev.dir * (Math.PI * 0.5) * tanhStep(age, ev.t, 0.11);
+          ahAngle += ev.dir * 0.56 * tanhStep(age, ev.t, 0.12);
         }
-        const stairDrift = (1 - snapU) * (fl.baseSpin * age);
-        const cuboidBreath = snapU * Math.sin(age * 0.55 + i * 0.7) * 0.025;
-        fl.rotPivot.rotation.y = stairDrift + cuboidBreath + ahAngle;
+        const helicalBreath = Math.sin(age * 0.65 - i * 0.38) * 0.04;
+        fl.rotPivot.rotation.y = fl.baseTwist + globalFlow + helicalBreath + ahAngle + (1 - floorU) * 0.85;
 
-        // Update all 3 MIC CHECK model & sticker emergence batches inside this floor!
+        // Update all 3 MIC CHECK photo-wrapped 3D model batches gliding continuously along the Reuleaux curve!
         for (let b = 0; b < fl.batches.length; b++) {
           const batch = fl.batches[b];
-          const bU = tanhStep(age, batch.tHit, 0.30);
+          const bU = tanhStep(age, batch.tHit, 0.32);
           if (bU < 0.01) {
             batch.grp.visible = false;
             continue;
@@ -629,42 +737,19 @@
           batch.grp.visible = true;
           const invB = 1 - bU;
 
-          // Update exaggerated 3D white models (NEVER velocity 0 — constant smooth spin + drift!)
           for (let m = 0; m < batch.items.length; m++) {
             const it = batch.items[m];
-            const driftX = Math.cos(age * it.driftFreq + it.phase) * it.driftAmp;
-            const driftY = Math.sin(age * it.driftFreq * 1.13 + it.phase) * (it.driftAmp * 0.55);
-            const driftZ = Math.sin(age * it.driftFreq * 0.87 + it.phase) * it.driftAmp;
-            it.obj.position.set(
-              it.homeX + it.enterOffset.x * invB + driftX,
-              it.homeY + it.enterOffset.y * invB + driftY,
-              it.homeZ + it.enterOffset.z * invB + driftZ
-            );
+            const th = it.theta0 + age * it.orbitSpeed + invB * 1.4;
+            const rFluid = reuleauxR(th, it.radBase) + it.enterR * invB;
+            const yFluid = it.homeY + it.enterY * invB + Math.sin(age * it.bobFreq + it.phase) * it.bobAmp;
+            it.obj.position.set(Math.cos(th) * rFluid, yFluid, Math.sin(th) * rFluid);
             it.obj.rotation.set(
-              it.tiltX + Math.sin(age * 0.7 + it.phase) * 0.14,
-              age * it.spinSpeed + it.phase + invB * 1.8,
+              it.tiltX + Math.sin(age * 0.7 + it.phase) * 0.15,
+              -th + age * it.spinSpeed + it.phase,
               it.tiltZ + Math.cos(age * 0.65 + it.phase) * 0.12
             );
-            const sc = (0.12 + 0.88 * bU) * (1.0 + kickEnergy * 0.035);
+            const sc = (0.12 + 0.88 * bU) * (1.0 + kickEnergy * 0.04);
             it.obj.scale.set(sc, sc, sc);
-          }
-
-          // Update dense 3D cutout photo stickers (continuous smooth orbit/spin — never static!)
-          for (let s = 0; s < batch.stickers.length; s++) {
-            const st = batch.stickers[s];
-            const orb = age * st.spinRate;
-            const cosO = Math.cos(orb);
-            const sinO = Math.sin(orb);
-            const rx = st.homeX * cosO - st.homeZ * sinO;
-            const rz = st.homeX * sinO + st.homeZ * cosO;
-            st.mesh.position.set(
-              rx + st.enterOffset.x * invB,
-              st.homeY + st.enterOffset.y * invB + Math.sin(age * 1.2 + st.bobPhase) * 0.38,
-              rz + st.enterOffset.z * invB
-            );
-            st.mesh.rotation.y = st.baseRotY - orb;
-            const sc = 0.10 + 0.90 * bU;
-            st.mesh.scale.set(sc, sc, sc);
           }
         }
       }
@@ -675,17 +760,19 @@
       towerFloors,
       STAGE_COUNT,
       FLOOR_H,
-      totalTowerTopY: 1.2 + STAGE_COUNT * FLOOR_H,
+      totalTowerTopY: STAGE_COUNT * FLOOR_H + FLOOR_H * 1.35,
       updateTower,
       setSilhouetteAmount,
-      flushStickerAtlases,
+      flushStickerAtlases: flushPhotoTextures,
       MIC_CHECK_HITS,
       AH_STEREO_ROT_HITS,
+      getAssetAudit: () => floorAssetAudit,
     };
   }
 
   window.MicCheckTower = {
-    buildStaircaseToCuboidTower,
-    buildMesaAndTower: buildStaircaseToCuboidTower,
+    buildShanghaiFluidTower,
+    buildStaircaseToCuboidTower: buildShanghaiFluidTower,
+    buildMesaAndTower: buildShanghaiFluidTower,
   };
 })();

@@ -173,31 +173,46 @@
     }
 
     geo.computeVertexNormals();
-    const normAttr = geo.attributes.normal;
 
-    // Fill any missing UVs (e.g. shark.glb, whale.glb) using crisp tri-planar box projection!
-    const uvArr = new Float32Array(uvList.length);
-    for (let i = 0; i < uvList.length; i += 2) {
-      if (isFinite(uvList[i]) && isFinite(uvList[i + 1])) {
-        uvArr[i] = uvList[i];
-        uvArr[i + 1] = uvList[i + 1];
-      } else {
-        const vi = i / 2;
+    // Generate seamless, full-bleed [0..1]x[0..1] per-triangle bounding-box tri-planar UVs
+    // so EVERY photo texture stretches edge-to-edge tightly across the entire 3D model surface
+    // with ZERO UV island gaps, ZERO blank margins, and ZERO bare model peeking through!
+    const b2 = geo.boundingBox;
+    const minX = b2 ? b2.min.x : -0.5;
+    const minY2 = b2 ? b2.min.y : 0.0;
+    const minZ = b2 ? b2.min.z : -0.5;
+    const spanX = b2 ? Math.max(1e-4, b2.max.x - b2.min.x) : 1.0;
+    const spanY = b2 ? Math.max(1e-4, b2.max.y - b2.min.y) : 1.0;
+    const spanZ = b2 ? Math.max(1e-4, b2.max.z - b2.min.z) : 1.0;
+
+    const vertCount = posArr.length / 3;
+    const uvArr = new Float32Array(vertCount * 2);
+    const e1 = new THREE.Vector3();
+    const e2 = new THREE.Vector3();
+    const fn = new THREE.Vector3();
+
+    for (let v = 0; v + 2 < vertCount; v += 3) {
+      const i0 = v * 3, i1 = (v + 1) * 3, i2 = (v + 2) * 3;
+      e1.set(posArr[i1] - posArr[i0], posArr[i1 + 1] - posArr[i0 + 1], posArr[i1 + 2] - posArr[i0 + 2]);
+      e2.set(posArr[i2] - posArr[i0], posArr[i2 + 1] - posArr[i0 + 1], posArr[i2 + 2] - posArr[i0 + 2]);
+      fn.crossVectors(e1, e2);
+      const ax = Math.abs(fn.x), ay = Math.abs(fn.y), az = Math.abs(fn.z);
+      const plane = (ay >= ax && ay >= az) ? 1 : (ax >= ay && ax >= az ? 0 : 2);
+
+      for (let k = 0; k < 3; k++) {
+        const vi = v + k;
         const px = posArr[vi * 3];
         const py = posArr[vi * 3 + 1];
         const pz = posArr[vi * 3 + 2];
-        const nx = Math.abs(normAttr.getX(vi));
-        const ny = Math.abs(normAttr.getY(vi));
-        const nz = Math.abs(normAttr.getZ(vi));
-        if (ny >= nx && ny >= nz) {
-          uvArr[i] = px + 0.5;
-          uvArr[i + 1] = pz + 0.5;
-        } else if (nx >= ny && nx >= nz) {
-          uvArr[i] = pz + 0.5;
-          uvArr[i + 1] = py;
+        if (plane === 1) {
+          uvArr[vi * 2]     = (px - minX) / spanX;
+          uvArr[vi * 2 + 1] = (pz - minZ) / spanZ;
+        } else if (plane === 0) {
+          uvArr[vi * 2]     = (pz - minZ) / spanZ;
+          uvArr[vi * 2 + 1] = (py - minY2) / spanY;
         } else {
-          uvArr[i] = px + 0.5;
-          uvArr[i + 1] = py;
+          uvArr[vi * 2]     = (px - minX) / spanX;
+          uvArr[vi * 2 + 1] = (py - minY2) / spanY;
         }
       }
     }
