@@ -11,7 +11,7 @@
     const maxRetries = typeof retries === 'number' ? retries : 3;
     let attempt = 0;
     function run() {
-      return fetch(url).then((r) => {
+      return fetch(url, { cache: 'no-cache' }).then((r) => {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
       }).catch((err) => {
@@ -28,7 +28,7 @@
   function loadPvData() {
     if (pvDataCache) return Promise.resolve(pvDataCache);
     if (pvDataPromise) return pvDataPromise;
-    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json', 3)
+    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json?v=20261126v', 3)
       .then((d) => {
         pvDataCache = d;
         return d;
@@ -150,21 +150,11 @@
       .then((d) => {
         // Tier 0 (critical): all 4 hero monitor frames
         Object.values(d.monitors || {}).forEach((m) => enqueueImg(m.src, true));
-        // Tier 1 (background): real-photo road textures, non-human signals/signs/houses & street props
+        // Tier 1 (background): Part I street corridor assets only (zero overlap with Part II!)
         const a = d.assets || {};
-        (a.roadTextures || []).forEach((x) => enqueueImg(x.src, false));
-        (a.signalsClean || a.signals || []).forEach((x) => enqueueImg(x.src, false));
-        (a.cars || []).forEach((x) => enqueueImg(x.src, false));
-        (a.poles || []).forEach((x) => enqueueImg(x.src, false));
-        (a.housesLow || []).forEach((x) => enqueueImg(x.src, false));
-        (a.signsClean || a.signs || []).forEach((x) => enqueueImg(x.src, false));
-        (a.concreteTextures || []).forEach((x) => enqueueImg(x.src, false));
-        (a.brickTextures || []).forEach((x) => enqueueImg(x.src, false));
-        (a.archTextures || []).forEach((x) => enqueueImg(x.src, false));
-        (a.towerThemes || []).forEach((th) => (th.items || []).forEach((x) => enqueueImg(x.src, false)));
         (a.buildings || []).forEach((x) => enqueueImg(x.src, false));
         (a.streets || []).forEach((x) => enqueueImg(x.src, false));
-        (a.screens || []).slice(0, 24).forEach((x) => enqueueImg(x.src, false));
+        (a.signsClean || a.signs || []).forEach((x) => enqueueImg(x.src, false));
         return d;
       })
       .catch(() => null);
@@ -438,9 +428,12 @@ class AgentRunResult:
     const fallenItems = (opts.fallenItems && opts.fallenItems.length) ? opts.fallenItems : [];
     const allItems = (opts.allItems && opts.allItems.length) ? opts.allItems : fallenItems;
     const freezeAt = typeof opts.freezeAt === 'number' ? opts.freezeAt : null;
+    const initialEditMode = Boolean(opts.editMode);
+    const clockCtrl = opts.clockCtrl || null;
 
     let maskEl = null;
     let stageEl = null;
+    let cleanupFn = null;
     let pendingPortal = null;
     let alive = true;
 
@@ -491,15 +484,20 @@ class AgentRunResult:
       },
       destroy() {
         alive = false;
+        if (cleanupFn) cleanupFn();
         if (maskEl && maskEl.parentNode) maskEl.remove();
       },
     };
 
     loadPvData().then((data) => {
       if (!data || !alive) return;
-      const mounted = mountScene(data, getElapsedSec, fallenItems, allItems, freezeAt, () => alive, pendingPortal);
+      const mounted = mountScene(
+        data, getElapsedSec, fallenItems, allItems, freezeAt,
+        () => alive, pendingPortal, initialEditMode, clockCtrl
+      );
       maskEl = mounted.mask;
       stageEl = mounted.stage;
+      cleanupFn = mounted.cleanup;
       if (pendingPortal !== null) {
         applyPortal(maskEl, stageEl, pendingPortal);
       }
@@ -508,7 +506,7 @@ class AgentRunResult:
     return controller;
   }
 
-  function mountScene(data, getElapsedSec, fallenItems, allItems, freezeAt, isAlive, initialPortal) {
+  function mountScene(data, getElapsedSec, fallenItems, allItems, freezeAt, isAlive, initialPortal, initialEditMode, clockCtrl) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     // Exact measured tempo of Cornelius - Mic Check.wav: 101.00 BPM (+-3ms across 16 bars!)
@@ -539,20 +537,12 @@ class AgentRunResult:
     monitorLayer.className = 'pv-monitor-layer';
     const tossLayer = document.createElement('div');
     tossLayer.className = 'pv-toss-layer';
-    const floodCanvas = document.createElement('canvas');
-    floodCanvas.className = 'pv-flood-canvas';
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    floodCanvas.width = Math.round(vw * dpr);
-    floodCanvas.height = Math.round(vh * dpr);
-    const floodCtx = floodCanvas.getContext('2d');
-    if (floodCtx) floodCtx.scale(dpr, dpr);
 
-    // Strict stacking: Street (10) -> Floor Text Z=0 homography UNDER monitor (15) -> Monitors (20) -> Tossed (30) -> Flood Climax (40)
+    // Strict stacking: Street (10) -> Floor Text Z=0 homography UNDER monitor (15) -> Monitors (20) -> Tossed (30) -> Part II WebGL (45)
     root.appendChild(corridorLayer);
     root.appendChild(floorTextLayer);
     root.appendChild(monitorLayer);
     root.appendChild(tossLayer);
-    root.appendChild(floodCanvas);
     mask.appendChild(root);
     document.body.appendChild(mask);
 
@@ -1011,27 +1001,16 @@ class AgentRunResult:
     }
 
     // ---------------------------------------------------------------------
-    // 4.8 BAR 17 "ONE! TWO! THREE! FOUR!" BEAT-ANTICIPATED WALL-TO-WALL FLOOD
-    //     -> SEAMLESS HANDOFF INTO 60FPS+ 3D SURREAL OBJECT-COLLAGE T-JUNCTION (BAR 18.1+)!
+    // 4.8 BAR 17.1 ("ONE! TWO! THREE! FOUR!", +38.020s) HANDOFF INTO
+    //     PURE-IMAGE JAPANESE EXPERIMENTAL ANIMATION (MicCheckSketch3D)
     // ---------------------------------------------------------------------
-    const T_FLOOD_BEAT1 = BAR * 16;         // +38.020s = EXACT Bar 17.1 ("ONE!")
-    const T_FLOOD_LEAD = 0.12;              // 120ms anticipation so tiles slam ON the vocal beat (not late!)
-    const T_FLOOD_START = T_FLOOD_BEAT1 - T_FLOOD_LEAD;
-    const T_SKETCH_START = BAR * 17;        // +40.396s = EXACT Bar 18.1 (top-down road -> 60fps rotating pull-up!)
+    const T_FLOOD_BEAT1 = BAR * 16; // +38.020s = EXACT Bar 17.1 ("ONE!")
 
-    function getFloodImage(rawUrl) {
-      const url = safeEncodeUrl(rawUrl);
-      if (decodedImgCache.has(url)) return decodedImgCache.get(url);
-      const im = new Image();
-      im.decoding = 'async';
-      attachImgWithRetry(im, url, 3);
-      decodedImgCache.set(url, im);
-      return im;
-    }
-
-    // Lazy-init WebGL 3D stage AFTER Beat-1 drum-drop physics & portal zoom finish
-    // so creating 200+ 3D CanvasTextures NEVER stalls the instant Beat-1 object drop!
+    // Lazy-init WebGL 3D stage AFTER Beat-1 drum-drop physics & Monitor 1 finish
     let sketch3d = null;
+    let editorCtrl = null;
+    let pendingOpenEditor = Boolean(initialEditMode);
+
     function ensureSketch3D(deferTextures) {
       if (sketch3d || !window.MicCheckSketch3D) return sketch3d;
       sketch3d = window.MicCheckSketch3D.create({
@@ -1040,250 +1019,60 @@ class AgentRunResult:
         vh,
         beatSec: BEAT,
         barSec: BAR,
-        startSec: T_SKETCH_START,
+        startSec: T_FLOOD_BEAT1,
         assets: data.assets,
         monitors: data.monitors,
         fallenItems: allItems,
         portfolioAssets: PORTFOLIO_ASSETS,
         kicks3d: data.kicks3d || [],
         cues3d: data.cues3d || {},
-        getImage: getFloodImage,
+        isFrozen: freezeAt !== null,
         deferTextures: Boolean(deferTextures),
       });
       return sketch3d;
     }
 
-    function makeCodeCardSprite(title, lines) {
-      const c = document.createElement('canvas');
-      c.width = 460;
-      c.height = 300;
-      const g = c.getContext('2d');
-      if (!g) return c;
-      g.fillStyle = '#000000';
-      g.fillRect(0, 0, c.width, c.height);
-      g.strokeStyle = 'rgba(255,255,255,0.68)';
-      g.lineWidth = 3;
-      g.strokeRect(2, 2, c.width - 4, c.height - 4);
-      g.fillStyle = '#ffffff';
-      g.font = '300 26px "Cormorant Garamond", "STFangsong", serif';
-      g.fillText(title, 18, 38);
-      g.strokeStyle = 'rgba(255,255,255,0.32)';
-      g.lineWidth = 1.5;
-      g.beginPath();
-      g.moveTo(16, 52);
-      g.lineTo(c.width - 16, 52);
-      g.stroke();
-      g.font = '300 15px ui-monospace, "SF Mono", Menlo, monospace';
-      lines.forEach((ln, idx) => {
-        g.fillText(ln, 18, 80 + idx * 24);
-      });
-      return c;
-    }
-
-    const satoCodeSprites = [
-      makeCodeCardSprite('SATOBOT · AGENT HARNESS', [
-        '# sato_runtime/memory_store.py',
-        'RETENTION_DAYS = {1: 3, 2: 14, 3: 60, 5: 720}',
-        'def memory_clarity(item, *, score, now):',
-        '    life_frac = max(0.0, expire - now) / span',
-        '    if score >= 0.42 and life_frac >= 0.30:',
-        '        return "clear"',
-        '    if score >= 0.24 and life_frac >= 0.08:',
-        '        return "faded"',
-        '    return "gone"  # local decay eviction',
-      ]),
-      makeCodeCardSprite('SATOBOT · THINK · ACT · OBSERVE', [
-        '# sato_runtime/agent_core.py · llm_harness.py',
-        '@dataclass',
-        'class AgentRunResult:',
-        '    actions: List[Dict[str, Any]]',
-        '    declined: bool = False  # <NO_REPLY> gate',
-        '    steps_used: int = 0',
-        '    tool_trace: List[str]',
-        '    obliged_missed: List[str]',
-        '# layered_context: summary+bigram+thread+raw',
-      ]),
-    ];
-
-    // Build balanced sprite sources for solid gap-sealing base + dense collage mid/top layers
-    const solidSources = [];
-    PORTFOLIO_ASSETS.forEach((url) => {
-      solidSources.push({ kind: 'plate', url, img: getFloodImage(url) });
-    });
-    satoCodeSprites.forEach((cnv) => {
-      solidSources.push({ kind: 'canvas', img: cnv, sw: cnv.width, sh: cnv.height });
-    });
-    streetsPool.forEach((m) => {
-      solidSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-    buildingsPool.forEach((m) => {
-      solidSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-
-    const accentSources = [];
-    Object.values(data.monitors || {}).forEach((m) => {
-      accentSources.push({ kind: 'plate', url: m.src, img: getFloodImage(m.src) });
-    });
-    accentSources.push({ kind: 'plate', url: './items/screens/016_cutout.png', img: getFloodImage('./items/screens/016_cutout.png') });
-    tossPool.forEach((m) => {
-      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-    signsPool.forEach((m) => {
-      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-    ((data.assets && data.assets.cars) || []).slice(0, 8).forEach((m) => {
-      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-    ((data.assets && data.assets.signals) || []).slice(0, 8).forEach((m) => {
-      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-    ((data.assets && data.assets.poles) || []).slice(0, 6).forEach((m) => {
-      accentSources.push({ kind: 'meta', meta: m, img: getFloodImage(m.src) });
-    });
-    PORTFOLIO_ASSETS.forEach((url) => {
-      accentSources.push({ kind: 'plate', url, img: getFloodImage(url) });
-    });
-    satoCodeSprites.forEach((cnv) => {
-      accentSources.push({ kind: 'canvas', img: cnv, sw: cnv.width, sh: cnv.height });
-    });
-
-    // Generate 3 overlapping jittered coverage grids (~204 tiles!) sorted strictly outer-perimeter -> dead-center
-    // so "ONE! TWO! THREE! FOUR!" packs the viewport from ALL 4 EDGES inward to 99.9%+ ZERO-GAP fullness!
-    const floodRng = makeRng(12342026);
-    const floodTiles = [];
-
-    function addCoveragePass(cols, rows, scaleMult, sourcePool, passLayer) {
-      if (!sourcePool.length) return;
-      const cellW = vw / cols;
-      const cellH = vh / rows;
-      let cursor = Math.floor(floodRng() * sourcePool.length);
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const tx = (c + 0.5 + (floodRng() - 0.5) * 0.62) * cellW;
-          const ty = (r + 0.5 + (floodRng() - 0.5) * 0.62) * cellH;
-          const nx = (tx / vw - 0.5) * 2; // [-1..+1]
-          const ny = (ty / vh - 0.5) * 2; // [-1..+1]
-          const edgeDist = Math.max(Math.abs(nx), Math.abs(ny)); // 1.0 = screen edges, 0.0 = dead center
-
-          // Determine nearest screen edge to fly inward from!
-          let sx = tx;
-          let sy = ty;
-          const targetMax = Math.max(cellW, cellH) * scaleMult * (0.88 + floodRng() * 0.34);
-          if (Math.abs(nx) >= Math.abs(ny)) {
-            sx = nx < 0 ? -targetMax * 0.72 : vw + targetMax * 0.72;
-            sy = ty + (floodRng() - 0.5) * cellH * 0.6;
-          } else {
-            sy = ny < 0 ? -targetMax * 0.72 : vh + targetMax * 0.72;
-            sx = tx + (floodRng() - 0.5) * cellW * 0.6;
-          }
-
-          const src = sourcePool[cursor % sourcePool.length];
-          cursor += 1 + Math.floor(floodRng() * 2);
-
-          floodTiles.push({
-            src,
-            passLayer,
-            edgeDist,
-            tx,
-            ty,
-            sx,
-            sy,
-            targetMax,
-            rot: (floodRng() - 0.5) * (passLayer === 0 ? 0.16 : 0.36),
-            tIn: 0,
-            inDur: 0.12 + floodRng() * 0.04,
-          });
-        }
+    function ensureEditor(openNow) {
+      if (!window.MicCheckEditor) return null;
+      const sk = ensureSketch3D(false);
+      if (!sk || !sk.editorApi) return null;
+      if (!editorCtrl) {
+        editorCtrl = window.MicCheckEditor.attach({
+          sketch3d: sk.editorApi,
+          clockCtrl,
+          initialOpen: Boolean(openNow),
+        });
+      } else if (openNow && !editorCtrl.isOpen()) {
+        editorCtrl.open();
       }
+      return editorCtrl;
     }
 
-    // Pass 0: Oversized solid base grid (9x6 = 54) -> seals 100% of background gaps wall-to-wall!
-    addCoveragePass(9, 6, 1.95, solidSources, 0);
-    // Pass 1: Dense mid collage grid (9x6 = 54) -> overlapping buildings, streets, & project plates
-    addCoveragePass(9, 6, 1.55, solidSources.concat(accentSources), 1);
-    // Pass 2: Rich foreground collage layer (10x6 = 60) -> intro items, monitors, signs, code cards, screenshots!
-    addCoveragePass(10, 6, 1.28, accentSources, 2);
-    // Pass 3: Extra perimeter frame sealers (36) -> ensures zero slivers along top/bottom/left/right screen rims!
-    for (let i = 0; i < 36; i++) {
-      const side = i % 4;
-      const frac = ((i >> 2) + 0.5) / 9;
-      const tx = side === 0 || side === 2 ? frac * vw : (side === 1 ? vw * 0.96 : vw * 0.04);
-      const ty = side === 1 || side === 3 ? frac * vh : (side === 0 ? vh * 0.04 : vh * 0.96);
-      const targetMax = Math.max(vw, vh) * (0.20 + floodRng() * 0.08);
-      const sx = side === 1 ? vw + targetMax * 0.7 : (side === 3 ? -targetMax * 0.7 : tx);
-      const sy = side === 2 ? vh + targetMax * 0.7 : (side === 0 ? -targetMax * 0.7 : ty);
-      const src = solidSources[(i * 3) % solidSources.length];
-      floodTiles.push({
-        src,
-        passLayer: 0,
-        edgeDist: 1.04 + floodRng() * 0.06,
-        tx,
-        ty,
-        sx,
-        sy,
-        targetMax,
-        rot: (floodRng() - 0.5) * 0.14,
-        tIn: 0,
-        inDur: 0.12,
-      });
-    }
-
-    // Assign strict outer-to-inner beat-anticipated entry timestamps across the 4 shouts:
-    // Every wave starts ~120ms early with tight 140ms burst + 120ms snap so tiles IMPACT DEAD-ON
-    // "ONE!" (+38.02s), "TWO!" (+38.61s), "THREE!" (+39.21s), and "FOUR!" (+39.80s)!
-    floodTiles.sort((a, b) => b.edgeDist - a.edgeDist);
-    const totalFloodCount = floodTiles.length;
-    for (let i = 0; i < totalFloodCount; i++) {
-      const tile = floodTiles[i];
-      const rank = i / Math.max(1, totalFloodCount - 1); // 0 = outermost edge, 1 = dead center
-      const waveIdx = Math.min(3, Math.floor(rank * 4));  // 0="ONE", 1="TWO", 2="THREE", 3="FOUR"
-      const waveLocal = rank * 4 - waveIdx;               // [0..1) inside each shout beat
-      const waveSpan = BEAT * 0.24; // Tight 142ms surge right onto the beat!
-      tile.tIn = (T_FLOOD_BEAT1 - T_FLOOD_LEAD) + waveIdx * BEAT + waveLocal * waveSpan;
-    }
-
-    // Draw order: Pass 0 solid sealers first, then Pass 1 mid, then Pass 2 foreground cutouts (stable outer->inner)
-    const floodDrawList = floodTiles.slice().sort((a, b) => (a.passLayer - b.passLayer) || (a.tIn - b.tIn));
-    let behindFloodCleared = false;
-    let floodPackedFinal = false;
-
-    function drawFloodTile(tile, cx, cy, rot, sc) {
-      const s = tile.src;
-      const im = s.img;
-      let sx = 0, sy = 0, sw = 0, sh = 0;
-      if (s.kind === 'canvas') {
-        sw = s.sw; sh = s.sh;
-      } else {
-        if (!im || !im.complete || !im.naturalWidth) return;
-        if (s.kind === 'meta' && s.meta) {
-          sx = s.meta.x0; sy = s.meta.y0; sw = s.meta.bw; sh = s.meta.bh;
-        } else {
-          sw = im.naturalWidth; sh = im.naturalHeight;
-        }
+    const onEditHotkey = (e) => {
+      if (e.code !== 'KeyE' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      e.preventDefault();
+      if (editorCtrl && editorCtrl.isOpen()) {
+        editorCtrl.close();
+        return;
       }
-      if (sw <= 0 || sh <= 0) return;
-      // Pass 0 uses geometric-mean sizing so even tall/wide assets seal 100% of cell width & height with ZERO gaps!
-      const refDim = tile.passLayer === 0 ? Math.sqrt(sw * sh) : Math.max(sw, sh);
-      const fit = tile.targetMax / refDim;
-      const dw = sw * fit * sc;
-      const dh = sh * fit * sc;
-      floodCtx.save();
-      floodCtx.translate(cx, cy);
-      if (rot) floodCtx.rotate(rot);
-      floodCtx.drawImage(im, sx, sy, sw, sh, -dw * 0.5, -dh * 0.5, dw, dh);
-      floodCtx.restore();
-    }
-
-    function paintFullPackedFlood() {
-      if (!floodCtx) return;
-      floodCtx.fillStyle = '#000000';
-      floodCtx.fillRect(0, 0, vw, vh);
-      for (let i = 0; i < floodDrawList.length; i++) {
-        const tile = floodDrawList[i];
-        drawFloodTile(tile, tile.tx, tile.ty, tile.rot, 1.0);
+      const curT = clockCtrl ? clockCtrl.getElapsedSec() : getElapsedSec();
+      if (curT < T_FLOOD_BEAT1 && clockCtrl && typeof clockCtrl.setElapsedSec === 'function') {
+        const jumpT = T_FLOOD_BEAT1 + 6.8;
+        if (typeof clockCtrl.setPlaying === 'function') clockCtrl.setPlaying(false);
+        clockCtrl.setElapsedSec(jumpT);
+        renderAt(jumpT);
       }
-      floodPackedFinal = true;
-    }
+      ensureSketch3D(false);
+      if (sketch3d) {
+        sketch3d.render(Math.max(T_FLOOD_BEAT1, clockCtrl ? clockCtrl.getElapsedSec() : curT));
+      }
+      ensureEditor(true);
+    };
+    window.addEventListener('keydown', onEditHotkey);
+
+    let part1Cleared = false;
 
     // ---------------------------------------------------------------------
     // 5. EVENT CURSORS & SILKY 60FPS RENDER LOOP
@@ -1430,84 +1219,71 @@ class AgentRunResult:
         g.el.style.transform = buildFloorTransform(u);
       }
 
-      // 5. Render Bar 17 "ONE! TWO! THREE! FOUR!" Wall-to-Wall Flood -> Seamless 3D Hand-Drawn Road Handoff (Bar 18.1+)!
-      if (floodCtx) {
-        if (t < T_FLOOD_START) {
-          if (floodCanvas.style.visibility !== 'hidden') {
-            floodCanvas.style.visibility = 'hidden';
-          }
-          // Preload all 15 low-poly white-model GLBs lazily after Beat-1 physics (t >= 10s)!
-          if (!glbPreloadStarted && t >= 10.0 && window.MicCheckGLB && window.THREE) {
-            glbPreloadStarted = true;
-            window.MicCheckGLB.preloadAll(window.THREE);
-          }
-          // Warm up 3D WebGL stage quietly starting at t >= 18s (well after Beat-1 physics & Monitor 1!)
-          if (t >= 18.0) ensureSketch3D(true);
-          if (sketch3d) sketch3d.render(t, floodCanvas);
-        } else if (t < T_SKETCH_START) {
-          ensureSketch3D(true);
-          if (sketch3d) sketch3d.render(t, floodCanvas);
-          if (floodCanvas.style.visibility !== 'visible') {
-            floodCanvas.style.visibility = 'visible';
-          }
-          if (!behindFloodCleared && t >= T_SKETCH_START - 0.16) {
-            behindFloodCleared = true;
-            corridorLayer.style.visibility = 'hidden';
-            floorTextLayer.style.visibility = 'hidden';
-            monitorLayer.style.visibility = 'hidden';
-            tossLayer.style.visibility = 'hidden';
-          }
-
-          floodCtx.clearRect(0, 0, vw, vh);
-          for (let i = 0; i < floodDrawList.length; i++) {
-            const tile = floodDrawList[i];
-            if (t < tile.tIn) continue;
-            const u = clamp((t - tile.tIn) / tile.inDur, 0, 1);
-            const ease = u >= 1 ? 1 : 1 - Math.pow(2, -10 * u);
-            const cx = tile.sx + (tile.tx - tile.sx) * ease;
-            const cy = tile.sy + (tile.ty - tile.sy) * ease;
-            const sc = 1.12 - 0.12 * ease;
-            drawFloodTile(tile, cx, cy, tile.rot, sc);
-          }
-        } else {
-          // Ensure floodCanvas has the 100%-packed final collage painted even if jumping directly via ?scene=pv&t=44!
-          if (!floodPackedFinal) {
-            paintFullPackedFlood();
-          }
-          if (!behindFloodCleared) {
-            behindFloodCleared = true;
-            corridorLayer.style.visibility = 'hidden';
-            floorTextLayer.style.visibility = 'hidden';
-            monitorLayer.style.visibility = 'hidden';
-            tossLayer.style.visibility = 'hidden';
-          }
-          ensureSketch3D(false);
-          if (sketch3d) {
-            sketch3d.render(t, floodCanvas);
-            if (floodCanvas.style.visibility !== 'hidden') {
-              floodCanvas.style.visibility = 'hidden';
-            }
+      // 5. Seamless Handoff RIGHT AT Bar 17.1 (First "ONE! TWO! THREE! FOUR!") into
+      //    Pure-Image Japanese Experimental Animation in #000000 Void (ZERO text/lines)!
+      if (t < T_FLOOD_BEAT1) {
+        // Warm up Part II engine quietly after Beat-1 physics & Monitor 1 finish!
+        if (t >= 18.0) ensureSketch3D(true);
+        if (sketch3d) sketch3d.render(t);
+      } else {
+        if (!part1Cleared) {
+          part1Cleared = true;
+          corridorLayer.style.visibility = 'hidden';
+          floorTextLayer.style.visibility = 'hidden';
+          monitorLayer.style.visibility = 'hidden';
+          tossLayer.style.visibility = 'hidden';
+          // Free Part I DOM layer nodes cleanly once Part II owns the stage
+          corridorLayer.textContent = '';
+          floorTextLayer.textContent = '';
+          tossLayer.textContent = '';
+          streetPieces.length = 0;
+          activeTosses.length = 0;
+          activeGlyphs.length = 0;
+        }
+        ensureSketch3D(false);
+        if (sketch3d) {
+          sketch3d.render(t);
+          if (pendingOpenEditor) {
+            pendingOpenEditor = false;
+            ensureEditor(true);
           }
         }
       }
     }
 
+    function cleanup() {
+      window.removeEventListener('keydown', onEditHotkey);
+      if (editorCtrl) {
+        editorCtrl.destroy();
+        editorCtrl = null;
+      }
+      if (sketch3d) {
+        sketch3d.destroy();
+        sketch3d = null;
+      }
+    }
+
+    let lastRenderedT = initialT;
     renderAt(initialT);
     if (freezeAt !== null) {
-      return { mask, stage: root };
+      return { mask, stage: root, cleanup };
     }
 
     function loop() {
       if (!isAlive()) return;
       const t = getElapsedSec();
-      renderAt(t);
-      if (t <= SCENE_END + 0.35) {
+      const pausedInEdit = Boolean(editorCtrl && editorCtrl.isOpen() && clockCtrl && !clockCtrl.isPlaying());
+      if (!pausedInEdit || Math.abs(t - lastRenderedT) > 1e-5) {
+        lastRenderedT = t;
+        renderAt(t);
+      }
+      if (t <= SCENE_END + 0.35 || (editorCtrl && editorCtrl.isOpen())) {
         requestAnimationFrame(loop);
       }
     }
 
     requestAnimationFrame(loop);
-    return { mask, stage: root };
+    return { mask, stage: root, cleanup };
   }
 
   window.MicCheckPV = { preload, start };

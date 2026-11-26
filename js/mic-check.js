@@ -271,7 +271,7 @@
   // - Beat 10 (+5.376s) -> Beat 15 (+8.362s): Exponential cinema dolly-in
   //   straight into the monitor's black LCD -> pure #000000 black
   // =========================================================================
-  function triggerDrumDrop(drumDropAtAudioTime, externalElapsedFn) {
+  function triggerDrumDrop(drumDropAtAudioTime, externalElapsedFn, audioCtrlMeta) {
     if (finaleStarted) return;
     finaleStarted = true;
     if (window.MicCheckPV) {
@@ -463,11 +463,46 @@
     const SUBSTEPS = 6;
 
     const fallbackStartMs = performance.now();
+    const pvAudioEl = audioCtrlMeta && audioCtrlMeta.audioEl ? audioCtrlMeta.audioEl : null;
+    const pvDropSec = audioCtrlMeta && typeof audioCtrlMeta.drumDropSec === 'number' ? audioCtrlMeta.drumDropSec : 1.648;
+    const drumClockCtrl = {
+      _playing: true,
+      _pausedSec: 0,
+      getElapsedSec() {
+        if (!drumClockCtrl._playing) return drumClockCtrl._pausedSec;
+        if (typeof externalElapsedFn === 'function') {
+          return Math.max(0, externalElapsedFn());
+        }
+        return (performance.now() - fallbackStartMs) / 1000;
+      },
+      setElapsedSec(sec) {
+        const clamped = Math.max(0, sec);
+        drumClockCtrl._pausedSec = clamped;
+        if (pvAudioEl) {
+          try { pvAudioEl.currentTime = Math.max(0, pvDropSec + clamped); } catch {}
+        }
+      },
+      isPlaying: () => drumClockCtrl._playing,
+      setPlaying(on) {
+        const next = Boolean(on);
+        if (next === drumClockCtrl._playing) return;
+        drumClockCtrl._playing = next;
+        if (!pvAudioEl) return;
+        if (next) {
+          try { pvAudioEl.currentTime = Math.max(0, pvDropSec + drumClockCtrl._pausedSec); } catch {}
+          pvAudioEl.play().catch(() => {});
+        } else {
+          drumClockCtrl._pausedSec = drumClockCtrl.getElapsedSec();
+          pvAudioEl.pause();
+        }
+      },
+      togglePlay() { drumClockCtrl.setPlaying(!drumClockCtrl.isPlaying()); return drumClockCtrl.isPlaying(); },
+      isMuted: () => Boolean(pvAudioEl && pvAudioEl.muted),
+      setMuted(m) { if (pvAudioEl) pvAudioEl.muted = Boolean(m); },
+    };
+
     function getAudioElapsed() {
-      if (typeof externalElapsedFn === 'function') {
-        return Math.max(0, externalElapsedFn());
-      }
-      return (performance.now() - fallbackStartMs) / 1000;
+      return drumClockCtrl.getElapsedSec();
     }
 
     // Mount live 3D vertical street corridor IMMEDIATELY behind 016_cutout.png's transparent window!
@@ -475,6 +510,7 @@
     if (window.MicCheckPV) {
       pvCtrl = window.MicCheckPV.start({
         getElapsedSec: getAudioElapsed,
+        clockCtrl: drumClockCtrl,
         fallenItems: entries.map((e) => e.imgMeta),
         allItems: allStageItems,
       });
@@ -896,7 +932,7 @@
         if (!voice.dropped && t >= drumDropSec) {
           voice.dropped = true;
           voice.keepPlaying = true; // keep 23.mp3 playing uninterrupted through entire PV!
-          triggerDrumDrop(null, () => Math.max(0, getMediaT() - drumDropSec));
+          triggerDrumDrop(null, () => Math.max(0, getMediaT() - drumDropSec), { audioEl, drumDropSec });
           return;
         }
         const progress = clamp(t / drumDropSec, 0, 1);
@@ -1036,50 +1072,104 @@
       if (!finaleStarted) preloadFinaleIfReady();
     }, 350);
 
-    // Optional direct PV scene inspection via URL query (?scene=pv&t=15.0[&freeze=1])
+    // Optional direct PV scene inspection / editor via URL query (?scene=pv&t=... [&freeze=1] [&edit=1])
     const qs = new URLSearchParams(window.location.search);
     if (qs.get('scene') === 'pv' && window.MicCheckPV) {
       finaleStarted = true;
-      const startT = parseFloat(qs.get('t') || '10.5');
-      const freeze = qs.get('freeze') === '1';
-      let wallT0 = performance.now();
-      let previewAudio = null;
-      let previewClock = null;
-      let previewDropSec = 1.648;
-      const getPreviewT = () => {
-        if (previewAudio && previewClock && !previewAudio.paused) {
-          return Math.max(0, previewClock() - previewDropSec);
-        }
-        return startT + (performance.now() - wallT0) / 1000;
+      const editMode = qs.get('edit') === '1';
+      const freeze = !editMode && qs.get('freeze') === '1';
+      const defaultStartT = editMode ? (38.01980198019802 + 6.8) : 10.5;
+      const parsedT = parseFloat(qs.get('t') || '');
+      const startT = Number.isFinite(parsedT) ? parsedT : defaultStartT;
+      const lastPhrase = phrases[phrases.length - 1];
+
+      const createTimelineClock = (initSec, phrase, startPaused) => {
+        const dropSec = (phrase && phrase.drumDropSec) || 1.648;
+        const audioUrl = phrase && phrase.audio;
+        if (audioUrl) preloadAudioBlob(audioUrl);
+        let playing = !startPaused;
+        let curSec = Math.max(0, initSec);
+        let wallPerfMs = performance.now();
+        let audioEl = null;
+        let mediaClock = null;
+        let muted = false;
+
+        const getElapsedSec = () => {
+          if (!playing) return curSec;
+          if (audioEl && mediaClock && !audioEl.paused) {
+            curSec = Math.max(0, mediaClock() - dropSec);
+            return curSec;
+          }
+          const nowMs = performance.now();
+          curSec += Math.max(0, (nowMs - wallPerfMs) / 1000);
+          wallPerfMs = nowMs;
+          return curSec;
+        };
+
+        const syncAudioStart = (offsetSec) => {
+          if (!audioUrl) return;
+          const a = getAudioEl(audioUrl);
+          audioEl = a;
+          try { a.currentTime = Math.max(0, dropSec + offsetSec); } catch {}
+          a.volume = 1.0;
+          a.muted = muted;
+          a.play().then(() => {
+            if (!playing) {
+              a.pause();
+              return;
+            }
+            mediaClock = makeSmoothMediaClock(a);
+          }).catch(() => {});
+        };
+
+        const setElapsedSec = (sec) => {
+          curSec = Math.max(0, sec);
+          wallPerfMs = performance.now();
+          if (audioEl) {
+            try { audioEl.currentTime = Math.max(0, dropSec + curSec); } catch {}
+          }
+        };
+
+        const setPlaying = (on) => {
+          const next = Boolean(on);
+          if (next === playing) return;
+          if (next) {
+            wallPerfMs = performance.now();
+            playing = true;
+            syncAudioStart(curSec);
+          } else {
+            curSec = getElapsedSec();
+            playing = false;
+            if (audioEl && !audioEl.paused) audioEl.pause();
+          }
+        };
+
+        return {
+          getElapsedSec,
+          setElapsedSec,
+          isPlaying: () => playing,
+          setPlaying,
+          togglePlay: () => { setPlaying(!playing); return playing; },
+          isMuted: () => muted,
+          setMuted: (m) => { muted = Boolean(m); if (audioEl) audioEl.muted = muted; },
+          syncAudioOnGesture: () => { if (playing) syncAudioStart(getElapsedSec()); },
+        };
       };
-      // In non-frozen preview mode, clicking anywhere starts synced native <audio> from 23.mp3
-      if (!freeze) {
-        const lastPhrase = phrases[phrases.length - 1];
-        if (lastPhrase && lastPhrase.audio) {
-          previewDropSec = lastPhrase.drumDropSec || 1.648;
-          preloadAudioBlob(lastPhrase.audio);
-          window.addEventListener(
-            'pointerdown',
-            () => {
-              const a = getAudioEl(lastPhrase.audio);
-              const curT = getPreviewT();
-              const offset = previewDropSec + curT;
-              try { a.currentTime = Math.max(0, offset); } catch {}
-              a.volume = 1.0;
-              a.muted = false;
-              a.play().then(() => {
-                previewAudio = a;
-                previewClock = makeSmoothMediaClock(a);
-              }).catch(() => {});
-            },
-            { once: true }
-          );
-        }
+
+      const clockCtrl = createTimelineClock(startT, lastPhrase, editMode || freeze);
+      if (!editMode && !freeze && lastPhrase && lastPhrase.audio) {
+        window.addEventListener(
+          'pointerdown',
+          () => clockCtrl.syncAudioOnGesture(),
+          { once: true }
+        );
       }
+
       window.MicCheckPV.preload().then(() => {
-        wallT0 = performance.now();
         window.MicCheckPV.start({
-          getElapsedSec: getPreviewT,
+          getElapsedSec: clockCtrl.getElapsedSec,
+          clockCtrl,
+          editMode,
           fallenItems: pickedItems,
           allItems: allStageItems,
           freezeAt: freeze ? startT : null,

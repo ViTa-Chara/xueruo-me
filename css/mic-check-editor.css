@@ -1,0 +1,415 @@
+/* =========================================================================
+   MIC CHECK — VISUAL 3D CAMERA PATH & MODEL POSITION EDITOR HUD
+   Scoped strictly to .mc-editor-root and body.mc-editor-active.
+   Normal playback mounts ZERO editor DOM and keeps pointer-events: none.
+   ========================================================================= */
+
+body.mc-editor-active .pv-portal-mask,
+body.mc-editor-active .pv-stage,
+body.mc-editor-active .pv-sketch3d-wrap {
+  pointer-events: auto;
+}
+
+.mc-editor-root {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  color: #e5e7eb;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mc-editor-root * {
+  box-sizing: border-box;
+}
+
+.mc-ed-topbar {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  background: rgba(10, 11, 15, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  pointer-events: auto;
+  overflow-x: auto;
+}
+
+.mc-ed-brand {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #38bdf8;
+  padding-right: 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+}
+
+.mc-ed-spacer {
+  flex: 1;
+}
+
+.mc-ed-btn {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.07);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.mc-ed-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.mc-ed-btn.active {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #f0f9ff;
+}
+
+.mc-ed-btn.warn {
+  background: rgba(251, 146, 60, 0.18);
+  border-color: rgba(251, 146, 60, 0.5);
+  color: #fed7aa;
+}
+
+.mc-ed-btn.danger {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fecaca;
+}
+
+.mc-ed-btn.gold {
+  background: rgba(253, 224, 71, 0.16);
+  border-color: rgba(253, 224, 71, 0.55);
+  color: #fef08a;
+}
+
+/* Live PiP Frame Overlay */
+.mc-ed-pip-frame {
+  position: fixed;
+  pointer-events: none;
+  border: 1px solid rgba(56, 189, 248, 0.72);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65);
+  border-radius: 4px;
+  display: none;
+}
+
+.mc-ed-pip-badge {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #38bdf8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+/* Right Inspector */
+.mc-ed-inspector {
+  position: absolute;
+  top: 58px;
+  right: 12px;
+  bottom: 92px;
+  width: 292px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 11, 15, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.mc-ed-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.mc-ed-tab {
+  appearance: none;
+  background: transparent;
+  color: #9ca3af;
+  border: none;
+  padding: 9px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.mc-ed-tab.active {
+  color: #f9fafb;
+  background: rgba(56, 189, 248, 0.10);
+  border-bottom-color: #38bdf8;
+}
+
+.mc-ed-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mc-ed-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mc-ed-list {
+  max-height: 158px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.mc-ed-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mc-ed-list-item:last-child {
+  border-bottom: none;
+}
+
+.mc-ed-list-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.mc-ed-list-item.selected {
+  background: rgba(56, 189, 248, 0.22);
+  color: #fde047;
+  font-weight: 600;
+}
+
+.mc-ed-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #93c5fd;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mc-ed-field {
+  display: grid;
+  grid-template-columns: 38px 1fr 58px;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.mc-ed-field-wide {
+  display: grid;
+  grid-template-columns: 62px 1fr 58px;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.mc-ed-axis-x { color: #f87171; font-weight: 700; }
+.mc-ed-axis-y { color: #4ade80; font-weight: 700; }
+.mc-ed-axis-z { color: #60a5fa; font-weight: 700; }
+
+.mc-ed-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f9fafb;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  padding: 3px 5px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mc-ed-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+.mc-ed-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+  outline: none;
+}
+
+.mc-ed-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+}
+
+.mc-ed-help {
+  padding: 7px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  font-size: 10px;
+  line-height: 1.45;
+  color: #9ca3af;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Bottom Timeline Bar */
+.mc-ed-timeline {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  height: 74px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(10, 11, 15, 0.90);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  pointer-events: auto;
+}
+
+.mc-ed-tl-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mc-ed-tl-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fde047;
+  min-width: 138px;
+}
+
+.mc-ed-stages {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.mc-ed-stage-pill {
+  flex: 1;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 4px;
+  padding: 3px 4px;
+  font-size: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mc-ed-stage-pill:hover {
+  background: rgba(56, 189, 248, 0.20);
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+.mc-ed-stage-pill.active {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.mc-ed-track {
+  position: relative;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  cursor: ew-resize;
+}
+
+.mc-ed-playhead {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: #f87171;
+  pointer-events: none;
+  transform: translateX(-1px);
+}
+
+.mc-ed-kf-diamond {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  background: #38bdf8;
+  border: 1px solid #0f172a;
+  transform: translate(-50%, -50%) rotate(45deg);
+  cursor: pointer;
+}
+
+.mc-ed-kf-diamond.selected {
+  background: #fde047;
+  width: 11px;
+  height: 11px;
+  z-index: 2;
+}
+
+.mc-ed-toast {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.94);
+  color: #fde047;
+  border: 1px solid rgba(253, 224, 71, 0.45);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.mc-ed-toast.show {
+  opacity: 1;
+}
