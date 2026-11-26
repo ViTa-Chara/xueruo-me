@@ -28,7 +28,7 @@
   function loadPvData() {
     if (pvDataCache) return Promise.resolve(pvDataCache);
     if (pvDataPromise) return pvDataPromise;
-    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json?v=20261126v', 3)
+    pvDataPromise = fetchJsonWithRetry('./data/mic_check_pv.json?v=20261126w', 3)
       .then((d) => {
         pvDataCache = d;
         return d;
@@ -1026,6 +1026,7 @@ class AgentRunResult:
         portfolioAssets: PORTFOLIO_ASSETS,
         kicks3d: data.kicks3d || [],
         cues3d: data.cues3d || {},
+        stereoCues: data.part2StereoCues || [],
         isFrozen: freezeAt !== null,
         deferTextures: Boolean(deferTextures),
       });

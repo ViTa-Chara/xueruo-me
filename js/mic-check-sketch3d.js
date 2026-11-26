@@ -2,7 +2,7 @@
   'use strict';
 
   // =========================================================================
-  // MIC CHECK — PART II: USER-CHOREOGRAPHED ALWAYS-ON HOLLOW PHOTO-SCULPTURES
+  // MIC CHECK — PART II: PROGRESSIVE HOLLOW COLLAGE + STEREO SOUND-STAGE + ALWAYS-ON
   // (Bar 17.1 "1, 2, 3, 4" -> Bar 52.1)
   //
   // Contract:
@@ -14,10 +14,12 @@
   //   5. OPENING 4 BEATS (Bar 17, 0.000s..2.376s): ZERO models visible; 4 images
   //      laid out Right -> Left across screen, switching off one per beat until
   //      the first "Mic Check" (2.376s) glides seamlessly into the 3D models.
-  //   6. ALL MODELS ALWAYS ON (age >= 2.376s): M1..M7 + orbiters + Rocket stay active
-  //      and visible simultaneously throughout the whole camera flight.
-  //   7. ZERO STATIC IMAGES: every single card continuously performs a gentle,
-  //      very slow 3D wiggle / orbital Brownian float (scale === (1,1,1), opacity === 1).
+  //   6. PER-MODEL COLLAGE FLY-IN + PERMANENT PERSISTENCE: each sculpture flies
+  //      in from outside the frustum and collages right on its choreographed cue,
+  //      then stays permanently visible & alive (NEVER destroyed / disposed!).
+  //   7. SLOW WIGGLE + STEREO RESPONSE: every image stays in gentle slow drift,
+  //      plus Left/Right/Center WAV stereo cues push images Left/Right or pull
+  //      toward center at per-image randomized speeds (scale === (1,1,1) ALWAYS).
   // =========================================================================
 
   const CHOREO_STORAGE_KEY = 'mic_check_part2_choreo_v2';
@@ -155,7 +157,7 @@
     return h00 * v0 + h10 * dt * m0 + h01 * v1 + h11 * dt * m1;
   }
 
-  // Calm, very slow 3-octave breathing positional wiggle (zero scale/rotation jitter)
+  // Calm, very slow 3-octave breathing positional wiggle
   const WIGGLE_FREQS = [0.31, 0.57, 0.93];
   function buildSlowWiggleParams(wRng, ampScale) {
     const rawW = [1.0, 0.56, 0.30];
@@ -239,6 +241,65 @@
     const BAR = opts.barSec || (BEAT * 4);
     const isFrozen = Boolean(opts.isFrozen);
     const T_START = opts.startSec;
+
+    const stereoCues = Array.isArray(opts.stereoCues)
+      ? opts.stereoCues.slice().sort((a, b) => a.t - b.t)
+      : [];
+    let stereoEnabled = true;
+    const activeStereoCues = [];
+    const stereoRng = makeRng(20261777);
+
+    function collectActiveStereoCues(age) {
+      activeStereoCues.length = 0;
+      if (!stereoEnabled || stereoCues.length === 0) return;
+      for (let i = 0; i < stereoCues.length; i++) {
+        const ev = stereoCues[i];
+        if (ev.t > age) break;
+        if (age <= ev.t + 1.75) {
+          activeStereoCues.push(ev);
+        }
+      }
+    }
+
+    const _stereoRel = new THREE.Vector3();
+    function applyStereoResponse(actor, age, camPose, entryWeight, mesh) {
+      if (!stereoEnabled || entryWeight <= 1e-4 || activeStereoCues.length === 0) return;
+      const st = actor.stereo;
+      if (!st) return;
+
+      let latSum = 0;
+      let centerSum = 0;
+      for (let i = 0; i < activeStereoCues.length; i++) {
+        const ev = activeStereoCues[i];
+        const dt = age - (ev.t + st.lag);
+        if (dt <= 0) continue;
+        const u = (dt * st.speed) / 0.115;
+        if (u > 11.0) continue;
+        const env = u * Math.exp(1.0 - u);
+        if (ev.dir === 'L') latSum -= env * ev.strength;
+        else if (ev.dir === 'R') latSum += env * ev.strength;
+        else centerSum += env * ev.strength;
+      }
+
+      if (Math.abs(latSum) < 1e-4 && centerSum < 1e-4) return;
+
+      const latShift = Math.tanh(latSum * 0.78) * 3.2 * st.amp * st.roleGain * entryWeight;
+      const centerPull = Math.tanh(centerSum * 0.74) * 0.21 * st.amp * st.roleGain * entryWeight;
+
+      let pullX = 0;
+      let pullY = 0;
+      if (centerPull > 1e-4) {
+        _stereoRel.copy(mesh.position).sub(camPose.pos);
+        const sx = _stereoRel.dot(camPose.right);
+        const sy = _stereoRel.dot(camPose.up);
+        pullX = clamp(-sx * centerPull, -5.5, 5.5);
+        pullY = clamp(-sy * centerPull, -4.5, 4.5);
+      }
+
+      mesh.position
+        .addScaledVector(camPose.right, latShift + pullX)
+        .addScaledVector(camPose.up, pullY + Math.abs(latShift) * st.vertBias * 0.22);
+    }
 
     function encodeUrl(url) {
       try { return encodeURI(decodeURI(url)); } catch (_) { return encodeURI(url); }
@@ -373,7 +434,7 @@
     }
 
     // =========================================================================
-    // 3. LUMINOUS RIGID HARD-PASTE SHADER + STREAMING PIPELINE (ALL 416 KEPT LIVE)
+    // 3. LUMINOUS RIGID HARD-PASTE SHADER + STREAMING PIPELINE (NEVER DISPOSED)
     // =========================================================================
     const VERT_SHADER = `
       varying vec2 vUv;
@@ -482,6 +543,13 @@
         isOpeningCard: Boolean(o.isOpeningCard),
         arenaId: o.arenaId || null,
         isKnockout,
+        stereo: {
+          speed: lerp(0.58, 1.68, stereoRng()),
+          amp: lerp(0.62, 1.55, stereoRng()),
+          lag: stereoRng() * 0.055,
+          vertBias: (stereoRng() - 0.5) * 0.52,
+          roleGain: o.isOrbiter ? 1.35 : (o.isOpeningCard ? 0.85 : 1.0),
+        },
         queued: false,
         imgReady: false,
         loaded: false,
@@ -651,19 +719,67 @@
     }
 
     // =========================================================================
-    // 4. TIMELINE & 8 ALWAYS-ON ARENAS (USING USER CHOREOGRAPHY DEFAULTS)
+    // 4. TIMELINE & 8 STAGGERED-COLLAGE ALWAYS-ON ARENAS
     // =========================================================================
     const T_MIC_CHECK = BAR * 1.0; // Exact first "Mic Check" downbeat (+2.376238s)
 
     const ARENA_SPECS = [
-      { id: 'M1_whale', label: 'M1 巨鲸', glb: './items/lowpoly/鲸鱼/whale.glb', count: 58, orbitCount: 10, seed: 1101, tEnter: 2.676, tExit: 9.188, heroAge: 6.8, modelSpan: 28.0, orbitRadius: 33.0 },
-      { id: 'M2_shark', label: 'M2 鲨鱼', glb: './items/lowpoly/鲨鱼/shark.glb', count: 56, orbitCount: 10, seed: 2202, tEnter: 14.200, tExit: 20.836, heroAge: 16.8, modelSpan: 28.0, orbitRadius: 32.0 },
-      { id: 'M3_cat', label: 'M3 巨猫', glb: './items/lowpoly/猫/cat.glb', count: 58, orbitCount: 10, seed: 3303, tEnter: 12.200, tExit: 27.965, heroAge: 25.0, modelSpan: 26.5, orbitRadius: 36.5 },
-      { id: 'M4_flamingo', label: 'M4 火烈鸟', glb: './items/lowpoly/火烈鸟/flamingo.glb', count: 54, orbitCount: 10, seed: 4404, tEnter: 30.003, tExit: 34.327, heroAge: 32.1, modelSpan: 27.5, orbitRadius: 38.0 },
-      { id: 'M5_beermug', label: 'M5 啤酒杯', glb: './items/lowpoly/啤酒/beer-mug.glb', count: 52, orbitCount: 10, seed: 5505, tEnter: 36.390, tExit: 39.768, heroAge: 39.0, modelSpan: 24.5, orbitRadius: 33.5 },
-      { id: 'M6_shuttlecock', label: 'M6 羽毛球', glb: './items/lowpoly/羽毛球/shuttlecock.glb', count: 52, orbitCount: 10, seed: 6606, tEnter: 44.766, tExit: 49.351, heroAge: 47.3, modelSpan: 25.5, orbitRadius: 33.0 },
-      { id: 'M7_chain', label: 'M7 金属锁链', glb: './items/lowpoly/金属锁链/chain.glb', count: 42, orbitCount: 8, seed: 7707, tEnter: 52.019, tExit: 57.968, heroAge: 55.8, modelSpan: 29.0, orbitRadius: 33.0 },
-      { id: 'FIN_rocket', label: 'FIN 照片火箭', glb: null, count: 40, orbitCount: 10, seed: 8808, tEnter: 59.815, tExit: 84.500, heroAge: 74.1, modelSpan: 30.0, orbitRadius: 42.0 },
+      {
+        id: 'M1_whale', label: 'M1 巨鲸', glb: './items/lowpoly/鲸鱼/whale.glb',
+        count: 58, orbitCount: 10, seed: 1101,
+        tEnter: 2.676, tExit: 9.188, heroAge: 6.8,
+        tAssembleStart: T_MIC_CHECK, tAssembleSpan: 0.85, lockMin: 0.72, lockMax: 1.05,
+        modelSpan: 28.0, orbitRadius: 33.0,
+      },
+      {
+        id: 'M2_shark', label: 'M2 鲨鱼', glb: './items/lowpoly/鲨鱼/shark.glb',
+        count: 56, orbitCount: 10, seed: 2202,
+        tEnter: 14.200, tExit: 20.836, heroAge: 16.8,
+        tAssembleStart: 13.40, tAssembleSpan: 2.10, lockMin: 1.05, lockMax: 1.45,
+        modelSpan: 28.0, orbitRadius: 32.0,
+      },
+      {
+        id: 'M3_cat', label: 'M3 巨猫', glb: './items/lowpoly/猫/cat.glb',
+        count: 58, orbitCount: 10, seed: 3303,
+        tEnter: 12.200, tExit: 27.965, heroAge: 25.0,
+        tAssembleStart: 10.60, tAssembleSpan: 1.75, lockMin: 1.05, lockMax: 1.40,
+        modelSpan: 26.5, orbitRadius: 36.5,
+      },
+      {
+        id: 'M4_flamingo', label: 'M4 火烈鸟', glb: './items/lowpoly/火烈鸟/flamingo.glb',
+        count: 54, orbitCount: 10, seed: 4404,
+        tEnter: 30.003, tExit: 34.327, heroAge: 32.1,
+        tAssembleStart: 28.80, tAssembleSpan: 2.00, lockMin: 1.00, lockMax: 1.35,
+        modelSpan: 27.5, orbitRadius: 38.0,
+      },
+      {
+        id: 'M5_beermug', label: 'M5 啤酒杯', glb: './items/lowpoly/啤酒/beer-mug.glb',
+        count: 52, orbitCount: 10, seed: 5505,
+        tEnter: 36.390, tExit: 39.768, heroAge: 39.0,
+        tAssembleStart: 35.10, tAssembleSpan: 1.95, lockMin: 0.95, lockMax: 1.35,
+        modelSpan: 24.5, orbitRadius: 33.5,
+      },
+      {
+        id: 'M6_shuttlecock', label: 'M6 羽毛球', glb: './items/lowpoly/羽毛球/shuttlecock.glb',
+        count: 52, orbitCount: 10, seed: 6606,
+        tEnter: 44.766, tExit: 49.351, heroAge: 47.3,
+        tAssembleStart: 42.40, tAssembleSpan: 2.75, lockMin: 1.05, lockMax: 1.45,
+        modelSpan: 25.5, orbitRadius: 33.0,
+      },
+      {
+        id: 'M7_chain', label: 'M7 金属锁链', glb: './items/lowpoly/金属锁链/chain.glb',
+        count: 42, orbitCount: 8, seed: 7707,
+        tEnter: 52.019, tExit: 57.968, heroAge: 55.8,
+        tAssembleStart: 50.80, tAssembleSpan: 2.70, lockMin: 1.10, lockMax: 1.50,
+        modelSpan: 29.0, orbitRadius: 33.0,
+      },
+      {
+        id: 'FIN_rocket', label: 'FIN 照片火箭', glb: null,
+        count: 40, orbitCount: 10, seed: 8808,
+        tEnter: 59.815, tExit: 84.500, heroAge: 74.1,
+        tAssembleStart: 58.60, tAssembleSpan: 6.20, lockMin: 2.40, lockMax: 3.60,
+        modelSpan: 30.0, orbitRadius: 42.0,
+      },
     ];
 
     const WORLD_UP = new THREE.Vector3(0, 1, 0);
@@ -807,12 +923,12 @@
           .addScaledVector(cp.up, dirY * 10);
       }
       const safeA = Math.max(aspect, 2.58);
-      const tanHalfV = Math.tan(deg(Math.max(cp.fov, 62) * 0.5));
+      const tanHalfV = Math.tan(deg((Math.max(cp.fov, 64) + 2.0) * 0.5));
       const halfH = depth * tanHalfV + rad;
       const halfW = depth * tanHalfV * safeA + rad;
 
-      const alreadyOutX = Math.abs(curX) > halfW * 1.15;
-      const alreadyOutY = Math.abs(curY) > halfH * 1.15;
+      const alreadyOutX = Math.abs(curX) > halfW * 1.18;
+      const alreadyOutY = Math.abs(curY) > halfH * 1.18;
       if (alreadyOutX || alreadyOutY) {
         return restPos.clone()
           .addScaledVector(cp.right, (curX >= 0 ? 1 : -1) * 9.0)
@@ -822,10 +938,10 @@
       let targetX = curX;
       let targetY = curY;
       if (Math.abs(dirX) >= Math.abs(dirY)) {
-        targetX = (dirX >= 0 ? 1 : -1) * (halfW * 1.15 + 4.0);
+        targetX = (dirX >= 0 ? 1 : -1) * (halfW * 1.18 + 4.0);
         targetY = curY + dirY * (halfH * 0.45);
       } else {
-        targetY = (dirY >= 0 ? 1 : -1) * (halfH * 1.15 + 4.0);
+        targetY = (dirY >= 0 ? 1 : -1) * (halfH * 1.18 + 4.0);
         targetX = curX + dirX * (halfW * 0.35);
       }
       return cp.pos.clone()
@@ -995,7 +1111,7 @@
     }
 
     // =========================================================================
-    // 7. ALWAYS-ON HOLLOW RIGID-45° SCULPTURES + SLOW WIGGLE + BROWNIAN ORBITERS
+    // 7. PER-MODEL STAGGERED COLLAGE FLY-IN + ALWAYS-ON SLOW WIGGLE + ORBITERS
     // =========================================================================
     const _tmpOrbLocal = new THREE.Vector3();
     const _tmpBrownian = new THREE.Vector3();
@@ -1005,7 +1121,7 @@
     const _tmpTarget = new THREE.Vector3();
 
     function evalOrbiterPos(sat, ar, age, outVec) {
-      const theta = sat.theta0 + sat.omega * (age - T_MIC_CHECK);
+      const theta = sat.theta0 + sat.omega * (age - ar.tAssembleStart);
       const r = sat.orbitR;
       const ox = Math.cos(theta) * r;
       const oz = Math.sin(theta) * r;
@@ -1086,10 +1202,10 @@
         const snapped = snapNormalTo3States(worldRawN);
         const restQuat = quatFromSnappedNormal(snapped);
 
-        const waveIn = ((k * 0.618034) % 1);
-        const tStart = T_MIC_CHECK + 0.06 + ar.index * 0.08 + waveIn * 0.45;
-        const tLock = tStart + 1.05;
-        const tEnd = 999.0; // Always ON permanently after Mic Check
+        const frac = orbiterItems.length > 1 ? k / (orbiterItems.length - 1) : 0;
+        const tStart = ar.tAssembleStart + (0.38 + 0.62 * frac) * ar.tAssembleSpan;
+        const tLock = tStart + lerp(ar.lockMin, ar.lockMax, 0.55);
+        const tEnd = 999.0; // Always ON permanently once collaged!
 
         const sat = {
           pw, ph,
@@ -1115,15 +1231,17 @@
           if (extraLiftFn) _tmpLivePos.y += extraLiftFn(age) * 0.35;
           if (editModeActive && showAllModels) {
             mesh.position.copy(_tmpLivePos);
-            return;
+            return 1.0;
           }
           if (age < sat.tLock) {
-            const p = easeOutCubic((age - sat.tStart) / Math.max(0.05, sat.tLock - sat.tStart));
+            const lin = clamp((age - sat.tStart) / Math.max(0.05, sat.tLock - sat.tStart), 0, 1);
+            const p = easeOutCubic(lin);
             mesh.position.lerpVectors(sat.inPos, _tmpLivePos, p);
             mesh.position.y += Math.sin(p * Math.PI) * sat.arcLiftIn;
-          } else {
-            mesh.position.copy(_tmpLivePos);
+            return lin;
           }
+          mesh.position.copy(_tmpLivePos);
+          return 1.0;
         }, { bright: 1.15, orientState: snapped.state, isOrbiter: true, arenaId: ar.id });
 
         ar.orbitCards.push(sat);
@@ -1248,7 +1366,7 @@
         });
       }
 
-      const isFirstModel = ar.index === 0;
+      const densityTotal = Math.max(1, N - backboneN);
 
       for (let i = 0; i < N; i++) {
         const pl = placements[i];
@@ -1289,13 +1407,18 @@
         const restQuat = quatFromSnappedNormal(snapped);
         const restPos = site.pos.clone().applyQuaternion(ar.liveQuat).add(ar.liveCenter).addScaledVector(snapped.n, pl.relief);
 
-        // ZERO models before T_MIC_CHECK; smooth staggered entry right at T_MIC_CHECK (2.376s), then ALWAYS ON!
-        const wave = ((i * 0.618034) % 1);
-        const tStart = isFirstModel
-          ? (T_MIC_CHECK + (i % 8) * 0.035)
-          : (T_MIC_CHECK + 0.08 + ar.index * 0.06 + wave * 0.42);
-        const tLock = tStart + (isFirstModel ? 0.85 : 1.05) + (i % 3) * 0.10;
-        const tEnd = 999.0;
+        // Staggered per-model collage fly-in aligned cleanly with user's camera arrival!
+        let startFrac;
+        if (pl.isPrimary) {
+          startFrac = (i / Math.max(1, backboneN - 1)) * 0.55;
+        } else {
+          const ci = i - backboneN;
+          startFrac = 0.45 + 0.55 * (ci / Math.max(1, densityTotal - 1));
+        }
+        const tStart = ar.tAssembleStart + startFrac * ar.tAssembleSpan;
+        const lockDur = lerp(ar.lockMin, ar.lockMax, (i * 0.618034) % 1);
+        const tLock = tStart + lockDur;
+        const tEnd = 999.0; // Stays permanently ON once collaged!
 
         const cpMid = getCameraPose(ar.heroAge);
         const relMid = restPos.clone().sub(cpMid.pos);
@@ -1329,15 +1452,17 @@
 
           if (editModeActive && showAllModels) {
             mesh.position.copy(_tmpTarget);
-            return;
+            return 1.0;
           }
           if (age < card.tLock) {
-            const p = easeOutCubic((age - card.tStart) / Math.max(0.05, card.tLock - card.tStart));
+            const lin = clamp((age - card.tStart) / Math.max(0.05, card.tLock - card.tStart), 0, 1);
+            const p = easeOutCubic(lin);
             mesh.position.lerpVectors(card.inPos, _tmpTarget, p);
             mesh.position.y += Math.sin(p * Math.PI) * card.arcLiftIn;
-          } else {
-            mesh.position.copy(_tmpTarget);
+            return lin;
           }
+          mesh.position.copy(_tmpTarget);
+          return 1.0;
         }, { bright: pl.bright, orientState: snapped.state, arenaId: ar.id });
 
         ar.mainCards.push(card);
@@ -1347,7 +1472,7 @@
     }
 
     // =========================================================================
-    // 8. BAR 17 RIGHT-TO-LEFT 4-BEAT OPENING + ALWAYS-ON FINALE PHOTO-ROCKET
+    // 8. BAR 17 RIGHT-TO-LEFT 4-BEAT OPENING + STAGGERED CONVERGING ROCKET
     // =========================================================================
     const openingItems = takeBatch(4);
     const modelBatches = ARENAS.slice(0, 7).map((ar) => takeBatch(ar.count));
@@ -1364,17 +1489,16 @@
       rocketRestItems.push(m);
     }
 
-    // 8A. Opening Bar 17: 4 images spread from Right -> Left, switching off one per beat
-    //     until the 4th beat / first "Mic Check" (T_MIC_CHECK = 2.376s) glides cleanly into the models!
+    // 8A. Opening Bar 17: 4 images spread Right -> Left, switching off one per beat
     const openingEntries = [];
     const cpOpen = getCameraPose(0);
     const openSnapped = snapNormalTo3States(cpOpen.fwd.clone().negate());
     const openQuat = quatFromSnappedNormal(openSnapped);
     const OPEN_SLOTS = [
-      { rx: +11.4, ry: +0.55 }, // Beat 1: Rightmost
-      { rx:  +3.8, ry: -0.45 }, // Beat 2: Mid-Right
-      { rx:  -3.8, ry: +0.45 }, // Beat 3: Mid-Left
-      { rx: -11.4, ry: -0.35 }, // Beat 4: Leftmost -> transitions into models at Mic Check!
+      { rx: +11.4, ry: +0.55 },
+      { rx:  +3.8, ry: -0.45 },
+      { rx:  -3.8, ry: +0.45 },
+      { rx: -11.4, ry: -0.35 },
     ];
 
     for (let i = 0; i < openingItems.length; i++) {
@@ -1423,14 +1547,15 @@
         if (entry.isLastSlot && age > entry.tHoldEnd) {
           const p = easeInCubic((age - entry.tHoldEnd) / Math.max(0.05, entry.tEnd - entry.tHoldEnd));
           mesh.position.lerpVectors(_tmpTarget, entry.outPos, p);
-        } else {
-          mesh.position.copy(_tmpTarget);
+          return clamp(1 - p, 0, 1);
         }
+        mesh.position.copy(_tmpTarget);
+        return 1.0;
       }, { bright: 1.15, orientState: openSnapped.state, isOpeningCard: true, arenaId: null });
       openingEntries.push(entry);
     }
 
-    // 8B. Always-On Finale Rocket (30 main pieces + 10 slow-Brownian orbiters = 40)
+    // 8B. Staggered-Converging Always-On Finale Rocket (30 main pieces + 10 slow-Brownian orbiters = 40)
     const finArena = ARENAS[7];
     const finBasis = {
       anchor: finArena.liveCenter.clone(),
@@ -1490,7 +1615,6 @@
 
     updateFinaleRocketWorldPoses(false);
 
-    // Split rocketRestItems into 10 slow-Brownian orbiters (cutouts first) & 26 main body parts
     const finCutouts = [];
     const finSolids = [];
     for (let i = 0; i < rocketRestItems.length; i++) {
@@ -1515,9 +1639,10 @@
       if (lg > maxEdge) { const k = maxEdge / lg; pw *= k; ph *= k; }
 
       const idxOrd = finPieces.length;
-      const tStart = T_MIC_CHECK + 0.35 + (idxOrd % 12) * 0.035;
-      const tLock = tStart + 1.15;
-      const tEnd = 999.0; // Always ON permanently
+      const frac = clamp(idxOrd / 29, 0, 1);
+      const tStart = finArena.tAssembleStart + frac * (finArena.tAssembleSpan * 0.90);
+      const tLock = tStart + lerp(finArena.lockMin, finArena.lockMax, ((idxOrd * 0.618034) % 1));
+      const tEnd = 999.0; // Always ON permanently once converged
       const relX = optsPart.relX || 0;
       const relY = optsPart.relY || 0;
       const relZ = optsPart.relZ || 0;
@@ -1554,14 +1679,16 @@
 
         if (editModeActive && showAllModels) {
           mesh.position.copy(_tmpTarget);
-          return;
+          return 1.0;
         }
         if (age < fp.tLock) {
-          const p = easeOutCubic((age - fp.tStart) / Math.max(0.05, fp.tLock - fp.tStart));
+          const lin = clamp((age - fp.tStart) / Math.max(0.05, fp.tLock - fp.tStart), 0, 1);
+          const p = easeOutCubic(lin);
           mesh.position.lerpVectors(fp.inPos, _tmpTarget, p);
-        } else {
-          mesh.position.copy(_tmpTarget);
+          return lin;
         }
+        mesh.position.copy(_tmpTarget);
+        return 1.0;
       }, { bright: optsPart.bright || 1.12, orientState: oState, arenaId: finArena.id });
 
       return fp.actor;
@@ -1688,6 +1815,7 @@
         openingCardCount,
         brownianOrbiterCount,
         alwaysOnModelActors,
+        stereoCueCount: stereoCues.length,
         sceneNonMeshChildren: sc.nonMesh,
         sceneLineChildren: sc.lines,
         hasFog: Boolean(scene.fog),
@@ -1793,7 +1921,7 @@
     };
 
     window.__MIC_CHECK_PART2_INSPECT_MOTION__ = () => {
-      // 1. Opening 4 beats check: ZERO models visible, R->L card progression
+      // 1. Opening 4 beats check: ZERO models visible, R->L progression
       const beatAges = [0.25, 0.85, 1.45, 2.05];
       const openingBeats = [];
       for (let b = 0; b < beatAges.length; b++) {
@@ -1817,7 +1945,21 @@
         openingBeats.push({ age, modelVis, openVis, ndcXsDesc: xs });
       }
 
-      // 2. Always-ON & Never-Static wiggle check across ALL 416 actors
+      // 2. Progressive model collage accumulation & permanent persistence check
+      const checkAges = [6.8, 13.0, 17.5, 32.5, 39.0, 47.3, 55.5, 70.5, 80.0];
+      const progressiveCounts = {};
+      checkAges.forEach((tTest) => {
+        let cnt = 0;
+        for (let i = 0; i < actors.length; i++) {
+          const a = actors[i];
+          if (a.arenaId != null && !a.disposed && tTest >= a.tStart && tTest <= a.tEnd) cnt++;
+        }
+        progressiveCounts['age_' + tTest] = cnt;
+      });
+
+      // 3. Always slow-wiggling check across ALL 416 actors (without stereo impulses)
+      const prevStereo = stereoEnabled;
+      stereoEnabled = false;
       let wiggleMovingCount = 0;
       let maxWiggleJump = 0;
       let minWiggleMove = Infinity;
@@ -1825,7 +1967,7 @@
       const pB = new THREE.Vector3();
       for (let i = 0; i < actors.length; i++) {
         const a = actors[i];
-        const t1 = a.isOpeningCard ? (i * BEAT + 0.08) : 20.0;
+        const t1 = a.isOpeningCard ? (i * BEAT + 0.08) : 72.0;
         const t2 = t1 + 0.45;
         a.behaviorFn(t1, a.mesh);
         pA.copy(a.mesh.position);
@@ -1837,53 +1979,93 @@
         if (dist > maxWiggleJump) maxWiggleJump = dist;
       }
 
-      // 3. Brownian Orbiters 3D non-collinear check
-      let totalOrbiters = 0;
-      let nonCollinearCount = 0;
-      for (let i = 0; i < ARENAS.length; i++) {
-        const ar = ARENAS[i];
-        for (let k = 0; k < ar.orbitCards.length; k++) {
-          const sat = ar.orbitCards[k];
-          totalOrbiters++;
-          const pts = [];
-          for (let s = 0; s < 5; s++) {
-            pts.push(evalOrbiterPos(sat, ar, 20.0 + s * 0.25, new THREE.Vector3()));
+      // 4. Stereo Sound-Stage Response Verification ('L', 'R', 'C')
+      const pickCue = (dir) => {
+        let best = null;
+        for (let i = 0; i < stereoCues.length; i++) {
+          const c = stereoCues[i];
+          if (c.t < 4.5 || c.t > 68.0 || c.dir !== dir) continue;
+          let prevOpp = -999;
+          for (let j = i - 1; j >= 0; j--) {
+            if (stereoCues[j].dir !== dir) { prevOpp = stereoCues[j].t; break; }
           }
-          const dirs = [];
-          for (let j = 1; j < pts.length; j++) {
-            const diff = pts[j].clone().sub(pts[j - 1]);
-            if (diff.length() > 1e-5) dirs.push(diff.normalize());
+          if (c.t - prevOpp >= 0.45 && (!best || c.strength > best.strength)) {
+            best = c;
           }
-          let maxTurn = 0;
-          for (let j = 1; j < dirs.length; j++) {
-            const turn = 1 - clamp(dirs[j].dot(dirs[j - 1]), -1, 1);
-            if (turn > maxTurn) maxTurn = turn;
-          }
-          if (maxTurn > 0.0015) nonCollinearCount++;
         }
-      }
+        if (best) return best;
+        return stereoCues.find((c) => c.t >= 4.5 && c.dir === dir) || null;
+      };
 
-      // 4. Always-ON count check across mid-sequence ages
-      const alwaysOnCounts = {};
-      [6.8, 25.0, 52.0, 74.1].forEach((tTest) => {
-        let cnt = 0;
+      const measureStereo = (dir) => {
+        const ev = pickCue(dir);
+        if (!ev) return null;
+        const tSample = ev.t + 0.14;
+        const cp = updateCamera(tSample);
+        const deltasR = [];
+        const radialDeltas = [];
+        const pOff = new THREE.Vector3();
+        const pOn = new THREE.Vector3();
+        const rel = new THREE.Vector3();
+
         for (let i = 0; i < actors.length; i++) {
           const a = actors[i];
-          if (a.arenaId != null && !a.disposed && tTest >= a.tStart && tTest <= a.tEnd) cnt++;
-        }
-        alwaysOnCounts['age_' + tTest] = cnt;
-      });
+          if (a.disposed || tSample < a.tStart + 0.35 || tSample > a.tEnd) continue;
 
+          stereoEnabled = false;
+          a.behaviorFn(tSample, a.mesh);
+          pOff.copy(a.mesh.position);
+
+          stereoEnabled = true;
+          collectActiveStereoCues(tSample);
+          const ew = a.behaviorFn(tSample, a.mesh);
+          applyStereoResponse(a, tSample, cp, ew, a.mesh);
+          pOn.copy(a.mesh.position);
+
+          const dr = pOn.clone().sub(pOff).dot(cp.right);
+          deltasR.push(dr);
+
+          rel.copy(pOff).sub(cp.pos);
+          const r0 = Math.hypot(rel.dot(cp.right), rel.dot(cp.up));
+          rel.copy(pOn).sub(cp.pos);
+          const r1 = Math.hypot(rel.dot(cp.right), rel.dot(cp.up));
+          radialDeltas.push(r1 - r0);
+        }
+
+        const n = Math.max(1, deltasR.length);
+        const meanR = deltasR.reduce((s, x) => s + x, 0) / n;
+        const varR = deltasR.reduce((s, x) => s + (x - meanR) * (x - meanR), 0) / n;
+        const meanRad = radialDeltas.reduce((s, x) => s + x, 0) / n;
+        const varRad = radialDeltas.reduce((s, x) => s + (x - meanRad) * (x - meanRad), 0) / n;
+
+        return {
+          cueT: ev.t,
+          strength: ev.strength,
+          sampleCount: deltasR.length,
+          meanDeltaRight: Number(meanR.toFixed(4)),
+          stdDeltaRight: Number(Math.sqrt(varR).toFixed(4)),
+          meanDeltaRadial: Number(meanRad.toFixed(4)),
+          stdDeltaRadial: Number(Math.sqrt(varRad).toFixed(4)),
+        };
+      };
+
+      const stereoStats = {
+        L: measureStereo('L'),
+        R: measureStereo('R'),
+        C: measureStereo('C'),
+      };
+
+      stereoEnabled = prevStereo;
+      collectActiveStereoCues(Math.max(0, lastRenderAge));
       if (lastRenderAge >= 0) updateCamera(lastRenderAge);
 
       return {
         openingBeats,
+        progressiveCounts,
         wiggleMovingCount,
         minWiggleMove: Number(minWiggleMove.toFixed(4)),
         maxWiggleJump: Number(maxWiggleJump.toFixed(4)),
-        totalOrbiters,
-        nonCollinearCount,
-        alwaysOnCounts,
+        stereoStats,
       };
     };
 
@@ -1902,7 +2084,9 @@
     function renderAtAge(age) {
       lastRenderAge = age;
       preloadAll();
-      flushReadyUploads(age, (isFrozen || editModeActive) ? 64 : 8);
+      const uploadQuota = (isFrozen || editModeActive) ? 64 : (age < T_MIC_CHECK ? 3 : 8);
+      flushReadyUploads(age, uploadQuota);
+      collectActiveStereoCues(age);
       const pose = updateCamera(age);
       const showAll = editModeActive && showAllModels;
 
@@ -1921,7 +2105,8 @@
           if (a.imgReady) uploadActorTexture(a);
           else enqueueActorFetch(a, true);
         }
-        a.behaviorFn(age, a.mesh);
+        const entryW = a.behaviorFn(age, a.mesh);
+        applyStereoResponse(a, age, pose, entryW, a.mesh);
         const show = a.loaded;
         a.mesh.visible = show;
         if (show) visibleNow++;
@@ -2131,7 +2316,7 @@
         }
         if (t >= T_START - 20.0) {
           preloadAll();
-          flushReadyUploads(0, 6);
+          flushReadyUploads(0, 2);
         }
         return false;
       }
