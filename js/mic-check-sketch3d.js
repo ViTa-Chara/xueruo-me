@@ -17,9 +17,12 @@
   //   6. PER-MODEL COLLAGE FLY-IN + PERMANENT PERSISTENCE: each sculpture flies
   //      in from outside the frustum and collages right on its choreographed cue,
   //      then stays permanently visible & alive (NEVER destroyed / disposed!).
-  //   7. SLOW WIGGLE + STEREO RESPONSE: every image stays in gentle slow drift,
-  //      plus Left/Right/Center WAV stereo cues push images Left/Right or pull
-  //      toward center at per-image randomized speeds (scale === (1,1,1) ALWAYS).
+  //   7. SLOW WIGGLE + 3-THIRDS ELASTIC STEREO STAGE: every image stays in gentle
+  //      slow drift, while the viewport is vertically split into 3 equal thirds:
+  //      Left third shifts LEFT on Left audio cues, Right third shifts RIGHT on
+  //      Right audio cues, Center third glides horizontally toward the vertical
+  //      centerline on "Mic Check" cues — all with silky fast-out / slow-return
+  //      elastic easing (scale === (1,1,1) ALWAYS).
   // =========================================================================
 
   const CHOREO_STORAGE_KEY = 'mic_check_part2_choreo_v2';
@@ -101,6 +104,36 @@
   function easeInCubic(t) {
     const x = clamp(t, 0, 1);
     return x * x * x;
+  }
+
+  function smoothStepRange(edge0, edge1, x) {
+    const denom = edge1 - edge0;
+    const t = clamp(Math.abs(denom) < 1e-6 ? (x >= edge1 ? 1 : 0) : (x - edge0) / denom, 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  // Silky C1 asymmetric elastic curve:
+  //   - Fast, smooth launch out (0 -> tPeak ≈ 0.145s / speed)
+  //   - Slow, liquid elastic return (~10x slower, ~1.45s decay with one gentle -7.7% cushion)
+  function evalElasticFastOutSlowReturn(dt, speed) {
+    if (dt <= 0) return 0;
+    const sp = clamp(speed || 1, 0.5, 2.0);
+    const tPeak = 0.145 / sp;
+    if (dt <= tPeak) {
+      const u = dt / tPeak;
+      const s = u * u * (3 - 2 * u);
+      return Math.pow(s, 0.58);
+    }
+    const tRet = 1.45 / Math.sqrt(sp);
+    const r = (dt - tPeak) / tRet;
+    if (r >= 2.6) return 0;
+    const damp = 2.35;
+    const omega = Math.PI * 0.92;
+    let val = Math.exp(-damp * r) * (Math.cos(omega * r) + (damp / omega) * Math.sin(omega * r));
+    if (r > 2.2) {
+      val *= (1 - smoothStepRange(2.2, 2.6, r));
+    }
+    return val;
   }
 
   function numArr3(v) {
@@ -255,7 +288,8 @@
       for (let i = 0; i < stereoCues.length; i++) {
         const ev = stereoCues[i];
         if (ev.t > age) break;
-        if (age <= ev.t + 1.75) {
+        // Full slow elastic return window (~4.55s worst case for speed=0.76 + lag=0.045s)
+        if (age <= ev.t + 4.75) {
           activeStereoCues.push(ev);
         }
       }
@@ -267,38 +301,62 @@
       const st = actor.stereo;
       if (!st) return;
 
-      let latSum = 0;
-      let centerSum = 0;
+      // Project live world position into screen NDC X to partition viewport vertically into 3 equal thirds
+      _stereoRel.copy(mesh.position).sub(camPose.pos);
+      const depth = _stereoRel.dot(camPose.fwd);
+      if (depth <= 0.25) return;
+
+      const sx = _stereoRel.dot(camPose.right);
+      const halfW = depth * Math.tan(deg(camPose.fov * 0.5)) * aspect;
+      const ndcX = sx / Math.max(0.01, halfW);
+
+      // Equal vertical thirds: [-1, -1/3], [-1/3, +1/3], [+1/3, +1] with +/-0.055 C1 boundary feather
+      const leftW = smoothStepRange(-0.278, -0.388, ndcX);
+      const rightW = smoothStepRange(+0.278, +0.388, ndcX);
+      const centerW = clamp(1.0 - leftW - rightW, 0, 1);
+
+      let lSum = 0;
+      let rSum = 0;
+      let cSum = 0;
       for (let i = 0; i < activeStereoCues.length; i++) {
         const ev = activeStereoCues[i];
+        if (ev.dir === 'L' && leftW <= 1e-4) continue;
+        if (ev.dir === 'R' && rightW <= 1e-4) continue;
+        if (ev.dir === 'C' && centerW <= 1e-4) continue;
         const dt = age - (ev.t + st.lag);
         if (dt <= 0) continue;
-        const u = (dt * st.speed) / 0.115;
-        if (u > 11.0) continue;
-        const env = u * Math.exp(1.0 - u);
-        if (ev.dir === 'L') latSum -= env * ev.strength;
-        else if (ev.dir === 'R') latSum += env * ev.strength;
-        else centerSum += env * ev.strength;
+        const env = evalElasticFastOutSlowReturn(dt, st.speed);
+        if (Math.abs(env) < 1e-4) continue;
+        const w = env * ev.strength;
+        if (ev.dir === 'L') lSum += w;
+        else if (ev.dir === 'R') rSum += w;
+        else cSum += w;
       }
 
-      if (Math.abs(latSum) < 1e-4 && centerSum < 1e-4) return;
+      if (Math.abs(lSum) < 1e-4 && Math.abs(rSum) < 1e-4 && Math.abs(cSum) < 1e-4) return;
 
-      const latShift = Math.tanh(latSum * 0.78) * 3.2 * st.amp * st.roleGain * entryWeight;
-      const centerPull = Math.tanh(centerSum * 0.74) * 0.21 * st.amp * st.roleGain * entryWeight;
+      const gain = st.amp * st.roleGain * entryWeight;
+      const depthScale = clamp(depth / 34.0, 0.55, 1.55);
 
-      let pullX = 0;
-      let pullY = 0;
-      if (centerPull > 1e-4) {
-        _stereoRel.copy(mesh.position).sub(camPose.pos);
-        const sx = _stereoRel.dot(camPose.right);
-        const sy = _stereoRel.dot(camPose.up);
-        pullX = clamp(-sx * centerPull, -5.5, 5.5);
-        pullY = clamp(-sy * centerPull, -4.5, 4.5);
+      // Left third glides LEFT (-camPose.right) on Left cues only
+      const leftShift = leftW > 1e-4
+        ? -Math.tanh(lSum * 0.88) * 3.6 * gain * depthScale * leftW
+        : 0;
+      // Right third glides RIGHT (+camPose.right) on Right cues only
+      const rightShift = rightW > 1e-4
+        ? +Math.tanh(rSum * 0.88) * 3.6 * gain * depthScale * rightW
+        : 0;
+      // Center third glides horizontally toward the vertical center axis (x = 0) on Mic Check cues only
+      let centerShift = 0;
+      if (centerW > 1e-4 && Math.abs(cSum) > 1e-4) {
+        const pullFrac = Math.tanh(cSum * 0.90) * 0.42 * gain * centerW;
+        centerShift = clamp(-sx * pullFrac, -5.2, 5.2);
       }
 
-      mesh.position
-        .addScaledVector(camPose.right, latShift + pullX)
-        .addScaledVector(camPose.up, pullY + Math.abs(latShift) * st.vertBias * 0.22);
+      const totalRightShift = leftShift + rightShift + centerShift;
+      if (Math.abs(totalRightShift) > 1e-5) {
+        mesh.position.addScaledVector(camPose.right, totalRightShift);
+      }
     }
 
     function encodeUrl(url) {
@@ -544,11 +602,10 @@
         arenaId: o.arenaId || null,
         isKnockout,
         stereo: {
-          speed: lerp(0.58, 1.68, stereoRng()),
-          amp: lerp(0.62, 1.55, stereoRng()),
-          lag: stereoRng() * 0.055,
-          vertBias: (stereoRng() - 0.5) * 0.52,
-          roleGain: o.isOrbiter ? 1.35 : (o.isOpeningCard ? 0.85 : 1.0),
+          speed: lerp(0.76, 1.32, stereoRng()),
+          amp: lerp(0.78, 1.32, stereoRng()),
+          lag: stereoRng() * 0.045,
+          roleGain: o.isOrbiter ? 1.22 : (o.isOpeningCard ? 0.85 : 1.0),
         },
         queued: false,
         imgReady: false,
@@ -1979,80 +2036,173 @@
         if (dist > maxWiggleJump) maxWiggleJump = dist;
       }
 
-      // 4. Stereo Sound-Stage Response Verification ('L', 'R', 'C')
-      const pickCue = (dir) => {
-        let best = null;
-        for (let i = 0; i < stereoCues.length; i++) {
-          const c = stereoCues[i];
-          if (c.t < 4.5 || c.t > 68.0 || c.dir !== dir) continue;
-          let prevOpp = -999;
-          for (let j = i - 1; j >= 0; j--) {
-            if (stereoCues[j].dir !== dir) { prevOpp = stereoCues[j].t; break; }
-          }
-          if (c.t - prevOpp >= 0.45 && (!best || c.strength > best.strength)) {
-            best = c;
-          }
-        }
-        if (best) return best;
-        return stereoCues.find((c) => c.t >= 4.5 && c.dir === dir) || null;
+      // 4. 3-Vertical-Thirds Elastic Stereo Response Verification ('L', 'R', 'C')
+      // 4A. Asymmetric elastic curve profile ("去得快，回来的慢")
+      const curveProfile = {
+        at0_05s: Number(evalElasticFastOutSlowReturn(0.05, 1.0).toFixed(4)),
+        at0_145s_peak: Number(evalElasticFastOutSlowReturn(0.145, 1.0).toFixed(4)),
+        at0_55s_returning: Number(evalElasticFastOutSlowReturn(0.55, 1.0).toFixed(4)),
+        at1_00s_returning: Number(evalElasticFastOutSlowReturn(1.00, 1.0).toFixed(4)),
+        at1_72s_cushion: Number(evalElasticFastOutSlowReturn(1.72, 1.0).toFixed(4)),
+        at3_95s_settled: Number(evalElasticFastOutSlowReturn(3.95, 1.0).toFixed(4)),
       };
 
-      const measureStereo = (dir) => {
-        const ev = pickCue(dir);
-        if (!ev) return null;
-        const tSample = ev.t + 0.14;
-        const cp = updateCamera(tSample);
-        const deltasR = [];
-        const radialDeltas = [];
+      // 4B. Strict single-cue 3-thirds isolation audit (ensuring ZERO cross-third bleeding)
+      const measureIsolatedThirds = (dir, testAge) => {
+        const cueT = testAge - 0.16;
+        const cp = updateCamera(testAge);
+        const tanHalf = Math.tan(deg(cp.fov * 0.5));
+        const zones = {
+          left: { dr: [], dAbsX: [], dy: [] },
+          center: { dr: [], dAbsX: [], dy: [] },
+          right: { dr: [], dAbsX: [], dy: [] },
+        };
         const pOff = new THREE.Vector3();
         const pOn = new THREE.Vector3();
         const rel = new THREE.Vector3();
 
+        const savedActive = activeStereoCues.slice();
+        activeStereoCues.length = 0;
+        activeStereoCues.push({ t: cueT, dir, pan: dir === 'L' ? -0.5 : (dir === 'R' ? 0.5 : 0), strength: 0.95 });
+
         for (let i = 0; i < actors.length; i++) {
           const a = actors[i];
-          if (a.disposed || tSample < a.tStart + 0.35 || tSample > a.tEnd) continue;
+          if (a.disposed || testAge < a.tStart + 0.35 || testAge > a.tEnd) continue;
 
           stereoEnabled = false;
-          a.behaviorFn(tSample, a.mesh);
+          const ew = a.behaviorFn(testAge, a.mesh);
           pOff.copy(a.mesh.position);
 
+          rel.copy(pOff).sub(cp.pos);
+          const depth = rel.dot(cp.fwd);
+          if (depth <= 0.5) continue;
+          const sx0 = rel.dot(cp.right);
+          const sy0 = rel.dot(cp.up);
+          const ndcX = sx0 / Math.max(0.01, depth * tanHalf * aspect);
+          if (Math.abs(ndcX) > 1.05) continue;
+
+          let bucket = null;
+          if (ndcX <= -0.39) bucket = zones.left;
+          else if (ndcX >= +0.39) bucket = zones.right;
+          else if (Math.abs(ndcX) <= 0.27) bucket = zones.center;
+          if (!bucket) continue;
+
           stereoEnabled = true;
-          collectActiveStereoCues(tSample);
-          const ew = a.behaviorFn(tSample, a.mesh);
-          applyStereoResponse(a, tSample, cp, ew, a.mesh);
+          a.mesh.position.copy(pOff);
+          applyStereoResponse(a, testAge, cp, ew, a.mesh);
           pOn.copy(a.mesh.position);
 
-          const dr = pOn.clone().sub(pOff).dot(cp.right);
-          deltasR.push(dr);
-
-          rel.copy(pOff).sub(cp.pos);
-          const r0 = Math.hypot(rel.dot(cp.right), rel.dot(cp.up));
           rel.copy(pOn).sub(cp.pos);
-          const r1 = Math.hypot(rel.dot(cp.right), rel.dot(cp.up));
-          radialDeltas.push(r1 - r0);
+          const sx1 = rel.dot(cp.right);
+          const sy1 = rel.dot(cp.up);
+
+          bucket.dr.push(sx1 - sx0);
+          bucket.dAbsX.push(Math.abs(sx1) - Math.abs(sx0));
+          bucket.dy.push(Math.abs(sy1 - sy0));
         }
 
-        const n = Math.max(1, deltasR.length);
-        const meanR = deltasR.reduce((s, x) => s + x, 0) / n;
-        const varR = deltasR.reduce((s, x) => s + (x - meanR) * (x - meanR), 0) / n;
-        const meanRad = radialDeltas.reduce((s, x) => s + x, 0) / n;
-        const varRad = radialDeltas.reduce((s, x) => s + (x - meanRad) * (x - meanRad), 0) / n;
+        activeStereoCues.length = 0;
+        for (let k = 0; k < savedActive.length; k++) activeStereoCues.push(savedActive[k]);
 
+        const summarize = (b) => {
+          const n = b.dr.length;
+          if (n === 0) return { count: 0, meanDeltaRight: 0, stdDeltaRight: 0, meanDeltaAbsX: 0, maxAbsRight: 0, maxAbsY: 0 };
+          const meanR = b.dr.reduce((s, x) => s + x, 0) / n;
+          const varR = b.dr.reduce((s, x) => s + (x - meanR) * (x - meanR), 0) / n;
+          const meanAbsX = b.dAbsX.reduce((s, x) => s + x, 0) / n;
+          const maxAbsR = b.dr.reduce((m, x) => Math.max(m, Math.abs(x)), 0);
+          const maxAbsY = b.dy.reduce((m, x) => Math.max(m, x), 0);
+          return {
+            count: n,
+            meanDeltaRight: Number(meanR.toFixed(4)),
+            stdDeltaRight: Number(Math.sqrt(varR).toFixed(4)),
+            meanDeltaAbsX: Number(meanAbsX.toFixed(4)),
+            maxAbsRight: Number(maxAbsR.toFixed(4)),
+            maxAbsY: Number(maxAbsY.toFixed(4)),
+          };
+        };
+
+        return {
+          dir,
+          testAge,
+          left: summarize(zones.left),
+          center: summarize(zones.center),
+          right: summarize(zones.right),
+        };
+      };
+
+      // 4C. Live cue-driven verification from real data/mic_check_pv.json part2StereoCues
+      const pickRealCue = (dir) => {
+        const candidates = stereoCues.filter((c) => c.dir === dir && c.t >= 4.5 && c.t <= 68.0);
+        if (candidates.length === 0) return stereoCues.find((c) => c.dir === dir) || null;
+        return candidates[Math.min(candidates.length - 1, Math.floor(candidates.length * 0.5))];
+      };
+      const measureRealCue = (dir) => {
+        const ev = pickRealCue(dir);
+        if (!ev) return null;
+        const tPeak = ev.t + 0.16;
+        const tSlow = ev.t + 0.85;
+        const sampleZoneShift = (tSample) => {
+          const cp = updateCamera(tSample);
+          const tanHalf = Math.tan(deg(cp.fov * 0.5));
+          const pOff = new THREE.Vector3();
+          const pOn = new THREE.Vector3();
+          const rel = new THREE.Vector3();
+          const vals = [];
+          for (let i = 0; i < actors.length; i++) {
+            const a = actors[i];
+            if (a.disposed || tSample < a.tStart + 0.35 || tSample > a.tEnd) continue;
+            stereoEnabled = false;
+            const ew = a.behaviorFn(tSample, a.mesh);
+            pOff.copy(a.mesh.position);
+            rel.copy(pOff).sub(cp.pos);
+            const depth = rel.dot(cp.fwd);
+            if (depth <= 0.5) continue;
+            const sx0 = rel.dot(cp.right);
+            const ndcX = sx0 / Math.max(0.01, depth * tanHalf * aspect);
+            if (Math.abs(ndcX) > 1.05) continue;
+            const inTarget = (dir === 'L' && ndcX <= -0.39) || (dir === 'R' && ndcX >= +0.39) || (dir === 'C' && Math.abs(ndcX) <= 0.27);
+            if (!inTarget) continue;
+            stereoEnabled = true;
+            collectActiveStereoCues(tSample);
+            a.mesh.position.copy(pOff);
+            applyStereoResponse(a, tSample, cp, ew, a.mesh);
+            pOn.copy(a.mesh.position);
+            const sx1 = pOn.clone().sub(cp.pos).dot(cp.right);
+            vals.push(dir === 'C' ? (Math.abs(sx1) - Math.abs(sx0)) : (sx1 - sx0));
+          }
+          const n = vals.length;
+          return {
+            count: n,
+            meanMetric: n ? Number((vals.reduce((s, x) => s + x, 0) / n).toFixed(4)) : 0,
+          };
+        };
         return {
           cueT: ev.t,
           strength: ev.strength,
-          sampleCount: deltasR.length,
-          meanDeltaRight: Number(meanR.toFixed(4)),
-          stdDeltaRight: Number(Math.sqrt(varR).toFixed(4)),
-          meanDeltaRadial: Number(meanRad.toFixed(4)),
-          stdDeltaRadial: Number(Math.sqrt(varRad).toFixed(4)),
+          atPeak: sampleZoneShift(tPeak),
+          atSlowReturn: sampleZoneShift(tSlow),
         };
       };
 
       const stereoStats = {
-        L: measureStereo('L'),
-        R: measureStereo('R'),
-        C: measureStereo('C'),
+        cueCounts: {
+          total: stereoCues.length,
+          L: stereoCues.filter((c) => c.dir === 'L').length,
+          R: stereoCues.filter((c) => c.dir === 'R').length,
+          C: stereoCues.filter((c) => c.dir === 'C').length,
+        },
+        curveProfile,
+        isolatedThirds: {
+          L: measureIsolatedThirds('L', 55.5),
+          R: measureIsolatedThirds('R', 55.5),
+          C: measureIsolatedThirds('C', 55.5),
+        },
+        realCues: {
+          L: measureRealCue('L'),
+          R: measureRealCue('R'),
+          C: measureRealCue('C'),
+        },
       };
 
       stereoEnabled = prevStereo;
